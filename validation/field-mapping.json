@@ -1,0 +1,4343 @@
+{
+  "_metadata": {
+    "description": "Maps human-readable field labels (from calculator.aws UI) to internal API field IDs used by the AWS Pricing Calculator API. Derived from saved estimates at d3knqfixx3sbls.cloudfront.net and calculator.aws service definitions.",
+    "generated_from": "https://d3knqfixx3sbls.cloudfront.net/66abf4cd1eacf67cbbdd1cb516e76e890b30fdcb",
+    "date": "2026-05-11",
+    "notes": "fieldId values are the keys in calculationComponents. Fields prefixed with _autosuggest: or _radio are special UI interaction types handled by the FieldProcessor. version is from the CDN service definition. defaultValue is the sensible default for API submission. allowedValues lists valid options for dropdown/radio fields. unit specifies the API unit format.",
+    "cdn_manifest": "https://d1qsjq9pzbk1k6.cloudfront.net/manifest/en_US.json",
+    "service_definitions": "https://d1qsjq9pzbk1k6.cloudfront.net/data/{serviceCode}/en_US.json"
+  },
+  "AWS Amplify": {
+    "serviceCode": "awsAmplify",
+    "estimateFor": "awsAmplify",
+    "fields": {
+      "Number of build minutes": {
+        "fieldId": "numberOfBuildMinutes",
+        "type": "input"
+      },
+      "Data stored per month": {
+        "fieldId": "dataStoredPerMonth",
+        "type": "input"
+      },
+      "Data served per month": {
+        "fieldId": "dataServedPerMonth",
+        "type": "input"
+      },
+      "Number of SSR requests": {
+        "fieldId": "numberOfSsrRequests",
+        "type": "input"
+      },
+      "Duration of each request (in ms)": {
+        "fieldId": "durationOfEachRequestInMs",
+        "type": "input"
+      }
+    },
+    "version": "0.0.43"
+  },
+  "AWS App Runner": {
+    "serviceCode": "awsAppRunner",
+    "estimateFor": "AppRunner",
+    "fields": {
+      "Concurrency": {
+        "fieldId": "concurrency",
+        "type": "input"
+      },
+      "Minimum provisioned container instances": {
+        "fieldId": "minimumProvisionedContainerInstances",
+        "type": "input"
+      },
+      "Peak traffic hours": {
+        "fieldId": "peakTrafficHours",
+        "type": "input"
+      },
+      "Number of requests during peak traffic (requests/second)": {
+        "fieldId": "numberOfRequestsDuringPeakTrafficRequestssec",
+        "type": "input"
+      },
+      "Number of requests during off-peak traffic (requests/second)": {
+        "fieldId": "numberOfRequestsDuringOffpeakTrafficRequests",
+        "type": "input"
+      }
+    },
+    "version": "0.0.54"
+  },
+  "AWS AppSync": {
+    "serviceCode": "awsAppSync",
+    "estimateFor": "appSyncApiCall",
+    "fields": {
+      "Number of API Requests": {
+        "fieldId": "numberOfApiRequests",
+        "type": "input"
+      },
+      "Enter Amount": {
+        "fieldId": "enterAmount",
+        "type": "input"
+      }
+    },
+    "version": "0.0.66"
+  },
+  "AWS Application Migration Service": {
+    "serviceCode": "awsApplicationMigrationService",
+    "estimateFor": "template",
+    "fields": {
+      "Number of server/s": {
+        "fieldId": "numberOfServers",
+        "type": "input"
+      },
+      "Number of hour/s per server": {
+        "fieldId": "numberOfHoursPerServer",
+        "type": "input"
+      }
+    },
+    "version": "0.0.34"
+  },
+  "AWS Audit Manager": {
+    "serviceCode": "awsAuditManager",
+    "estimateFor": "template_auditmanager",
+    "fields": {
+      "Number of accounts": {
+        "fieldId": "numberOfAccounts",
+        "type": "input"
+      },
+      "Number of resources per account": {
+        "fieldId": "numberOfResourcesPerAccount",
+        "type": "input"
+      },
+      "Number of configuration snapshots (API calls)": {
+        "fieldId": "numberOfConfigurationSnapshotsApiCalls",
+        "type": "input"
+      },
+      "Number of configuration changes/user activity logs (Cloudtrail)": {
+        "fieldId": "numberOfConfigurationChangesuserActivityLogs",
+        "type": "input"
+      },
+      "Number of compliance checks (Security Hub, Config)": {
+        "fieldId": "numberOfComplianceChecksSecurityHubConfig",
+        "type": "input"
+      }
+    },
+    "version": "0.0.86"
+  },
+  "AWS B2B Data Interchange": {
+    "serviceCode": "awsB2BDataInterchange",
+    "estimateFor": "template",
+    "fields": {
+      "Number of partnerships": {
+        "fieldId": "numberOfPartnerships",
+        "type": "input"
+      },
+      "Number of transformation steps per month": {
+        "fieldId": "numberOfTransformationStepsPerMonth",
+        "type": "input"
+      }
+    },
+    "version": "0.0.26"
+  },
+  "AWS Backup": {
+    "serviceCode": "awsBackup",
+    "estimateFor": "awsBackupSelector",
+    "fields": {
+      "Amount of primary data to be backed up": {
+        "fieldId": "primaryDataGB",
+        "type": "input",
+        "unit_field": "primaryDataGB_unit",
+        "default_unit": "gb|NA"
+      },
+      "Estimated daily change of primary data": {
+        "fieldId": "dailyChangePct",
+        "type": "input",
+        "notes": "Percentage value"
+      },
+      "Daily backups warm retention period": {
+        "fieldId": "dailyWarmRetention",
+        "type": "input",
+        "unit_field": "dailyWarmRetention_unit",
+        "default_unit": "days"
+      },
+      "Weekly backups warm retention period": {
+        "fieldId": "weeklyWarmRetention",
+        "type": "input",
+        "unit_field": "weeklyWarmRetention_unit",
+        "default_unit": "weeks"
+      },
+      "Monthly backups warm retention period": {
+        "fieldId": "monthlyWarmRetention",
+        "type": "input",
+        "unit_field": "monthlyWarmRetention_unit",
+        "default_unit": "months"
+      }
+    },
+    "version": "0.0.101"
+  },
+  "AWS Certificate Manager": {
+    "serviceCode": "awsCertificateManager",
+    "estimateFor": "certificateManager",
+    "fields": {
+      "Number of fully qualified domain names (FQDNs)": {
+        "fieldId": "numberOfFullyQualifiedDomainNamesFqdns",
+        "type": "input"
+      },
+      "Number of wildcard domain names": {
+        "fieldId": "numberOfWildcardDomainNames",
+        "type": "input"
+      },
+      "Number of API calls": {
+        "fieldId": "numberOfApiCalls",
+        "type": "input"
+      }
+    },
+    "version": "0.0.45"
+  },
+  "AWS Cloud Map": {
+    "serviceCode": "awsCloudMap",
+    "estimateFor": "template_0",
+    "fields": {},
+    "version": "0.0.11"
+  },
+  "AWS CloudFormation": {
+    "serviceCode": "awsCloudFormation",
+    "estimateFor": "CloudFormation",
+    "fields": {
+      "Number of third-party extensions managed": {
+        "fieldId": "numberOfThirdpartyExtensionsManaged",
+        "type": "input"
+      },
+      "Total number of operations per extension": {
+        "fieldId": "totalNumberOfOperationsPerExtension",
+        "type": "input"
+      }
+    },
+    "version": "0.0.31"
+  },
+  "AWS CloudHSM": {
+    "serviceCode": "awsCloudHSM",
+    "estimateFor": "awsCloudhsm",
+    "fields": {
+      "Total number of hsm1.medium HSMs": {
+        "fieldId": "totalNumberOfHsm1mediumHsms",
+        "type": "input"
+      },
+      "Total number of hsm2m.medium HSMs": {
+        "fieldId": "totalNumberOfHsm2mmediumHsms",
+        "type": "input"
+      }
+    },
+    "version": "0.0.17"
+  },
+  "AWS CloudTrail": {
+    "serviceCode": "awsCloudTrail",
+    "estimateFor": "template",
+    "fields": {
+      "Number of management events": {
+        "fieldId": "OpsMult",
+        "type": "input",
+        "notes": "Stored as raw number (e.g., 1000000)",
+        "defaultValue": "1000000"
+      },
+      "Management event trails": {
+        "fieldId": "numberOfWriteTrails",
+        "type": "input",
+        "defaultValue": "1"
+      },
+      "Read management events": {
+        "fieldId": "numberOfReadTrails",
+        "type": "input",
+        "defaultValue": "0"
+      },
+      "S3 operations": {
+        "fieldId": "dataOpsMult",
+        "type": "input",
+        "defaultValue": "0"
+      },
+      "S3 trails": {
+        "fieldId": "numberOfS3Trails",
+        "type": "input",
+        "defaultValue": "0"
+      },
+      "Lambda data events": {
+        "fieldId": "numberOfLambdaTrails",
+        "type": "input",
+        "defaultValue": "0"
+      },
+      "Number of network activity events": {
+        "fieldId": "networkActivityOpsMult",
+        "type": "input",
+        "defaultValue": "0"
+      },
+      "Network activity event trails": {
+        "fieldId": "numberOfNetworkActivityTrails",
+        "type": "input",
+        "defaultValue": "0"
+      },
+      "Insights events": {
+        "fieldId": "eventMult",
+        "type": "input",
+        "defaultValue": "0"
+      },
+      "Number of trails with Insights": {
+        "fieldId": "numberOfInsightTrails",
+        "type": "input",
+        "defaultValue": "0"
+      },
+      "Data ingested - CloudTrail": {
+        "fieldId": "dataIngestedCloudTrail",
+        "type": "input"
+      },
+      "Data scanned using queries": {
+        "fieldId": "dataScannedUsingQueries",
+        "type": "input"
+      }
+    },
+    "version": "0.0.46"
+  },
+  "AWS CodeArtifact": {
+    "serviceCode": "awsCodeArtifact",
+    "estimateFor": "CodeArtifact",
+    "fields": {
+      "Size of artifacts stored": {
+        "fieldId": "sizeOfArtifactsStored",
+        "type": "input"
+      },
+      "Number of API requests": {
+        "fieldId": "numberOfApiRequests",
+        "type": "input"
+      },
+      "Enter Amount": {
+        "fieldId": "enterAmount",
+        "type": "input"
+      }
+    },
+    "version": "0.0.8"
+  },
+  "AWS CodeBuild": {
+    "serviceCode": "awsCodeBuild",
+    "estimateFor": "template_0",
+    "fields": {
+      "Number of builds in a month": {
+        "fieldId": "numberOfBuildsInAMonth",
+        "type": "input"
+      },
+      "Average build duration (minutes)": {
+        "fieldId": "averageBuildDurationMinutes",
+        "type": "input"
+      },
+      "Instance Type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Select an instance"
+      }
+    },
+    "version": "0.0.44"
+  },
+  "AWS CodeDeploy": {
+    "serviceCode": "awsCodeDeploy",
+    "estimateFor": "CodeDeployTemplate",
+    "fields": {
+      "Number of on-premise instances": {
+        "fieldId": "numberOfOnpremiseInstances",
+        "type": "input"
+      },
+      "Number of deployments": {
+        "fieldId": "numberOfDeployments",
+        "type": "input"
+      }
+    },
+    "version": "0.0.32"
+  },
+  "AWS CodePipeline": {
+    "serviceCode": "awsCodePipeline",
+    "estimateFor": "awscodepipeline",
+    "fields": {
+      "Number of active pipelines of type V1 used per account per month": {
+        "fieldId": "numberOfActivePipelinesOfTypeV1UsedPerAcc",
+        "type": "input"
+      },
+      "Number of action execution minutes used in pipeline of type V2 per account per month": {
+        "fieldId": "numberOfActionExecutionMinutesUsedInPipelin",
+        "type": "input"
+      }
+    },
+    "version": "0.0.18"
+  },
+  "AWS Config": {
+    "serviceCode": "awsConfig",
+    "estimateFor": "awsConfig",
+    "fields": {
+      "Number of Continuous Configuration items recorded": {
+        "fieldId": "numberOfContinuousConfigItems",
+        "type": "input"
+      },
+      "Number of Periodic Configuration items recorded": {
+        "fieldId": "numberOfPeriodicConfigItems",
+        "type": "input"
+      },
+      "Number of Config rule evaluations": {
+        "fieldId": "numberOfConfigRuleEvaluations",
+        "type": "input"
+      },
+      "Number of Conformance pack evaluations": {
+        "fieldId": "numberOfConformancePackEvaluations",
+        "type": "input"
+      }
+    },
+    "version": "0.0.35"
+  },
+  "AWS Data Transfer": {
+    "serviceCode": "aWSDataTransfer",
+    "estimateFor": "awsDatatransfer",
+    "fields": {
+      "Enter Amount": {
+        "fieldId": "dataTransfer",
+        "type": "input",
+        "notes": "Table field with entryType, value, unit, fromRegion columns"
+      }
+    },
+    "version": "0.0.61"
+  },
+  "AWS DataSync": {
+    "serviceCode": "awsDataSync",
+    "estimateFor": "dataSync",
+    "fields": {
+      "Total data copied by AWS DataSync per month": {
+        "fieldId": "totalDataCopiedByAwsDatasyncPerMonth",
+        "type": "input"
+      }
+    },
+    "version": "0.0.26"
+  },
+  "AWS Database Migration Service": {
+    "serviceCode": "awsDatabaseMigrationService",
+    "estimateFor": "awsDatabaseMigrationSvc",
+    "fields": {
+      "Number of instances": {
+        "fieldId": "numberOfInstances",
+        "type": "input"
+      },
+      "Instance Type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Select an instance"
+      },
+      "Storage amount (multiple AZ)": {
+        "fieldId": "storageAmountMultipleAz",
+        "type": "input"
+      }
+    },
+    "version": "0.0.69"
+  },
+  "AWS Deadline Cloud": {
+    "serviceCode": "awsDeadlineCloud",
+    "estimateFor": "template",
+    "fields": {
+      "Number of Instance": {
+        "fieldId": "numberOfInstance",
+        "type": "input"
+      },
+      "Instance Type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Select an instance"
+      },
+      "Monthly utilization": {
+        "fieldId": "monthlyUtilization",
+        "type": "input"
+      },
+      "Storage per worker": {
+        "fieldId": "storagePerWorker",
+        "type": "input"
+      },
+      "Utilization (On-Demand only)": {
+        "fieldId": "utilizationOndemandOnly",
+        "type": "input"
+      }
+    },
+    "version": "0.0.53"
+  },
+  "AWS Direct Connect": {
+    "serviceCode": "awsDirectConnect",
+    "estimateFor": "template",
+    "fields": {
+      "Number of ports": {
+        "fieldId": "numberOfPorts",
+        "type": "input"
+      },
+      "Hours used": {
+        "fieldId": "hoursUsed",
+        "type": "input"
+      },
+      "Data transfer out": {
+        "fieldId": "dataTransferOut",
+        "type": "input",
+        "unit_field": "dataTransferOut_unit",
+        "default_unit": "gb|NA"
+      },
+      "Data transfer in (free)": {
+        "fieldId": "dataTransferIn",
+        "type": "input",
+        "unit_field": "dataTransferIn_unit",
+        "default_unit": "gb|NA"
+      }
+    },
+    "version": "0.0.59"
+  },
+  "AWS Directory Service": {
+    "serviceCode": "awsDirectoryService",
+    "estimateFor": "managedMicrosoftActiveDirectory",
+    "fields": {
+      "Total number of directories": {
+        "fieldId": "totalNumberOfDirectories",
+        "type": "input"
+      },
+      "Number of total additional domain controllers": {
+        "fieldId": "numberOfTotalAdditionalDomainControllers",
+        "type": "input"
+      },
+      "Number of directories to be shared": {
+        "fieldId": "numberOfDirectoriesToBeShared",
+        "type": "input"
+      },
+      "Number of additional accounts to which each directory is shared": {
+        "fieldId": "numberOfAdditionalAccountsToWhichEachDirect",
+        "type": "input"
+      }
+    },
+    "version": "0.0.61"
+  },
+  "AWS Elastic Disaster Recovery": {
+    "serviceCode": "awsElasticDisasterRecovery",
+    "estimateFor": "awsDrsRecoveryReplication",
+    "fields": {
+      "Number of source servers replicated per month": {
+        "fieldId": "numberOfSourceServersReplicatedPerMonth",
+        "type": "input"
+      },
+      "Number of disks": {
+        "fieldId": "numberOfDisks",
+        "type": "input"
+      },
+      "Storage on all disks and all servers": {
+        "fieldId": "storageOnAllDisksAndAllServers",
+        "type": "input"
+      },
+      "Number of days selected for EBS snapshot retention period": {
+        "fieldId": "numberOfDaysSelectedForEbsSnapshotRetention",
+        "type": "input"
+      }
+    },
+    "version": "0.0.17"
+  },
+  "AWS Elemental Media Tailor": {
+    "serviceCode": "awsElementalMediaTailor",
+    "estimateFor": "mediaTailor",
+    "fields": {
+      "Basic tier channel hours per month": {
+        "fieldId": "basicTierChannelHoursPerMonth",
+        "type": "input"
+      },
+      "Standard tier channel hours per month": {
+        "fieldId": "standardTierChannelHoursPerMonth",
+        "type": "input"
+      }
+    },
+    "version": "0.0.10"
+  },
+  "AWS Elemental MediaConnect": {
+    "serviceCode": "awsElementalMediaConnect",
+    "estimateFor": "elementalMediaConnect",
+    "fields": {
+      "Number of running flows": {
+        "fieldId": "numberOfRunningFlows",
+        "type": "input"
+      },
+      "Flow utilization": {
+        "fieldId": "flowUtilization",
+        "type": "input"
+      },
+      "Number of outputs per flow": {
+        "fieldId": "numberOfOutputsPerFlow",
+        "type": "input"
+      },
+      "Bitrate (Mbit per second)": {
+        "fieldId": "bitrateMbitPerSecond",
+        "type": "input"
+      },
+      "Running flow utilization": {
+        "fieldId": "runningFlowUtilization",
+        "type": "input"
+      },
+      "Number of running outputs": {
+        "fieldId": "numberOfRunningOutputs",
+        "type": "input"
+      },
+      "Running output utilization": {
+        "fieldId": "runningOutputUtilization",
+        "type": "input"
+      },
+      "Enter Amount": {
+        "fieldId": "enterAmount",
+        "type": "input"
+      }
+    },
+    "version": "0.0.20"
+  },
+  "AWS Elemental MediaConvert": {
+    "serviceCode": "awsElementalMediaConvert",
+    "estimateFor": "outputConfiguration1",
+    "fields": {
+      "Output basic usage": {
+        "fieldId": "outputBasicUsage",
+        "type": "input"
+      }
+    },
+    "version": "0.0.98"
+  },
+  "AWS Elemental MediaLive": {
+    "serviceCode": "awsElementalMediaLive",
+    "estimateFor": "mediaLiveInput1",
+    "fields": {
+      "Number of inputs": {
+        "fieldId": "numberOfInputs",
+        "type": "input"
+      },
+      "Active hours (On Demand)": {
+        "fieldId": "activeHoursOnDemand",
+        "type": "input"
+      },
+      "Number of outputs": {
+        "fieldId": "numberOfOutputs",
+        "type": "input"
+      }
+    },
+    "version": "0.0.36"
+  },
+  "AWS Elemental MediaPackage": {
+    "serviceCode": "awsElementalMediaPackage",
+    "estimateFor": "mediaPackage",
+    "fields": {
+      "Number of inputs per channel": {
+        "fieldId": "numberOfInputsPerChannel",
+        "type": "input"
+      },
+      "Total duration of live streams per month": {
+        "fieldId": "totalDurationOfLiveStreamsPerMonth",
+        "type": "input"
+      },
+      "Ingest bitrate per input (Mbit per second)": {
+        "fieldId": "ingestBitratePerInputMbitPerSecond",
+        "type": "input"
+      },
+      "Average Number of viewers per hour": {
+        "fieldId": "averageNumberOfViewersPerHour",
+        "type": "input"
+      },
+      "Average bitrate per viewer (Mbit per second)": {
+        "fieldId": "averageBitratePerViewerMbitPerSecond",
+        "type": "input"
+      },
+      "Cache/hit ratio Enter cache/hit ratio as a pecentage": {
+        "fieldId": "cachehitRatioEnterCachehitRatioAsAPecentage",
+        "type": "input"
+      },
+      "Hours of VOD content watched": {
+        "fieldId": "hoursOfVodContentWatched",
+        "type": "input"
+      },
+      "Average bitrate (Mbit per second)": {
+        "fieldId": "averageBitrateMbitPerSecond",
+        "type": "input"
+      }
+    },
+    "version": "0.0.24"
+  },
+  "AWS Entity Resolution": {
+    "serviceCode": "awsEntityResolution",
+    "estimateFor": "matchingWorkflows",
+    "fields": {
+      "Number of Records": {
+        "fieldId": "numberOfRecords",
+        "type": "input"
+      }
+    },
+    "version": "0.0.13"
+  },
+  "AWS Fargate": {
+    "serviceCode": "awsFargate",
+    "estimateFor": "template",
+    "fields": {
+      "Operating system": {
+        "fieldId": "operatingSystem",
+        "type": "dropdown",
+        "values": [
+          "linux",
+          "windows"
+        ],
+        "defaultValue": "linux",
+        "allowedValues": [
+          "linux",
+          "windows"
+        ]
+      },
+      "CPU Architecture": {
+        "fieldId": "selectArchitecture",
+        "type": "dropdown",
+        "values": [
+          "x86",
+          "ARM"
+        ],
+        "defaultValue": "x86",
+        "allowedValues": [
+          "x86",
+          "arm"
+        ]
+      },
+      "Number of tasks or pods": {
+        "fieldId": "numberOfTasks",
+        "type": "input",
+        "unit_field": "numberOfTasks_unit",
+        "default_unit": "perDay",
+        "defaultValue": "1",
+        "unit": "perDay"
+      },
+      "Average duration": {
+        "fieldId": "taskDuration",
+        "type": "input",
+        "unit_field": "taskDuration_unit",
+        "default_unit": "hr",
+        "defaultValue": "24",
+        "unit": "hr"
+      },
+      "Amount of memory allocated": {
+        "fieldId": "memoryStandardFargateOnDemand",
+        "type": "input",
+        "unit_field": "memoryStandardFargateOnDemand_unit",
+        "default_unit": "gb|NA",
+        "defaultValue": "1",
+        "unit": "gb|NA"
+      },
+      "vCPU per task": {
+        "fieldId": "vcpuPerTask",
+        "type": "input",
+        "defaultValue": "0.25"
+      },
+      "Amount of ephemeral storage allocated for Amazon ECS": {
+        "fieldId": "storageAmountECS",
+        "type": "input",
+        "unit_field": "storageAmountECS_unit",
+        "default_unit": "gb|NA",
+        "defaultValue": "20",
+        "unit": "gb|NA"
+      }
+    },
+    "version": "0.0.66"
+  },
+  "AWS Fault Injection Service (FIS)": {
+    "serviceCode": "awsFaultInjectionService",
+    "estimateFor": "template_0",
+    "fields": {
+      "Experiments per Month": {
+        "fieldId": "experimentsPerMonth",
+        "type": "input"
+      },
+      "Average action-minutes per experiment": {
+        "fieldId": "averageActionminutesPerExperiment",
+        "type": "input"
+      },
+      "Average count of target accounts per experiment": {
+        "fieldId": "averageCountOfTargetAccountsPerExperiment",
+        "type": "input"
+      },
+      "% of Experiments per Month with experiment report Enter %": {
+        "fieldId": "ofExperimentsPerMonthWithExperimentReportEn",
+        "type": "input"
+      }
+    },
+    "version": "0.0.38"
+  },
+  "AWS Firewall Manager": {
+    "serviceCode": "awsFirewallManager",
+    "estimateFor": "template_firewallmanager",
+    "fields": {
+      "Number of protection policy": {
+        "fieldId": "numberOfProtectionPolicy",
+        "type": "input"
+      },
+      "Number of aws account": {
+        "fieldId": "numberOfAwsAccount",
+        "type": "input"
+      },
+      "Number of Configuration items recorded": {
+        "fieldId": "numberOfConfigurationItemsRecorded",
+        "type": "input"
+      },
+      "Number of Config rule evaluations": {
+        "fieldId": "numberOfConfigRuleEvaluations",
+        "type": "input"
+      },
+      "Number of AWS Network Firewall endpoints": {
+        "fieldId": "numberOfAwsNetworkFirewallEndpoints",
+        "type": "input"
+      },
+      "Usage per endpoint": {
+        "fieldId": "usagePerEndpoint",
+        "type": "input"
+      },
+      "Data processed per month": {
+        "fieldId": "dataProcessedPerMonth",
+        "type": "input"
+      },
+      "Number of Web Access Control Lists (Web ACLs) utilized": {
+        "fieldId": "numberOfWebAccessControlListsWebAclsUtiliz",
+        "type": "input"
+      },
+      "Number of Rules added per Web ACL": {
+        "fieldId": "numberOfRulesAddedPerWebAcl",
+        "type": "input"
+      },
+      "Number of domains stored": {
+        "fieldId": "numberOfDomainsStored",
+        "type": "input"
+      },
+      "DNS queries": {
+        "fieldId": "dnsQueries",
+        "type": "input"
+      },
+      "Elastic Load Balancing (ELB) Usage": {
+        "fieldId": "elasticLoadBalancingElbUsage",
+        "type": "input"
+      },
+      "Elastic IP Usage": {
+        "fieldId": "elasticIpUsage",
+        "type": "input"
+      },
+      "Number of Security groups": {
+        "fieldId": "numberOfSecurityGroups",
+        "type": "input"
+      }
+    },
+    "version": "0.0.74"
+  },
+  "AWS Glue": {
+    "serviceCode": "awsGlue",
+    "estimateFor": "awsEtlJobsAndDevelopmentEndpoints",
+    "fields": {
+      "Number of DPUs for Apache Spark job": {
+        "fieldId": "numberOfDPUsForApacheSparkJob",
+        "type": "input"
+      },
+      "Duration for which Apache Spark ETL job  runs": {
+        "fieldId": "durationForApacheSparkETLJob",
+        "type": "input",
+        "unit_field": "durationForApacheSparkETLJob_unit",
+        "default_unit": "hr"
+      },
+      "Number of DPUs for Python Shell job": {
+        "fieldId": "numberOfDPUsForPythonShellJob",
+        "type": "input"
+      },
+      "Number of DPUs for each provisioned interactive session": {
+        "fieldId": "numberOfDPUsForInteractiveSession",
+        "type": "input"
+      }
+    },
+    "version": "0.0.43"
+  },
+  "AWS IAM Access Analyzer": {
+    "serviceCode": "awsIAMAccessAnalyzer",
+    "estimateFor": "iamaccessanalyzer",
+    "fields": {
+      "Number of accounts to monitor": {
+        "fieldId": "numberOfAccountsToMonitor",
+        "type": "input"
+      },
+      "Average roles per account": {
+        "fieldId": "averageRolesPerAccount",
+        "type": "input"
+      },
+      "Average users per account": {
+        "fieldId": "averageUsersPerAccount",
+        "type": "input"
+      },
+      "Number of analyzers per account": {
+        "fieldId": "numberOfAnalyzersPerAccount",
+        "type": "input"
+      },
+      "Number of requests to CheckNoNewAccess API": {
+        "fieldId": "numberOfRequestsToChecknonewaccessApi",
+        "type": "input"
+      },
+      "Number of requests to CheckAccessNotGranted API": {
+        "fieldId": "numberOfRequestsToCheckaccessnotgrantedApi",
+        "type": "input"
+      },
+      "Number of resources to monitor": {
+        "fieldId": "numberOfResourcesToMonitor",
+        "type": "input"
+      }
+    },
+    "version": "0.0.112"
+  },
+  "AWS IoT Analytics": {
+    "serviceCode": "awsIoTAnalytics",
+    "estimateFor": "template_0",
+    "fields": {
+      "Number of IoT devices (monthly)": {
+        "fieldId": "numberOfIotDevicesMonthly",
+        "type": "input"
+      },
+      "Data generation by each device": {
+        "fieldId": "dataGenerationByEachDevice",
+        "type": "input"
+      },
+      "Number of data pipelines (monthly)": {
+        "fieldId": "numberOfDataPipelinesMonthly",
+        "type": "input"
+      },
+      "Data queried per month": {
+        "fieldId": "dataQueriedPerMonth",
+        "type": "input"
+      },
+      "Number of queries (monthly)": {
+        "fieldId": "numberOfQueriesMonthly",
+        "type": "input"
+      },
+      "Data scanned per query": {
+        "fieldId": "dataScannedPerQuery",
+        "type": "input"
+      },
+      "Average ACU execution time": {
+        "fieldId": "averageAcuExecutionTime",
+        "type": "input"
+      }
+    },
+    "version": "0.0.22"
+  },
+  "AWS IoT Core": {
+    "serviceCode": "awsIoTCore",
+    "estimateFor": "awsIoTCoreMqtt",
+    "fields": {
+      "Number of devices (MQTT)": {
+        "fieldId": "numberOfDevicesMqtt",
+        "type": "input"
+      }
+    },
+    "version": "0.0.13"
+  },
+  "AWS IoT Device Defender": {
+    "serviceCode": "awsIoTDeviceDefender",
+    "estimateFor": "deviceDefenderTemplate",
+    "fields": {},
+    "version": "0.0.26"
+  },
+  "AWS IoT Device Management": {
+    "serviceCode": "awsIoTDeviceManagement",
+    "estimateFor": "IotDeviceManagementSimple",
+    "fields": {},
+    "version": "0.0.18"
+  },
+  "AWS IoT Events": {
+    "serviceCode": "awsIoTEvents",
+    "estimateFor": "template_0",
+    "fields": {
+      "Number of devices": {
+        "fieldId": "numberOfDevices",
+        "type": "input"
+      },
+      "Number of messages for a device including timer expiry messages": {
+        "fieldId": "numberOfMessagesForADeviceIncludingTimerEx",
+        "type": "input"
+      },
+      "Number of event detector models per device": {
+        "fieldId": "numberOfEventDetectorModelsPerDevice",
+        "type": "input"
+      },
+      "Average size of each message": {
+        "fieldId": "averageSizeOfEachMessage",
+        "type": "input"
+      },
+      "Number of actions triggered per message": {
+        "fieldId": "numberOfActionsTriggeredPerMessage",
+        "type": "input"
+      }
+    },
+    "version": "0.0.11"
+  },
+  "AWS IoT Greengrass": {
+    "serviceCode": "awsIoTGreengrass",
+    "estimateFor": "template",
+    "fields": {
+      "Number of greengrass core devices": {
+        "fieldId": "numberOfGreengrassCoreDevices",
+        "type": "input"
+      },
+      "Activity Period in minutes per month": {
+        "fieldId": "activityPeriodInMinutesPerMonth",
+        "type": "input"
+      },
+      "MQTT topics with cloud as source (optional)": {
+        "fieldId": "mqttTopicsWithCloudAsSourceOptional",
+        "type": "input"
+      },
+      "Number of client devices per greengrass core device (optional)": {
+        "fieldId": "numberOfClientDevicesPerGreengrassCoreDevic",
+        "type": "input"
+      }
+    },
+    "version": "0.0.10"
+  },
+  "AWS IoT SiteWise": {
+    "serviceCode": "awsIoTSiteWise",
+    "estimateFor": "template_0",
+    "fields": {
+      "Number of daily measurements": {
+        "fieldId": "numberOfDailyMeasurements",
+        "type": "input"
+      },
+      "Number of tags or sensors": {
+        "fieldId": "numberOfTagsOrSensors",
+        "type": "input"
+      },
+      "Cloud data availablity": {
+        "fieldId": "cloudDataAvailablity",
+        "type": "input"
+      },
+      "Buffer period": {
+        "fieldId": "bufferPeriod",
+        "type": "input"
+      },
+      "Number of messages in response to egress API calls": {
+        "fieldId": "numberOfMessagesInResponseToEgressApiCalls",
+        "type": "input"
+      },
+      "Total computations of metrics and transforms": {
+        "fieldId": "totalComputationsOfMetricsAndTransforms",
+        "type": "input"
+      },
+      "Volume of data (GB)": {
+        "fieldId": "volumeOfDataGb",
+        "type": "input"
+      },
+      "Count of monthly active users": {
+        "fieldId": "countOfMonthlyActiveUsers",
+        "type": "input"
+      },
+      "Cost of Egress from IoT Sitewise Pricing Tool": {
+        "fieldId": "costOfEgressFromIotSitewisePricingTool",
+        "type": "input"
+      }
+    },
+    "version": "0.0.38"
+  },
+  "AWS Key Management Service": {
+    "serviceCode": "awsKeyManagementService",
+    "estimateFor": "kms",
+    "fields": {
+      "Number of customer managed Customer Master Keys (CMK)": {
+        "fieldId": "numberOfCmk",
+        "type": "input",
+        "defaultValue": "1"
+      },
+      "Number of symmetric requests": {
+        "fieldId": "numberOfSymmetricRequests",
+        "type": "input",
+        "defaultValue": "100000"
+      },
+      "Number of asymmetric requests except RSA 2048": {
+        "fieldId": "numberOfAsymmetricRequests",
+        "type": "input"
+      },
+      "Number of asymmetric requests involving RSA 2048": {
+        "fieldId": "numberOfAsymmetricRequestsRSA2048",
+        "type": "input"
+      },
+      "Number of ECC GenerateDataKeyPair requests": {
+        "fieldId": "numberOfECCGenerateDataKeyPairRequests",
+        "type": "input"
+      },
+      "Number of RSA GenerateDataKeyPair requests": {
+        "fieldId": "numberOfRSAGenerateDataKeyPairRequests",
+        "type": "input"
+      }
+    },
+    "version": "0.0.20"
+  },
+  "AWS Lake Formation": {
+    "serviceCode": "awsLakeFormation",
+    "estimateFor": "template",
+    "fields": {
+      "Data scanned": {
+        "fieldId": "dataScanned",
+        "type": "input"
+      },
+      "Storage usage in a month (in millions)": {
+        "fieldId": "storageUsageInAMonthInMillions",
+        "type": "input"
+      },
+      "Requests in a month (in millions)": {
+        "fieldId": "requestsInAMonthInMillions",
+        "type": "input"
+      },
+      "Number of tables": {
+        "fieldId": "numberOfTables",
+        "type": "input"
+      },
+      "Number of small files ingested per table per day": {
+        "fieldId": "numberOfSmallFilesIngestedPerTablePerDay",
+        "type": "input"
+      },
+      "Size of small files (less than 64MB)": {
+        "fieldId": "sizeOfSmallFilesLessThan64mb",
+        "type": "input"
+      }
+    },
+    "version": "0.0.16"
+  },
+  "AWS Lambda": {
+    "serviceCode": "awsLambda",
+    "estimateFor": "lambdaWithFreeTier",
+    "fields": {
+      "Number of requests": {
+        "fieldId": "numberOfRequests",
+        "type": "input",
+        "unit_field": "numberOfRequests_unit",
+        "default_unit": "perMonth",
+        "defaultValue": "1000000",
+        "unit": "perMonth"
+      },
+      "Duration of each request (in ms)": {
+        "fieldId": "durationOfEachRequest",
+        "type": "input",
+        "unit_field": "durationOfEachRequest_unit",
+        "default_unit": "ms",
+        "defaultValue": "100",
+        "unit": "ms"
+      },
+      "Amount of memory allocated": {
+        "fieldId": "amountOfMemoryAllocated",
+        "type": "input",
+        "unit_field": "amountOfMemoryAllocated_unit",
+        "default_unit": "mb|NA",
+        "defaultValue": "512",
+        "unit": "mb|NA"
+      },
+      "Amount of ephemeral storage allocated": {
+        "fieldId": "amountOfEphemeralStorageAllocated",
+        "type": "input",
+        "unit_field": "amountOfEphemeralStorageAllocated_unit",
+        "default_unit": "mb|NA",
+        "defaultValue": "512",
+        "unit": "mb|NA"
+      },
+      "Architecture": {
+        "fieldId": "architecture",
+        "type": "dropdown",
+        "values": [
+          "x86",
+          "Arm"
+        ],
+        "defaultValue": "x86",
+        "allowedValues": [
+          "x86",
+          "Arm"
+        ]
+      },
+      "Concurrency": {
+        "fieldId": "concurrency",
+        "type": "input"
+      },
+      "Duration of each provisioned request (in ms)": {
+        "fieldId": "durationOfEachProvisionedRequest",
+        "type": "input"
+      },
+      "Number of cold-starts (i.e. SnapStart restores)": {
+        "fieldId": "numberOfColdStarts",
+        "type": "input"
+      }
+    },
+    "version": "0.0.146"
+  },
+  "AWS Mainframe Modernization": {
+    "serviceCode": "awsMainframeModernization",
+    "estimateFor": "mainframeBluAge",
+    "fields": {
+      "Number of instances": {
+        "fieldId": "numberOfInstances",
+        "type": "input"
+      },
+      "Monthly utilization": {
+        "fieldId": "monthlyUtilization",
+        "type": "input"
+      }
+    },
+    "version": "0.0.7"
+  },
+  "AWS Migration Hub Refactor Spaces": {
+    "serviceCode": "awsMigrationHubRefactorSpaces",
+    "estimateFor": "migrationhub",
+    "fields": {
+      "Number of Environments": {
+        "fieldId": "numberOfEnvironments",
+        "type": "input"
+      },
+      "Number of Hours": {
+        "fieldId": "numberOfHours",
+        "type": "input"
+      },
+      "API Requests": {
+        "fieldId": "apiRequests",
+        "type": "input"
+      }
+    },
+    "version": "0.0.20"
+  },
+  "AWS Network Firewall": {
+    "serviceCode": "awsNetworkFirewall",
+    "estimateFor": "AWSnetworkfirewall",
+    "fields": {
+      "Number of AWS Network Firewall endpoints": {
+        "fieldId": "numberOfEndpoints",
+        "type": "input"
+      },
+      "Monthly usage per endpoint": {
+        "fieldId": "monthlyUsagePerEndpoint",
+        "type": "input",
+        "unit_field": "monthlyUsagePerEndpoint_unit",
+        "default_unit": "hr"
+      },
+      "Advanced Inspection Monthly usage per endpoint": {
+        "fieldId": "advancedInspectionMonthlyUsage",
+        "type": "input"
+      },
+      "Number of Network Firewall secondary endpoints": {
+        "fieldId": "numberOfSecondaryEndpoints",
+        "type": "input"
+      },
+      "Usage per secondary endpoint": {
+        "fieldId": "usagePerSecondaryEndpoint",
+        "type": "input"
+      },
+      "Data processed per month": {
+        "fieldId": "dataProcessedPerMonth",
+        "type": "input",
+        "unit_field": "dataProcessedPerMonth_unit",
+        "default_unit": "gb|NA"
+      }
+    },
+    "version": "0.0.37"
+  },
+  "AWS PCS": {
+    "serviceCode": "awsPCS",
+    "estimateFor": "AWS PCS",
+    "fields": {
+      "Number of PCS Clusters": {
+        "fieldId": "numberOfPcsClusters",
+        "type": "input"
+      },
+      "Length of time cluster is running": {
+        "fieldId": "lengthOfTimeClusterIsRunning",
+        "type": "input"
+      }
+    },
+    "version": "0.0.11"
+  },
+  "AWS Payment Cryptography": {
+    "serviceCode": "awsPaymentCryptography",
+    "estimateFor": "template_0",
+    "fields": {
+      "Number of API requests": {
+        "fieldId": "numberOfApiRequests",
+        "type": "input"
+      },
+      "Number of active keys": {
+        "fieldId": "numberOfActiveKeys",
+        "type": "input"
+      }
+    },
+    "version": "0.0.14"
+  },
+  "AWS Private Certificate Authority": {
+    "serviceCode": "awsPrivateCertificateAuthority",
+    "estimateFor": "certificateManager",
+    "fields": {
+      "Number of Private CAs": {
+        "fieldId": "numberOfPrivateCas",
+        "type": "input"
+      },
+      "Number of general purpose mode private certificates issued": {
+        "fieldId": "numberOfGeneralPurposeModePrivateCertificate",
+        "type": "input"
+      },
+      "Number of certificates used with ACM-integrated services": {
+        "fieldId": "numberOfCertificatesUsedWithAcmintegratedSer",
+        "type": "input"
+      },
+      "Number of short lived certificate mode private certificates issued": {
+        "fieldId": "numberOfShortLivedCertificateModePrivateCer",
+        "type": "input"
+      },
+      "Number of OCSP responses per Month": {
+        "fieldId": "numberOfOcspResponsesPerMonth",
+        "type": "input"
+      },
+      "Number of OCSP Queries per hour": {
+        "fieldId": "numberOfOcspQueriesPerHour",
+        "type": "input"
+      }
+    },
+    "version": "0.0.45"
+  },
+  "AWS Resilience Hub": {
+    "serviceCode": "awsResilienceHub",
+    "estimateFor": "template_0",
+    "fields": {
+      "Number of applications assessed for resilience": {
+        "fieldId": "numberOfApplicationsAssessedForResilience",
+        "type": "input"
+      }
+    },
+    "version": "0.0.3"
+  },
+  "AWS Secrets Manager": {
+    "serviceCode": "awsSecretsManager",
+    "estimateFor": "awssecretsmanager",
+    "fields": {
+      "Number of secrets": {
+        "fieldId": "NumberOfSecrets",
+        "type": "input",
+        "defaultValue": "1"
+      },
+      "Average duration of each secret": {
+        "fieldId": "secretDuration",
+        "type": "input",
+        "unit_field": "secretDuration_unit",
+        "default_unit": "day",
+        "defaultValue": "30",
+        "unit": "day"
+      },
+      "Number of API calls": {
+        "fieldId": "numberOfAPIs",
+        "type": "input",
+        "unit_field": "numberOfAPIs_unit",
+        "default_unit": "perMonth",
+        "defaultValue": "10000",
+        "unit": "perMonth"
+      }
+    },
+    "version": "0.0.24"
+  },
+  "AWS Security Hub": {
+    "serviceCode": "awsSecurityHub",
+    "estimateFor": "template_securityhub",
+    "fields": {
+      "Number of Accounts": {
+        "fieldId": "numberOfAccounts",
+        "type": "input"
+      },
+      "Number of Security Checks per Account": {
+        "fieldId": "numberOfSecurityChecksPerAccount",
+        "type": "input"
+      },
+      "Number of Finding Ingested per Account": {
+        "fieldId": "numberOfFindingIngestedPerAccount",
+        "type": "input"
+      },
+      "Number of Automation Rules": {
+        "fieldId": "numberOfAutomationRules",
+        "type": "input"
+      },
+      "Number of criteria in each automation rule": {
+        "fieldId": "numberOfCriteriaInEachAutomationRule",
+        "type": "input"
+      }
+    },
+    "version": "0.0.51"
+  },
+  "AWS Service Catalog": {
+    "serviceCode": "awsServiceCatalog",
+    "estimateFor": "template_0",
+    "fields": {
+      "Number of API calls": {
+        "fieldId": "numberOfApiCalls",
+        "type": "input"
+      }
+    },
+    "version": "0.0.7"
+  },
+  "AWS Shield": {
+    "serviceCode": "awsShield",
+    "estimateFor": "template",
+    "fields": {
+      "Cloud Front Usage": {
+        "fieldId": "cloudFrontUsage",
+        "type": "input"
+      },
+      "Elastic Load Balancing (ELB) Usage": {
+        "fieldId": "elbUsage",
+        "type": "input"
+      },
+      "Elastic IP Usage": {
+        "fieldId": "elasticIPUsage",
+        "type": "input"
+      },
+      "Global Accelerator Usage": {
+        "fieldId": "globalAcceleratorUsage",
+        "type": "input"
+      }
+    },
+    "version": "0.0.22"
+  },
+  "AWS SimSpace Weaver": {
+    "serviceCode": "awsSimSpaceWeaver",
+    "estimateFor": "template_0",
+    "fields": {
+      "Number of instances": {
+        "fieldId": "numberOfInstances",
+        "type": "input"
+      },
+      "Instance Type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Select an instance"
+      },
+      "Usage": {
+        "fieldId": "usage",
+        "type": "input"
+      }
+    },
+    "version": "0.0.21"
+  },
+  "AWS Snowball": {
+    "serviceCode": "awsSnowball",
+    "estimateFor": "snowballEdgeComputeOptimizedWithEc2ComputeInstances",
+    "fields": {
+      "Number of devices": {
+        "fieldId": "numberOfDevices",
+        "type": "input"
+      }
+    },
+    "version": "0.0.41"
+  },
+  "AWS Step Functions": {
+    "serviceCode": "awsStepFunctions",
+    "estimateFor": "stepFunctionStandard",
+    "fields": {
+      "Workflow requests": {
+        "fieldId": "workflowRequests",
+        "type": "input",
+        "unit_field": "workflowRequests_unit",
+        "default_unit": "perMonth",
+        "defaultValue": "1000",
+        "unit": "perMonth"
+      },
+      "State transitions per workflow": {
+        "fieldId": "stateTransitionsPerWorkflow",
+        "type": "input",
+        "defaultValue": "5"
+      }
+    },
+    "version": "0.0.19"
+  },
+  "AWS Storage Gateway": {
+    "serviceCode": "awsStorageGateway",
+    "estimateFor": "fileGateway",
+    "fields": {
+      "Data written to AWS file storage by your gateway": {
+        "fieldId": "dataWrittenToAwsFileStorageByYourGateway",
+        "type": "input"
+      },
+      "Enter Amount": {
+        "fieldId": "enterAmount",
+        "type": "input"
+      }
+    },
+    "version": "0.0.69"
+  },
+  "AWS Systems Manager": {
+    "serviceCode": "awsSystemsManager",
+    "estimateFor": "awsSystemsManagerOpsCenter",
+    "fields": {
+      "Standard parameters": {
+        "fieldId": "standardParameters",
+        "type": "input"
+      },
+      "Advanced parameters": {
+        "fieldId": "advancedParameters",
+        "type": "input"
+      },
+      "Frequency of API interactions per parameter": {
+        "fieldId": "frequencyOfApiInteractionsPerParameter",
+        "type": "input"
+      }
+    },
+    "version": "0.0.35"
+  },
+  "AWS Transfer Family": {
+    "serviceCode": "awsTransferFamily",
+    "estimateFor": "as2",
+    "fields": {
+      "Total number of endpoints with AS2 enabled": {
+        "fieldId": "totalNumberOfEndpointsWithAs2Enabled",
+        "type": "input"
+      },
+      "Number of AS2 messages sent per month": {
+        "fieldId": "numberOfAs2MessagesSentPerMonth",
+        "type": "input"
+      },
+      "Number of AS2 messages received per month": {
+        "fieldId": "numberOfAs2MessagesReceivedPerMonth",
+        "type": "input"
+      }
+    },
+    "version": "0.0.16"
+  },
+  "AWS Web Application Firewall (WAF)": {
+    "serviceCode": "awsWebApplicationFirewall",
+    "estimateFor": "awsWaf",
+    "fields": {
+      "Number of Web Access Control Lists (Web ACLs) utilized": {
+        "fieldId": "numberOfWebAcls",
+        "type": "input",
+        "unit_field": "numberOfWebAcls_unit",
+        "default_unit": "perMonth",
+        "defaultValue": "1",
+        "unit": "perMonth"
+      },
+      "Number of Rules added per Web ACL": {
+        "fieldId": "numberOfRulesPerWebAcl",
+        "type": "input",
+        "unit_field": "numberOfRulesPerWebAcl_unit",
+        "default_unit": "perMonth",
+        "defaultValue": "1",
+        "unit": "perMonth"
+      },
+      "Number of Rules inside each Rule Group": {
+        "fieldId": "numberOfRulesInsideRuleGroup",
+        "type": "input"
+      },
+      "Number of web requests received across all web ACLs": {
+        "fieldId": "numberOfWebRequests",
+        "type": "input",
+        "unit_field": "numberOfWebRequests_unit",
+        "default_unit": "perMonth",
+        "defaultValue": "1",
+        "unit": "perMonth"
+      }
+    },
+    "version": "0.0.34"
+  },
+  "AWS X-Ray": {
+    "serviceCode": "awsXRay",
+    "estimateFor": "template_0",
+    "fields": {
+      "Number of requests per month": {
+        "fieldId": "numberOfRequestsPerMonth",
+        "type": "input"
+      },
+      "Number of queries per month": {
+        "fieldId": "numberOfQueriesPerMonth",
+        "type": "input"
+      },
+      "Traces retrieved per query": {
+        "fieldId": "tracesRetrievedPerQuery",
+        "type": "input"
+      }
+    },
+    "version": "0.0.15"
+  },
+  "Amazon API Gateway": {
+    "serviceCode": "amazonAPIGateway",
+    "estimateFor": "template",
+    "fields": {
+      "Requests": {
+        "fieldId": "requests",
+        "type": "input",
+        "unit_field": "requests_unit",
+        "default_unit": "millionPerMonth",
+        "defaultValue": "1",
+        "unit": "millionPerMonth"
+      },
+      "Average size of each request": {
+        "fieldId": "averageSizeOfEachRequest",
+        "type": "input",
+        "unit_field": "averageSizeOfEachRequest_unit",
+        "default_unit": "kb",
+        "defaultValue": "1",
+        "unit": "kb"
+      },
+      "Messages": {
+        "fieldId": "messages",
+        "type": "input",
+        "unit_field": "messages_unit",
+        "default_unit": "millionPerMonth"
+      },
+      "Average message size": {
+        "fieldId": "averageMessageSize",
+        "type": "input",
+        "unit_field": "averageMessageSize_unit",
+        "default_unit": "kb"
+      },
+      "Average connection rate": {
+        "fieldId": "averageConnectionRate",
+        "type": "input"
+      }
+    },
+    "version": "0.0.59"
+  },
+  "Amazon AppFlow": {
+    "serviceCode": "amazonAppFlow",
+    "estimateFor": "Appflow",
+    "fields": {
+      "Number of flows": {
+        "fieldId": "numberOfFlows",
+        "type": "input"
+      },
+      "Volume of data per flow": {
+        "fieldId": "volumeOfDataPerFlow",
+        "type": "input"
+      }
+    },
+    "version": "0.0.15"
+  },
+  "Amazon Athena": {
+    "serviceCode": "amazonAthena",
+    "estimateFor": "Athena",
+    "fields": {
+      "Total number of queries": {
+        "fieldId": "totalNumberOfQueries",
+        "type": "input",
+        "unit_field": "totalNumberOfQueries_unit",
+        "default_unit": "perMonth",
+        "defaultValue": "100",
+        "unit": "perMonth"
+      },
+      "Amount of data scanned per query": {
+        "fieldId": "amountOfDataScannedPerQuery",
+        "type": "input",
+        "unit_field": "amountOfDataScannedPerQuery_unit",
+        "default_unit": "gb|NA",
+        "defaultValue": "5",
+        "unit": "gb|NA"
+      },
+      "Number of DPUs": {
+        "fieldId": "numberOfDPUs",
+        "type": "input"
+      },
+      "Length of time capacity is active": {
+        "fieldId": "lengthOfTimeCapacityIsActive",
+        "type": "input",
+        "unit_field": "lengthOfTimeCapacityIsActive_unit",
+        "default_unit": "hr"
+      },
+      "Total number of spark sessions": {
+        "fieldId": "totalNumberOfSparkSessions",
+        "type": "input"
+      },
+      "Code execution per session": {
+        "fieldId": "codeExecutionPerSession",
+        "type": "input"
+      }
+    },
+    "version": "0.0.118"
+  },
+  "Amazon Augmented AI": {
+    "serviceCode": "amazonAugmentedAI",
+    "estimateFor": "amazona2i",
+    "fields": {
+      "Number of reviewed images per month with Amazon Rekognition and Amazon Augmented AI": {
+        "fieldId": "numberOfReviewedImagesPerMonthWithAmazonRe",
+        "type": "input"
+      },
+      "Number of reviewed pages per month with Amazon Textract and Amazon Augmented AI": {
+        "fieldId": "numberOfReviewedPagesPerMonthWithAmazonTex",
+        "type": "input"
+      },
+      "Number of reviewed objects per month with a Custom Model and Amazon Augmented AI": {
+        "fieldId": "numberOfReviewedObjectsPerMonthWithACustom",
+        "type": "input"
+      }
+    },
+    "version": "0.0.8"
+  },
+  "Amazon Aurora MySQL-Compatible": {
+    "serviceCode": "amazonAuroraMySQLDB",
+    "estimateFor": "auroraMySQLCompatible",
+    "fields": {
+      "Nodes": {
+        "fieldId": "columnFormIPM[0].Number of Nodes",
+        "type": "input"
+      },
+      "Instance Type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Select an instance"
+      },
+      "Utilization": {
+        "fieldId": "columnFormIPM[0].undefined.unit",
+        "type": "input"
+      },
+      "Storage amount": {
+        "fieldId": "storageAmount",
+        "type": "input",
+        "unit_field": "storageAmount_unit",
+        "default_unit": "gb|NA",
+        "defaultValue": "20",
+        "unit": "gb|NA"
+      },
+      "Baseline IO rate": {
+        "fieldId": "baselineIORate",
+        "type": "input"
+      },
+      "Storage mode": {
+        "fieldId": "storageMode",
+        "type": "dropdown",
+        "values": [
+          "Aurora Standard",
+          "Aurora I/O-Optimized"
+        ],
+        "defaultValue": "Aurora Standard",
+        "allowedValues": [
+          "Aurora Standard",
+          "Aurora I/O-Optimized"
+        ]
+      },
+      "Pricing model": {
+        "fieldId": "columnFormIPM[0].TermType",
+        "type": "dropdown",
+        "values": [
+          "OnDemand",
+          "Reserved"
+        ]
+      }
+    },
+    "version": "0.0.167"
+  },
+  "Amazon Aurora PostgreSQL-Compatible DB": {
+    "serviceCode": "amazonAuroraPostgreSQLDB",
+    "estimateFor": "AuroraPostgreSQLCompatibleDB",
+    "fields": {
+      "Quantity": {
+        "fieldId": "columnFormIPM[0].Number of Nodes",
+        "type": "input"
+      },
+      "Instance Type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Select an instance"
+      },
+      "Utilization": {
+        "fieldId": "columnFormIPM[0].undefined.unit",
+        "type": "input"
+      },
+      "Storage amount": {
+        "fieldId": "storageAmount",
+        "type": "input",
+        "unit_field": "storageAmount_unit",
+        "default_unit": "gb|NA",
+        "defaultValue": "20",
+        "unit": "gb|NA"
+      },
+      "Baseline IO rate": {
+        "fieldId": "baselineIORate",
+        "type": "input"
+      },
+      "Storage mode": {
+        "fieldId": "storageMode",
+        "type": "dropdown",
+        "values": [
+          "Aurora Standard",
+          "Aurora I/O-Optimized"
+        ],
+        "defaultValue": "Aurora Standard",
+        "allowedValues": [
+          "Aurora Standard",
+          "Aurora I/O-Optimized"
+        ]
+      },
+      "Pricing model": {
+        "fieldId": "columnFormIPM[0].TermType",
+        "type": "dropdown",
+        "values": [
+          "OnDemand",
+          "Reserved"
+        ]
+      },
+      "Duration of peak IO activity": {
+        "fieldId": "durationOfPeakIOActivity",
+        "type": "input"
+      }
+    },
+    "version": "0.0.149"
+  },
+  "Amazon Bedrock": {
+    "serviceCode": "amazonBedrock",
+    "estimateFor": "ai21",
+    "fields": {
+      "Inference type": {
+        "fieldId": "inferenceType",
+        "type": "dropdown",
+        "values": [
+          "Geo Cross Region Inference",
+          "In-Region"
+        ],
+        "defaultValue": "In-Region",
+        "allowedValues": [
+          "Geo Cross Region Inference",
+          "In-Region"
+        ]
+      },
+      "Pricing model": {
+        "fieldId": "pricingModel",
+        "type": "dropdown",
+        "values": [
+          "On Demand - Standard",
+          "On Demand - Priority",
+          "On Demand - Flex",
+          "Batch"
+        ],
+        "defaultValue": "On Demand - Standard",
+        "allowedValues": [
+          "On Demand - Standard",
+          "On Demand - Priority",
+          "On Demand - Flex",
+          "Batch"
+        ]
+      },
+      "Average requests per minute": {
+        "fieldId": "averageRequestsPerMinute",
+        "type": "input"
+      },
+      "Hours per day at this rate": {
+        "fieldId": "hoursPerDayAtThisRate",
+        "type": "input"
+      },
+      "Average input tokens per request": {
+        "fieldId": "averageInputTokensPerRequest",
+        "type": "input"
+      },
+      "Average output tokens per request": {
+        "fieldId": "averageOutputTokensPerRequest",
+        "type": "input"
+      }
+    },
+    "version": "0.0.52"
+  },
+  "Amazon Bedrock AgentCore": {
+    "serviceCode": "amazonBedrockAgentCore",
+    "estimateFor": "agentCoreRuntime",
+    "fields": {
+      "Number of agent sessions per month": {
+        "fieldId": "numberOfAgentSessionsPerMonth",
+        "type": "input"
+      },
+      "Average Session Duration (seconds)": {
+        "fieldId": "averageSessionDurationSeconds",
+        "type": "input"
+      },
+      "Average vCPU excluding I/O wait time": {
+        "fieldId": "averageVcpuExcludingIoWaitTime",
+        "type": "input"
+      },
+      "Average Session Memory (in GB)": {
+        "fieldId": "averageSessionMemoryInGb",
+        "type": "input"
+      }
+    },
+    "version": "0.0.7"
+  },
+  "Amazon CloudFront": {
+    "serviceCode": "amazonCloudFront",
+    "estimateFor": "productPackd1",
+    "fields": {
+      "Free Plan": {
+        "fieldId": "freePlan",
+        "type": "input"
+      },
+      "Pro Plan": {
+        "fieldId": "proPlan",
+        "type": "input"
+      },
+      "Business Plan": {
+        "fieldId": "businessPlan",
+        "type": "input"
+      },
+      "Premium Plan": {
+        "fieldId": "premiumPlan",
+        "type": "input"
+      }
+    },
+    "version": "0.0.45"
+  },
+  "Amazon CloudWatch": {
+    "serviceCode": "amazonCloudWatch",
+    "estimateFor": "CloudWatch",
+    "fields": {
+      "Number of Metrics (includes detailed and custom metrics)": {
+        "fieldId": "totalNumberOfMetrics",
+        "type": "input",
+        "defaultValue": "0"
+      },
+      "GetMetricData: Number of metrics requested": {
+        "fieldId": "getMetricDataRequests",
+        "type": "input"
+      },
+      "GetMetricWidgetImage: Number of metrics requested": {
+        "fieldId": "getMetricWidgetImageRequests",
+        "type": "input"
+      },
+      "Number of other API requests": {
+        "fieldId": "numberOfOtherAPIRequests",
+        "type": "input"
+      },
+      "Standard Logs: Data Ingested": {
+        "fieldId": "sizeOfStandardLogsDataIngested",
+        "type": "input",
+        "unit_field": "sizeOfStandardLogsDataIngested_unit",
+        "default_unit": "gb|NA",
+        "defaultValue": "0",
+        "unit": "gb|NA"
+      },
+      "Number of Standard Alarms": {
+        "fieldId": "numberOfStandardAlarms",
+        "type": "input",
+        "defaultValue": "0"
+      },
+      "Number of Mobile RUM events": {
+        "fieldId": "numberOfMobileEvents",
+        "type": "input",
+        "defaultValue": "0"
+      },
+      "Log Storage Option": {
+        "fieldId": "logStorageOption",
+        "type": "radio",
+        "values": [
+          "0",
+          "1"
+        ],
+        "defaultValue": "1",
+        "allowedValues": [
+          "0",
+          "1"
+        ]
+      },
+      "Number of vCPUs monitored by Database Insights": {
+        "fieldId": "numberOfVCPUsMonitoredByDatabaseInsights",
+        "type": "input"
+      }
+    },
+    "version": "0.0.141"
+  },
+  "Amazon CodeGuru Reviewer": {
+    "serviceCode": "amazonCodeGuruReviewer",
+    "estimateFor": "template_0",
+    "fields": {
+      "Total number of repositories": {
+        "fieldId": "totalNumberOfRepositories",
+        "type": "input"
+      },
+      "Average lines of code (LOC) per repository": {
+        "fieldId": "averageLinesOfCodeLocPerRepository",
+        "type": "input"
+      }
+    },
+    "version": "0.0.22"
+  },
+  "Amazon Cognito": {
+    "serviceCode": "amazonCognito",
+    "estimateFor": "Cognito",
+    "fields": {
+      "Number of monthly active users (MAU)": {
+        "fieldId": "numberOfMAU",
+        "type": "input",
+        "defaultValue": "10000"
+      },
+      "Number of monthly active users (MAU) who sign in through SAML or OIDC federation": {
+        "fieldId": "numberOfMAUSAML",
+        "type": "input"
+      },
+      "Number of token requests": {
+        "fieldId": "numberOfTokenRequests",
+        "type": "input"
+      },
+      "Number of app clients": {
+        "fieldId": "numberOfAppClients",
+        "type": "input"
+      }
+    },
+    "version": "0.0.65"
+  },
+  "Amazon Comprehend": {
+    "serviceCode": "amazonComprehend",
+    "estimateFor": "piiDetection",
+    "fields": {
+      "Number of documents asynchronous": {
+        "fieldId": "numberOfDocumentsAsynchronous",
+        "type": "input"
+      },
+      "Average characters in a document asynchronous": {
+        "fieldId": "averageCharactersInADocumentAsynchronous",
+        "type": "input"
+      }
+    },
+    "version": "0.0.27"
+  },
+  "Amazon Comprehend Medical": {
+    "serviceCode": "amazonComprehendMedical",
+    "estimateFor": "medicalNamedEntityAndRelationshipExtractionNeReApi",
+    "fields": {
+      "Number of text (utf-8) documents (NERe)": {
+        "fieldId": "numberOfTextUtf8DocumentsNere",
+        "type": "input"
+      },
+      "Average characters in a document (NERe)": {
+        "fieldId": "averageCharactersInADocumentNere",
+        "type": "input"
+      }
+    },
+    "version": "0.0.5"
+  },
+  "Amazon Data firehose": {
+    "serviceCode": "amazonDataFirehose",
+    "estimateFor": "KinesisDataFirehose",
+    "fields": {
+      "Number of records for data ingestion": {
+        "fieldId": "numberOfRecordsForDataIngestion",
+        "type": "input"
+      },
+      "Record size": {
+        "fieldId": "recordSize",
+        "type": "input"
+      }
+    },
+    "version": "0.0.112"
+  },
+  "Amazon Detective": {
+    "serviceCode": "amazonDetective",
+    "estimateFor": "template_0",
+    "fields": {
+      "Data ingested from AWS CloudTrail, Amazon VPC Flow Logs, Amazon GuardDuty (per account, per region)": {
+        "fieldId": "dataIngestedFromAwsCloudtrailAmazonVpcFlow",
+        "type": "input"
+      }
+    },
+    "version": "0.0.24"
+  },
+  "Amazon DocumentDB (with MongoDB compatibility)": {
+    "serviceCode": "amazonDocumentDB",
+    "estimateFor": "documentDB",
+    "fields": {
+      "Engine": {
+        "fieldId": "engine",
+        "type": "dropdown",
+        "values": [
+          "Amazon DocumentDB Standard",
+          "Amazon DocumentDB I/O-Optimized"
+        ],
+        "defaultValue": "Amazon DocumentDB Standard",
+        "allowedValues": [
+          "Amazon DocumentDB Standard",
+          "Amazon DocumentDB I/O-Optimized"
+        ]
+      },
+      "Quantity": {
+        "fieldId": "columnFormIPM[0].Number of Nodes",
+        "type": "input"
+      },
+      "Instance Type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Select an instance"
+      },
+      "Server utilization": {
+        "fieldId": "columnFormIPM[0].undefined.unit",
+        "type": "input"
+      }
+    },
+    "version": "0.0.54"
+  },
+  "Amazon DynamoDB": {
+    "serviceCode": "amazonDynamoDB",
+    "estimateFor": "dynamoDbOnDemand",
+    "fields": {
+      "Table class": {
+        "fieldId": "tableClass",
+        "type": "dropdown",
+        "values": [
+          "Standard",
+          "Standard-Infrequent Access"
+        ],
+        "defaultValue": "Standard",
+        "allowedValues": [
+          "Standard",
+          "Standard-Infrequent Access"
+        ]
+      },
+      "Average item size (all attributes)": {
+        "fieldId": "averageItemSize",
+        "type": "input",
+        "unit_field": "averageItemSize_unit",
+        "default_unit": "kb",
+        "defaultValue": "1",
+        "unit": "kb"
+      },
+      "Percentage of Non-transactional writes Enter the percentage": {
+        "fieldId": "percentageOfNonTransactionalWrites",
+        "type": "input"
+      },
+      "Baseline write rate": {
+        "fieldId": "baselineWriteRate",
+        "type": "input"
+      },
+      "Peak write rate": {
+        "fieldId": "peakWriteRate",
+        "type": "input"
+      },
+      "Duration of peak write activity": {
+        "fieldId": "durationOfPeakWriteActivity",
+        "type": "input"
+      },
+      "Baseline read rate": {
+        "fieldId": "baselineReadRate",
+        "type": "input"
+      },
+      "Peak read rate": {
+        "fieldId": "peakReadRate",
+        "type": "input"
+      }
+    },
+    "version": "0.0.65"
+  },
+  "Amazon EC2": {
+    "serviceCode": "amazonEC2",
+    "estimateFor": "quickEstimate",
+    "fields": {
+      "Number of instances": {
+        "fieldId": "columnFormIPM[0].Number of Nodes",
+        "type": "input"
+      },
+      "Search instance type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Search instance type"
+      },
+      "Operating system": {
+        "fieldId": "operatingSystem",
+        "type": "dropdown",
+        "values": [
+          "Linux",
+          "Windows Server",
+          "Red Hat Enterprise Linux",
+          "SUSE Linux Enterprise Server",
+          "Ubuntu Pro"
+        ],
+        "defaultValue": "Linux",
+        "allowedValues": [
+          "Linux",
+          "Windows Server",
+          "Red Hat Enterprise Linux",
+          "SUSE Linux Enterprise Server",
+          "Ubuntu Pro"
+        ]
+      },
+      "Tenancy": {
+        "fieldId": "tenancy",
+        "type": "dropdown",
+        "values": [
+          "Shared Instances",
+          "Dedicated Instances",
+          "Dedicated Host"
+        ],
+        "defaultValue": "Shared Instances",
+        "allowedValues": [
+          "Shared Instances",
+          "Dedicated Instances",
+          "Dedicated Host"
+        ]
+      },
+      "Pricing model": {
+        "fieldId": "columnFormIPM[0].TermType",
+        "type": "radio",
+        "values": [
+          "On-Demand",
+          "Savings Plans",
+          "Reserved",
+          "Spot"
+        ]
+      },
+      "Storage amount": {
+        "fieldId": "storageAmount",
+        "type": "input",
+        "unit_field": "storageAmount_unit",
+        "default_unit": "gb|NA"
+      }
+    },
+    "version": "1.0.67"
+  },
+  "Amazon EKS": {
+    "serviceCode": "amazonEKS",
+    "estimateFor": "Amazon EKS",
+    "fields": {
+      "Number of EKS Clusters": {
+        "fieldId": "numberOfEKSClusters",
+        "type": "input"
+      }
+    },
+    "version": "0.0.40"
+  },
+  "Amazon EMR": {
+    "serviceCode": "amazonEMR",
+    "estimateFor": "amazonEmrMasterNode",
+    "fields": {
+      "Number of master EMR nodes": {
+        "fieldId": "numberOfMasterEmrNodes",
+        "type": "input"
+      },
+      "Utilization": {
+        "fieldId": "utilization",
+        "type": "input"
+      },
+      "Number of core EMR nodes": {
+        "fieldId": "numberOfCoreEmrNodes",
+        "type": "input"
+      }
+    },
+    "version": "0.0.18"
+  },
+  "Amazon ElastiCache": {
+    "serviceCode": "amazonElastiCache",
+    "estimateFor": "amazonElastiCache",
+    "fields": {
+      "Engine": {
+        "fieldId": "EngineType",
+        "type": "dropdown",
+        "values": [
+          "Memcached",
+          "Redis",
+          "Valkey"
+        ],
+        "notes": "API value is a hash like x4dSskWC2UA5R5dVtIkM0EjZJQKU02zll08quzox15U",
+        "defaultValue": "Redis",
+        "allowedValues": [
+          "Memcached",
+          "Redis",
+          "Valkey"
+        ]
+      },
+      "Nodes": {
+        "fieldId": "columnFormIPM[0].Number of Nodes",
+        "type": "input"
+      },
+      "Instance Type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Select an instance"
+      },
+      "Utilization (On-Demand only)": {
+        "fieldId": "columnFormIPM[0].undefined.unit",
+        "type": "input",
+        "notes": "Stored as percentage in undefined.value.unit"
+      },
+      "Cache Engine": {
+        "fieldId": "columnFormIPM[0].Cache Engine",
+        "type": "dropdown",
+        "values": [
+          "Memcached",
+          "Redis",
+          "Valkey"
+        ]
+      },
+      "Instance Family": {
+        "fieldId": "columnFormIPM[0].Instance Family",
+        "type": "dropdown",
+        "values": [
+          "Memory optimized",
+          "Standard",
+          "Burstable"
+        ]
+      },
+      "Pricing model": {
+        "fieldId": "columnFormIPM[0].TermType",
+        "type": "dropdown",
+        "values": [
+          "OnDemand",
+          "Reserved"
+        ]
+      }
+    },
+    "version": "0.0.81"
+  },
+  "Amazon Elastic Block Store (EBS)": {
+    "serviceCode": "amazonEBS",
+    "estimateFor": "elasticBlockStore",
+    "fields": {
+      "Volume type": {
+        "fieldId": "volumeType",
+        "type": "dropdown",
+        "values": [
+          "General Purpose SSD (gp2)",
+          "General Purpose SSD (gp3)",
+          "Provisioned IOPS SSD (io1)",
+          "Provisioned IOPS SSD (io2)",
+          "Throughput Optimized HDD (st 1)",
+          "Cold HDD (sc1)",
+          "Magnetic (previous generation)"
+        ],
+        "defaultValue": "General Purpose SSD (gp3)",
+        "allowedValues": [
+          "General Purpose SSD (gp2)",
+          "General Purpose SSD (gp3)",
+          "Provisioned IOPS SSD (io1)",
+          "Provisioned IOPS SSD (io2)",
+          "Throughput Optimized HDD (st 1)",
+          "Cold HDD (sc1)",
+          "Magnetic (previous generation)"
+        ]
+      },
+      "Number of volumes": {
+        "fieldId": "numberOfVolumes",
+        "type": "input",
+        "defaultValue": "1"
+      },
+      "Average duration of volume": {
+        "fieldId": "averageDurationOfVolume",
+        "type": "input",
+        "unit_field": "averageDurationOfVolume_unit",
+        "default_unit": "hr"
+      },
+      "Storage amount per volume": {
+        "fieldId": "storageAmountPerVolume",
+        "type": "input",
+        "unit_field": "storageAmountPerVolume_unit",
+        "default_unit": "gb|NA",
+        "defaultValue": "30",
+        "unit": "gb|NA"
+      },
+      "Amount changed per snapshot": {
+        "fieldId": "amountChangedPerSnapshot",
+        "type": "input",
+        "unit_field": "amountChangedPerSnapshot_unit",
+        "default_unit": "gb|NA"
+      }
+    },
+    "version": "0.0.159"
+  },
+  "Amazon Elastic Container Registry": {
+    "serviceCode": "amazonElasticContainerRegistry",
+    "estimateFor": "template_0",
+    "fields": {
+      "Amount of data stored": {
+        "fieldId": "amountofdatastored",
+        "type": "input",
+        "unit_field": "amountofdatastored_unit",
+        "default_unit": "gb|month",
+        "defaultValue": "10",
+        "unit": "gb|month"
+      },
+      "Enter Amount": {
+        "fieldId": "dataTransfer",
+        "type": "input",
+        "notes": "Data transfer table with entryType/value/unit/fromRegion"
+      }
+    },
+    "version": "0.0.33"
+  },
+  "Amazon Elastic File System (EFS)": {
+    "serviceCode": "amazonEFS",
+    "estimateFor": "elasticFileSystem",
+    "fields": {
+      "Throughput mode": {
+        "fieldId": "throughputMode",
+        "type": "dropdown",
+        "values": [
+          "Elastic Throughput",
+          "Provisioned Throughput"
+        ],
+        "defaultValue": "Elastic Throughput",
+        "allowedValues": [
+          "Elastic Throughput",
+          "Provisioned Throughput"
+        ]
+      },
+      "Desired Storage Capacity": {
+        "fieldId": "desiredStorageCapacity",
+        "type": "input",
+        "unit_field": "desiredStorageCapacity_unit",
+        "default_unit": "gb|NA",
+        "defaultValue": "100",
+        "unit": "gb|NA"
+      },
+      "Infrequent Access Tiering": {
+        "fieldId": "infrequentAccessTiering",
+        "type": "input"
+      },
+      "Infrequent Access Read": {
+        "fieldId": "infrequentAccessRead",
+        "type": "input"
+      },
+      "Archive Access Tiering": {
+        "fieldId": "archiveAccessTiering",
+        "type": "input"
+      },
+      "Archive Access Read": {
+        "fieldId": "archiveAccessRead",
+        "type": "input"
+      }
+    },
+    "version": "0.0.76"
+  },
+  "Amazon Elastic Graphics": {
+    "serviceCode": "amazonElasticGraphics",
+    "estimateFor": "elasticGraphics",
+    "fields": {
+      "Number of nodes": {
+        "fieldId": "numberOfNodes",
+        "type": "input"
+      },
+      "Instance Type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Select an instance"
+      },
+      "Utilization (On-Demand only)": {
+        "fieldId": "utilizationOndemandOnly",
+        "type": "input"
+      }
+    },
+    "version": "0.0.12"
+  },
+  "Amazon Elastic VMware Service": {
+    "serviceCode": "amazonElasticVMwareService",
+    "estimateFor": "amazonEVS",
+    "fields": {
+      "Number of Instances": {
+        "fieldId": "numberOfInstances",
+        "type": "input"
+      }
+    },
+    "version": "0.0.17"
+  },
+  "Amazon EventBridge": {
+    "serviceCode": "amazonEventBridge",
+    "estimateFor": "template_0",
+    "fields": {
+      "Size of the payload": {
+        "fieldId": "sizeOfThePayload",
+        "type": "input",
+        "unit_field": "sizeOfThePayload_unit",
+        "default_unit": "kb",
+        "defaultValue": "1",
+        "unit": "kb"
+      },
+      "Number of AWS management events": {
+        "fieldId": "numberOfAWSManagementEvents",
+        "type": "input",
+        "unit_field": "numberOfAWSManagementEvents_unit",
+        "default_unit": "perMonth"
+      },
+      "Number of custom events": {
+        "fieldId": "numberOfCustomEvents",
+        "type": "input",
+        "unit_field": "numberOfCustomEvents_unit",
+        "default_unit": "perMonth",
+        "defaultValue": "1000000",
+        "unit": "perMonth"
+      },
+      "Number of partner events": {
+        "fieldId": "numberOfPartnerEvents",
+        "type": "input"
+      },
+      "Number of events delivered to another event bus": {
+        "fieldId": "numberOfEventsDeliveredToAnotherBus",
+        "type": "input"
+      },
+      "Number of invocations": {
+        "fieldId": "numberOfInvocations",
+        "type": "input"
+      },
+      "Number of replayed events": {
+        "fieldId": "numberOfReplayedEvents",
+        "type": "input"
+      }
+    },
+    "version": "0.0.51"
+  },
+  "Amazon FSx for Lustre": {
+    "serviceCode": "amazonFSxForLustre",
+    "estimateFor": "persistent",
+    "fields": {
+      "Storage capacity": {
+        "fieldId": "storageCapacity",
+        "type": "input"
+      },
+      "Metadata IOPS (optional)": {
+        "fieldId": "metadataIopsOptional",
+        "type": "input"
+      },
+      "Backup storage": {
+        "fieldId": "backupStorage",
+        "type": "input"
+      }
+    },
+    "version": "0.0.94"
+  },
+  "Amazon FSx for NetApp ONTAP": {
+    "serviceCode": "amazonFSxForNetAppONTAP",
+    "estimateFor": "singleAZDeployment_2N",
+    "fields": {
+      "Desired storage capacity": {
+        "fieldId": "desiredStorageCapacity",
+        "type": "input"
+      },
+      "Desired additional SSD IOPS": {
+        "fieldId": "desiredAdditionalSsdIops",
+        "type": "input"
+      },
+      "Desired aggregate throughput": {
+        "fieldId": "desiredAggregateThroughput",
+        "type": "input"
+      },
+      "Read requests to capacity pool storage": {
+        "fieldId": "readRequestsToCapacityPoolStorage",
+        "type": "input"
+      },
+      "Write requests to capacity pool storage": {
+        "fieldId": "writeRequestsToCapacityPoolStorage",
+        "type": "input"
+      },
+      "Backup storage": {
+        "fieldId": "backupStorage",
+        "type": "input"
+      }
+    },
+    "version": "0.0.89"
+  },
+  "Amazon FSx for OpenZFS": {
+    "serviceCode": "amazonFSxForOpenZFS",
+    "estimateFor": "SingleAZ2",
+    "fields": {
+      "Desired storage capacity": {
+        "fieldId": "desiredStorageCapacity",
+        "type": "input"
+      }
+    },
+    "version": "0.0.54"
+  },
+  "Amazon FSx for Windows File Server": {
+    "serviceCode": "amazonFSxForWindowsFileServer",
+    "estimateFor": "singleAZDeployment",
+    "fields": {
+      "Desired storage capacity": {
+        "fieldId": "desiredStorageCapacity",
+        "type": "input"
+      },
+      "Desired aggregate throughput": {
+        "fieldId": "desiredAggregateThroughput",
+        "type": "input"
+      },
+      "Backup storage": {
+        "fieldId": "backupStorage",
+        "type": "input"
+      }
+    },
+    "version": "0.0.92"
+  },
+  "Amazon File Cache": {
+    "serviceCode": "amazonFileCache",
+    "estimateFor": "template",
+    "fields": {
+      "Storage capacity": {
+        "fieldId": "storageCapacity",
+        "type": "input"
+      }
+    },
+    "version": "0.0.16"
+  },
+  "Amazon FinSpace Dataset Browser": {
+    "serviceCode": "amazonFinSpaceDatasetBrowser",
+    "estimateFor": "FinSpace",
+    "fields": {
+      "Number of users": {
+        "fieldId": "numberOfUsers",
+        "type": "input"
+      },
+      "Size of data to be stored": {
+        "fieldId": "sizeOfDataToBeStored",
+        "type": "input"
+      },
+      "Total time spent: Small cluster (across all users)": {
+        "fieldId": "totalTimeSpentSmallClusterAcrossAllUsers",
+        "type": "input"
+      },
+      "Total time spent: Medium cluster (across all users)": {
+        "fieldId": "totalTimeSpentMediumClusterAcrossAllUsers",
+        "type": "input"
+      },
+      "Total time spent: Large cluster (across all users)": {
+        "fieldId": "totalTimeSpentLargeClusterAcrossAllUsers",
+        "type": "input"
+      },
+      "Total time spent: X-Large cluster (across all users)": {
+        "fieldId": "totalTimeSpentXlargeClusterAcrossAllUsers",
+        "type": "input"
+      },
+      "Total time spent: XX-Large cluster (across all users)": {
+        "fieldId": "totalTimeSpentXxlargeClusterAcrossAllUsers",
+        "type": "input"
+      }
+    },
+    "version": "0.0.6"
+  },
+  "Amazon Forecast": {
+    "serviceCode": "amazonForecast",
+    "estimateFor": "template_0",
+    "fields": {
+      "Data imported": {
+        "fieldId": "dataImported",
+        "type": "input"
+      },
+      "Training hours": {
+        "fieldId": "trainingHours",
+        "type": "input"
+      },
+      "Unique number of items": {
+        "fieldId": "uniqueNumberOfItems",
+        "type": "input"
+      },
+      "Number of forecast horizon data points": {
+        "fieldId": "numberOfForecastHorizonDataPoints",
+        "type": "input"
+      },
+      "Number of quantiles": {
+        "fieldId": "numberOfQuantiles",
+        "type": "input"
+      },
+      "Forecasting frequency": {
+        "fieldId": "forecastingFrequency",
+        "type": "input"
+      }
+    },
+    "version": "0.0.27"
+  },
+  "Amazon Fraud Detector": {
+    "serviceCode": "amazonFraudDetector",
+    "estimateFor": "Frauddetector",
+    "fields": {
+      "Event data processed and stored": {
+        "fieldId": "eventDataProcessedAndStored",
+        "type": "input"
+      },
+      "Number of model versions": {
+        "fieldId": "numberOfModelVersions",
+        "type": "input"
+      },
+      "Training time per model version in hours": {
+        "fieldId": "trainingTimePerModelVersionInHours",
+        "type": "input"
+      },
+      "Number of active model versions": {
+        "fieldId": "numberOfActiveModelVersions",
+        "type": "input"
+      },
+      "Number of monthly predictions with Online Fraud Insights (OFI) model type": {
+        "fieldId": "numberOfMonthlyPredictionsWithOnlineFraudIn",
+        "type": "input"
+      },
+      "Number of monthly predictions with Transaction Fraud Insights (TFI) model type": {
+        "fieldId": "numberOfMonthlyPredictionsWithTransactionFra",
+        "type": "input"
+      },
+      "Number of monthly predictions with rules only (no ML model)": {
+        "fieldId": "numberOfMonthlyPredictionsWithRulesOnlyNoM",
+        "type": "input"
+      }
+    },
+    "version": "0.0.72"
+  },
+  "Amazon GameLift Servers": {
+    "serviceCode": "amazonGameLiftServers",
+    "estimateFor": "gameLiftInstance",
+    "fields": {
+      "Peak concurrent players (peak CCU)": {
+        "fieldId": "peakConcurrentPlayersPeakCcu",
+        "type": "input"
+      },
+      "Game sessions per instance": {
+        "fieldId": "gameSessionsPerInstance",
+        "type": "input"
+      },
+      "Players per game session": {
+        "fieldId": "playersPerGameSession",
+        "type": "input"
+      },
+      "Instance Type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Select an instance"
+      }
+    },
+    "version": "0.0.87"
+  },
+  "Amazon GameLift Streams": {
+    "serviceCode": "amazonGameLiftStreams",
+    "estimateFor": "gameLiftstream",
+    "fields": {
+      "Estimated Daily Active Users": {
+        "fieldId": "estimatedDailyActiveUsers",
+        "type": "input"
+      },
+      "Estimated stream hours per user": {
+        "fieldId": "estimatedStreamHoursPerUser",
+        "type": "input"
+      }
+    },
+    "version": "0.0.94"
+  },
+  "Amazon GuardDuty": {
+    "serviceCode": "amazonGuardDuty",
+    "estimateFor": "template_0",
+    "fields": {
+      "AWS CloudTrail Management Event Analysis": {
+        "fieldId": "cloudTrailManagementEventAnalysis",
+        "type": "input",
+        "unit_field": "cloudTrailManagementEventAnalysis_unit",
+        "default_unit": "perMonth",
+        "defaultValue": "1000000",
+        "unit": "perMonth"
+      },
+      "EC2 VPC Flow Log Analysis": {
+        "fieldId": "ec2VpcFlowLogAnalysis",
+        "type": "input",
+        "unit_field": "ec2VpcFlowLogAnalysis_unit",
+        "default_unit": "gb|NA",
+        "defaultValue": "10",
+        "unit": "gb|NA"
+      },
+      "EC2 DNS Query Log Analysis": {
+        "fieldId": "ec2DnsQueryLogAnalysis",
+        "type": "input",
+        "unit_field": "ec2DnsQueryLogAnalysis_unit",
+        "default_unit": "gb|NA",
+        "defaultValue": "10",
+        "unit": "gb|NA"
+      },
+      "AWS CloudTrail S3 Data Event Analysis": {
+        "fieldId": "cloudTrailS3DataEventAnalysis",
+        "type": "input",
+        "unit_field": "cloudTrailS3DataEventAnalysis_unit",
+        "default_unit": "perMonth",
+        "defaultValue": "100000",
+        "unit": "perMonth"
+      },
+      "Amazon EKS Audit Logs Analysis": {
+        "fieldId": "eksAuditLogsAnalysis",
+        "type": "input"
+      },
+      "EBS Volume Data Scan Analysis": {
+        "fieldId": "ebsVolumeDataScanAnalysis",
+        "type": "input"
+      },
+      "RDS provisioned instance vCPU": {
+        "fieldId": "rdsProvisionedInstanceVCPU",
+        "type": "input"
+      },
+      "Lambda VPC Flow Log Analysis": {
+        "fieldId": "lambdaVpcFlowLogAnalysis",
+        "type": "input"
+      }
+    },
+    "version": "0.0.75"
+  },
+  "Amazon Healthlake": {
+    "serviceCode": "amazonHealthlake",
+    "estimateFor": "healthlake",
+    "fields": {
+      "Additional Data Storage": {
+        "fieldId": "additionalDataStorage",
+        "type": "input"
+      },
+      "Total Number Of Queries per Month": {
+        "fieldId": "totalNumberOfQueriesPerMonth",
+        "type": "input"
+      },
+      "Number Of NLP Characters": {
+        "fieldId": "numberOfNlpCharacters",
+        "type": "input"
+      },
+      "Exported Data per GB": {
+        "fieldId": "exportedDataPerGb",
+        "type": "input"
+      },
+      "Number of notifications to Amazon EventBridge": {
+        "fieldId": "numberOfNotificationsToAmazonEventbridge",
+        "type": "input"
+      },
+      "Number of notifications to REST-Hook": {
+        "fieldId": "numberOfNotificationsToResthook",
+        "type": "input"
+      }
+    },
+    "version": "0.0.25"
+  },
+  "Amazon Inspector": {
+    "serviceCode": "amazonInspector",
+    "estimateFor": "Inspectorv2",
+    "fields": {
+      "Average* No. of EC2 instances scanned per month": {
+        "fieldId": "averageEC2InstancesScanned",
+        "type": "input"
+      },
+      "Total number of newly pushed container images per month": {
+        "fieldId": "totalContainerImagesPushed",
+        "type": "input"
+      },
+      "Total number of automated rescans per image per month": {
+        "fieldId": "totalAutomatedRescans",
+        "type": "input"
+      },
+      "Average number of Lambda functions scanned in a month": {
+        "fieldId": "averageLambdaFunctionsScanned",
+        "type": "input"
+      },
+      "Total number of repositories": {
+        "fieldId": "totalNumberOfRepositories",
+        "type": "input"
+      }
+    },
+    "version": "0.0.22"
+  },
+  "Amazon Kendra": {
+    "serviceCode": "amazonKendra",
+    "estimateFor": "amazonKendra",
+    "fields": {},
+    "version": "0.0.34"
+  },
+  "Amazon Keyspaces": {
+    "serviceCode": "amazonKeyspaces",
+    "estimateFor": "keyspacesOnDemandCapacity",
+    "fields": {
+      "Storage": {
+        "fieldId": "storage",
+        "type": "input"
+      },
+      "Number of writes": {
+        "fieldId": "numberOfWrites",
+        "type": "input"
+      },
+      "Number of reads": {
+        "fieldId": "numberOfReads",
+        "type": "input"
+      },
+      "Number of TTL delete operations": {
+        "fieldId": "numberOfTtlDeleteOperations",
+        "type": "input"
+      }
+    },
+    "version": "0.0.48"
+  },
+  "Amazon Kinesis Data Streams": {
+    "serviceCode": "amazonKinesisDataStreams",
+    "estimateFor": "amazonKinesisDataStreamsOnDemand",
+    "fields": {
+      "Number of records": {
+        "fieldId": "numberOfRecords",
+        "type": "input",
+        "unit_field": "numberOfRecords_unit",
+        "default_unit": "perSecond",
+        "defaultValue": "1000",
+        "unit": "perSecond"
+      },
+      "Average record size": {
+        "fieldId": "averageRecordSize",
+        "type": "input",
+        "unit_field": "averageRecordSize_unit",
+        "default_unit": "kb",
+        "defaultValue": "5",
+        "unit": "kb"
+      },
+      "Number of Consumer Applications": {
+        "fieldId": "numberOfConsumerApplications",
+        "type": "input"
+      },
+      "Number of days for data retention": {
+        "fieldId": "numberOfDaysForDataRetention",
+        "type": "input"
+      },
+      "Number of Enhanced fan-out consumers": {
+        "fieldId": "numberOfEnhancedFanoutConsumers",
+        "type": "input"
+      }
+    },
+    "version": "0.0.95"
+  },
+  "Amazon Kinesis Video Streams": {
+    "serviceCode": "amazonKinesisVideoStreams",
+    "estimateFor": "kinesisVideoStreams",
+    "fields": {
+      "Number of devices": {
+        "fieldId": "numberOfDevices",
+        "type": "input"
+      },
+      "Average bitrate": {
+        "fieldId": "averageBitrate",
+        "type": "input"
+      },
+      "Duration of video streamed to Amazon Kinesis Video Streams (per device)": {
+        "fieldId": "durationOfVideoStreamedToAmazonKinesisVideo",
+        "type": "input"
+      },
+      "Duration of video playback over HLS or MPEG-DASH (per camera)": {
+        "fieldId": "durationOfVideoPlaybackOverHlsOrMpegdashPe",
+        "type": "input"
+      },
+      "Duration of video consumed by other applications (per camera)": {
+        "fieldId": "durationOfVideoConsumedByOtherApplicationsP",
+        "type": "input"
+      },
+      "Average length of each WebRTC session (for live view)": {
+        "fieldId": "averageLengthOfEachWebrtcSessionForLiveVie",
+        "type": "input"
+      },
+      "TURN Usage Enter the percentage": {
+        "fieldId": "turnUsageEnterThePercentage",
+        "type": "input"
+      },
+      "Average retention for video": {
+        "fieldId": "averageRetentionForVideo",
+        "type": "input"
+      },
+      "Images extracted per camera (1080p resolution stream or lower)": {
+        "fieldId": "imagesExtractedPerCamera1080pResolutionStrea",
+        "type": "input"
+      },
+      "Images extracted per camera (greater than 1080p resolution stream)": {
+        "fieldId": "imagesExtractedPerCameraGreaterThan1080pRes",
+        "type": "input"
+      }
+    },
+    "version": "0.0.57"
+  },
+  "Amazon Lightsail": {
+    "serviceCode": "amazonLightsail",
+    "estimateFor": "lightsailVirtualServers",
+    "fields": {
+      "Number of servers": {
+        "fieldId": "numberOfServers",
+        "type": "input"
+      },
+      "Instance Type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Select an instance"
+      },
+      "Server utilization": {
+        "fieldId": "serverUtilization",
+        "type": "input"
+      },
+      "Number of containers": {
+        "fieldId": "numberOfContainers",
+        "type": "input"
+      },
+      "Container utilization": {
+        "fieldId": "containerUtilization",
+        "type": "input"
+      }
+    },
+    "version": "0.0.69"
+  },
+  "Amazon Location Service": {
+    "serviceCode": "amazonLocationService",
+    "estimateFor": "locationServiceMaps",
+    "fields": {
+      "Dynamic Maps": {
+        "fieldId": "dynamicMaps",
+        "type": "input"
+      },
+      "Static Maps": {
+        "fieldId": "staticMaps",
+        "type": "input"
+      },
+      "Open Data Dynamic Maps": {
+        "fieldId": "openDataDynamicMaps",
+        "type": "input"
+      }
+    },
+    "version": "0.0.11"
+  },
+  "Amazon Lookout for Metrics": {
+    "serviceCode": "amazonLookoutForMetrics",
+    "estimateFor": "amazonLookoutMetric",
+    "fields": {
+      "Total number of measures": {
+        "fieldId": "totalNumberOfMeasures",
+        "type": "input"
+      },
+      "Total number of dimension values": {
+        "fieldId": "totalNumberOfDimensionValues",
+        "type": "input"
+      }
+    },
+    "version": "0.0.14"
+  },
+  "Amazon Lookout for Vision": {
+    "serviceCode": "amazonLookoutForVision",
+    "estimateFor": "amazonLookoutVision",
+    "fields": {
+      "Number of plants": {
+        "fieldId": "numberOfPlants",
+        "type": "input"
+      },
+      "Number of production lines per plant": {
+        "fieldId": "numberOfProductionLinesPerPlant",
+        "type": "input"
+      },
+      "Number of inspection points per production line": {
+        "fieldId": "numberOfInspectionPointsPerProductionLine",
+        "type": "input"
+      },
+      "Number of cameras per inspection point": {
+        "fieldId": "numberOfCamerasPerInspectionPoint",
+        "type": "input"
+      },
+      "Time to train initial model (hours)": {
+        "fieldId": "timeToTrainInitialModelHours",
+        "type": "input"
+      },
+      "Average number of model retrains per model per month": {
+        "fieldId": "averageNumberOfModelRetrainsPerModelPerMon",
+        "type": "input"
+      },
+      "Number of inference units": {
+        "fieldId": "numberOfInferenceUnits",
+        "type": "input"
+      },
+      "Number of production shifts per day": {
+        "fieldId": "numberOfProductionShiftsPerDay",
+        "type": "input"
+      },
+      "Production hours per shift": {
+        "fieldId": "productionHoursPerShift",
+        "type": "input"
+      },
+      "Production days per month": {
+        "fieldId": "productionDaysPerMonth",
+        "type": "input"
+      }
+    },
+    "version": "0.0.8"
+  },
+  "Amazon MQ": {
+    "serviceCode": "amazonMQ",
+    "estimateFor": "singleInstanceBroker",
+    "fields": {
+      "Number of Brokers running": {
+        "fieldId": "numberOfBrokersRunning",
+        "type": "input"
+      },
+      "Storage per Broker": {
+        "fieldId": "storagePerBroker",
+        "type": "input"
+      },
+      "Enter Amount": {
+        "fieldId": "enterAmount",
+        "type": "input"
+      }
+    },
+    "version": "0.0.59"
+  },
+  "Amazon Macie": {
+    "serviceCode": "amazonMacie",
+    "estimateFor": "template0",
+    "fields": {
+      "Number of S3 buckets": {
+        "fieldId": "numberOfS3Buckets",
+        "type": "input"
+      },
+      "Total bytes in S3 storage": {
+        "fieldId": "totalBytesInS3Storage",
+        "type": "input"
+      },
+      "Number of objects monitored for automated data discovery": {
+        "fieldId": "numberOfObjectsMonitoredForAutomatedDataDis",
+        "type": "input"
+      }
+    },
+    "version": "0.0.67"
+  },
+  "Amazon Managed Grafana": {
+    "serviceCode": "amazonManagedGrafana",
+    "estimateFor": "template_0",
+    "fields": {
+      "Number of active editors/administrators": {
+        "fieldId": "numberOfActiveEditorsadministrators",
+        "type": "input"
+      },
+      "Number of active viewers": {
+        "fieldId": "numberOfActiveViewers",
+        "type": "input"
+      }
+    },
+    "version": "0.0.30"
+  },
+  "Amazon Managed Service for Apache Flink": {
+    "serviceCode": "amazonManagedServiceForApacheFlink",
+    "estimateFor": "template",
+    "fields": {
+      "Apache Flink applications": {
+        "fieldId": "apacheFlinkApplications",
+        "type": "input"
+      },
+      "Apache Flink KPUs": {
+        "fieldId": "apacheFlinkKpus",
+        "type": "input"
+      },
+      "Durable application backups maintained": {
+        "fieldId": "durableApplicationBackupsMaintained",
+        "type": "input"
+      },
+      "Durable application backup storage (average size)": {
+        "fieldId": "durableApplicationBackupStorageAverageSize",
+        "type": "input"
+      },
+      "Studio applications": {
+        "fieldId": "studioApplications",
+        "type": "input"
+      }
+    },
+    "version": "0.0.29"
+  },
+  "Amazon Managed Service for Prometheus": {
+    "serviceCode": "amazonManagedServiceForPrometheus",
+    "estimateFor": "prometheusSimple",
+    "fields": {
+      "Average active time series": {
+        "fieldId": "averageActiveTimeSeries",
+        "type": "input"
+      },
+      "Avg Collection Interval (in seconds)": {
+        "fieldId": "avgCollectionIntervalInSeconds",
+        "type": "input"
+      },
+      "Retention Period (in days)": {
+        "fieldId": "retentionPeriodInDays",
+        "type": "input"
+      },
+      "Average Number of Dashboard users per day": {
+        "fieldId": "averageNumberOfDashboardUsersPerDay",
+        "type": "input"
+      },
+      "Number of Prometheus rules": {
+        "fieldId": "numberOfPrometheusRules",
+        "type": "input"
+      },
+      "Average rule execution interval (in seconds)": {
+        "fieldId": "averageRuleExecutionIntervalInSeconds",
+        "type": "input"
+      },
+      "Average number of queries per day per dashboard user": {
+        "fieldId": "averageNumberOfQueriesPerDayPerDashboardUs",
+        "type": "input"
+      },
+      "Average samples per query for Monitoring queries": {
+        "fieldId": "averageSamplesPerQueryForMonitoringQueries",
+        "type": "input"
+      },
+      "Average samples per query for Alerting queries": {
+        "fieldId": "averageSamplesPerQueryForAlertingQueries",
+        "type": "input"
+      },
+      "Number of collectors": {
+        "fieldId": "numberOfCollectors",
+        "type": "input"
+      },
+      "Number of Samples collected": {
+        "fieldId": "numberOfSamplesCollected",
+        "type": "input"
+      }
+    },
+    "version": "0.0.68"
+  },
+  "Amazon Managed Streaming for Apache Kafka (MSK)": {
+    "serviceCode": "amazonMSK",
+    "estimateFor": "amazonMSK",
+    "fields": {
+      "Number of Kafka broker nodes": {
+        "fieldId": "numberOfKafkaBrokerNodes",
+        "type": "input"
+      },
+      "Instance Type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Select an instance"
+      },
+      "Storage per Broker": {
+        "fieldId": "storagePerBroker",
+        "type": "input",
+        "unit_field": "storagePerBroker_unit",
+        "default_unit": "gb|NA"
+      },
+      "Desired Provisioned Storage Throughput (MiBps)": {
+        "fieldId": "desiredProvisionedStorageThroughput",
+        "type": "input"
+      },
+      "Number of authentication schemes configured for private connectivity": {
+        "fieldId": "numberOfAuthenticationSchemes",
+        "type": "input"
+      },
+      "Enter Amount": {
+        "fieldId": "dataTransfer",
+        "type": "input"
+      }
+    },
+    "version": "0.0.55"
+  },
+  "Amazon Managed Workflows for Apache Airflow": {
+    "serviceCode": "amazonManagedWorkflowsForApacheAirflow",
+    "estimateFor": "mwaa",
+    "fields": {
+      "Minimum workers": {
+        "fieldId": "minimumWorkers",
+        "type": "input"
+      },
+      "Maximum workers": {
+        "fieldId": "maximumWorkers",
+        "type": "input"
+      },
+      "Hours at maximum workers": {
+        "fieldId": "hoursAtMaximumWorkers",
+        "type": "input"
+      },
+      "Minimum web servers": {
+        "fieldId": "minimumWebServers",
+        "type": "input"
+      },
+      "Maximum web servers": {
+        "fieldId": "maximumWebServers",
+        "type": "input"
+      },
+      "Hours at maximum web servers": {
+        "fieldId": "hoursAtMaximumWebServers",
+        "type": "input"
+      },
+      "Number of schedulers": {
+        "fieldId": "numberOfSchedulers",
+        "type": "input"
+      },
+      "Data storage size": {
+        "fieldId": "dataStorageSize",
+        "type": "input"
+      }
+    },
+    "version": "0.0.14"
+  },
+  "Amazon MemoryDB": {
+    "serviceCode": "amazonMemoryDB",
+    "estimateFor": "template_0",
+    "fields": {
+      "Number of nodes": {
+        "fieldId": "columnFormIPM[0].Number of Nodes",
+        "type": "input"
+      },
+      "Instance Type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Select an instance"
+      },
+      "Utilization (On-Demand only)": {
+        "fieldId": "columnFormIPM[0].undefined.unit",
+        "type": "input"
+      },
+      "Data Written": {
+        "fieldId": "dataWritten",
+        "type": "input",
+        "unit_field": "dataWritten_unit",
+        "default_unit": "gb|NA"
+      },
+      "Snapshot storage": {
+        "fieldId": "snapshotStorage",
+        "type": "input",
+        "unit_field": "snapshotStorage_unit",
+        "default_unit": "gb|NA"
+      }
+    },
+    "version": "0.0.43"
+  },
+  "Amazon Neptune": {
+    "serviceCode": "amazonNeptune",
+    "estimateFor": "template_0",
+    "fields": {
+      "Storage mode": {
+        "fieldId": "storageMode",
+        "type": "dropdown",
+        "values": [
+          "Neptune Standard",
+          "Neptune I/O-Optimized"
+        ],
+        "defaultValue": "Neptune Standard",
+        "allowedValues": [
+          "Neptune Standard",
+          "Neptune I/O-Optimized"
+        ]
+      },
+      "Number of instances": {
+        "fieldId": "columnFormIPM[0].Number of Nodes",
+        "type": "input"
+      },
+      "Instance Type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Select an instance"
+      },
+      "Usage (Neptune instances)": {
+        "fieldId": "columnFormIPM[0].undefined.unit",
+        "type": "input"
+      },
+      "Data stored": {
+        "fieldId": "dataStored",
+        "type": "input",
+        "unit_field": "dataStored_unit",
+        "default_unit": "gb|NA",
+        "defaultValue": "10",
+        "unit": "gb|NA"
+      }
+    },
+    "version": "0.0.64"
+  },
+  "Amazon OpenSearch Service": {
+    "serviceCode": "amazonOpenSearch",
+    "estimateFor": "elasticSearchService",
+    "fields": {
+      "Pricing model": {
+        "fieldId": "columnFormIPM[0].TermType",
+        "type": "dropdown",
+        "values": [
+          "OnDemand",
+          "Reserved"
+        ]
+      },
+      "Nodes": {
+        "fieldId": "columnFormIPM[0].Number of Nodes",
+        "type": "input"
+      },
+      "Instance Type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Select an instance"
+      },
+      "Utilization (On-Demand only)": {
+        "fieldId": "columnFormIPM[0].undefined.unit",
+        "type": "input"
+      },
+      "Storage amount per volume (gp3)": {
+        "fieldId": "storageAmountPerVolumeGP3",
+        "type": "input"
+      },
+      "Provisioning IOPS per volume (gp3)": {
+        "fieldId": "provisioningIOPSPerVolumeGP3",
+        "type": "input"
+      }
+    },
+    "version": "0.0.167"
+  },
+  "Amazon Personalize": {
+    "serviceCode": "amazonPersonalize",
+    "estimateFor": "template_0",
+    "fields": {},
+    "version": "0.0.33"
+  },
+  "Amazon Pinpoint": {
+    "serviceCode": "amazonPinpoint",
+    "estimateFor": "pinpoint",
+    "fields": {
+      "Number of push notifications": {
+        "fieldId": "numberOfPushNotifications",
+        "type": "input"
+      },
+      "Number of in-app message requests": {
+        "fieldId": "numberOfInappMessageRequests",
+        "type": "input"
+      }
+    },
+    "version": "0.0.13"
+  },
+  "Amazon Polly": {
+    "serviceCode": "amazonPolly",
+    "estimateFor": "neuralTextToSpeech",
+    "fields": {
+      "Number of requests (Standard Text-to-Speech)": {
+        "fieldId": "numberOfRequestsStandardTexttospeech",
+        "type": "input"
+      },
+      "Number of characters per request including white spaces, but excluding SSML": {
+        "fieldId": "numberOfCharactersPerRequestIncludingWhiteS",
+        "type": "input"
+      }
+    },
+    "version": "0.0.26"
+  },
+  "Amazon Quantum Ledger Database (QLDB)": {
+    "serviceCode": "amazonQLDB",
+    "estimateFor": "template_0",
+    "fields": {
+      "Number of Write I/Os": {
+        "fieldId": "numberOfWriteIos",
+        "type": "input"
+      },
+      "Number of Read I/Os": {
+        "fieldId": "numberOfReadIos",
+        "type": "input"
+      },
+      "Journal Storage": {
+        "fieldId": "journalStorage",
+        "type": "input"
+      }
+    },
+    "version": "0.0.9"
+  },
+  "Amazon QuickSight": {
+    "serviceCode": "amazonQuickSight",
+    "estimateFor": "amazonQuickSightReadersAuthorsSpice",
+    "fields": {
+      "Number of Readers": {
+        "fieldId": "numberOfReaders",
+        "type": "input"
+      },
+      "Number of Authors": {
+        "fieldId": "numberOfAuthors",
+        "type": "input"
+      }
+    },
+    "version": "0.0.33"
+  },
+  "Amazon RDS Custom for Oracle": {
+    "serviceCode": "amazonRDSCustomForOracle",
+    "estimateFor": "rdsForCustom",
+    "fields": {
+      "Number of RDS Custom for Oracle instances": {
+        "fieldId": "numberOfRdsCustomForOracleInstances",
+        "type": "input"
+      },
+      "Instance Type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Select an instance"
+      },
+      "Utilization (On-Demand only)": {
+        "fieldId": "utilizationOndemandOnly",
+        "type": "input"
+      },
+      "Storage amount": {
+        "fieldId": "storageAmount",
+        "type": "input"
+      }
+    },
+    "version": "0.0.29"
+  },
+  "Amazon RDS Custom for SQL Server": {
+    "serviceCode": "amazonRDSCustomForSQLServer",
+    "estimateFor": "rdsForCustom",
+    "fields": {
+      "Number of RDS Custom for SQL Server instances": {
+        "fieldId": "numberOfRdsCustomForSqlServerInstances",
+        "type": "input"
+      },
+      "Instance Type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Select an instance"
+      },
+      "Utilization (On-Demand only)": {
+        "fieldId": "utilizationOndemandOnly",
+        "type": "input"
+      },
+      "Storage amount": {
+        "fieldId": "storageAmount",
+        "type": "input"
+      }
+    },
+    "version": "0.0.35"
+  },
+  "Amazon RDS for Db2": {
+    "serviceCode": "amazonRDSDb2",
+    "estimateFor": "rdsFordb2",
+    "fields": {
+      "Nodes": {
+        "fieldId": "nodes",
+        "type": "input"
+      },
+      "Instance Type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Select an instance"
+      },
+      "Utilization (On-Demand only)": {
+        "fieldId": "utilizationOndemandOnly",
+        "type": "input"
+      },
+      "Storage amount": {
+        "fieldId": "storageAmount",
+        "type": "input"
+      }
+    },
+    "version": "0.0.105"
+  },
+  "Amazon RDS for MariaDB": {
+    "serviceCode": "amazonRDSMariaDB",
+    "estimateFor": "rdsForMariaDB",
+    "fields": {
+      "Nodes": {
+        "fieldId": "columnFormIPM[0].Number of Nodes",
+        "type": "input"
+      },
+      "Instance Type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Select an instance"
+      },
+      "Deployment Option": {
+        "fieldId": "columnFormIPM[0].Deployment Option",
+        "type": "dropdown"
+      },
+      "Utilization (On-Demand only)": {
+        "fieldId": "columnFormIPM[0].undefined.unit",
+        "type": "input"
+      },
+      "Storage amount": {
+        "fieldId": "storageAmount",
+        "type": "input",
+        "unit_field": "storageAmount_unit",
+        "default_unit": "gb|NA"
+      },
+      "Storage type": {
+        "fieldId": "storageVolume",
+        "type": "dropdown"
+      }
+    },
+    "version": "0.0.132"
+  },
+  "Amazon RDS for MySQL": {
+    "serviceCode": "amazonRDSMySQLDB",
+    "estimateFor": "mySQLDB",
+    "fields": {
+      "Nodes": {
+        "fieldId": "columnFormIPM[0].Number of Nodes",
+        "type": "input"
+      },
+      "Instance Type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Select an instance"
+      },
+      "Deployment Option": {
+        "fieldId": "columnFormIPM[0].Deployment Option",
+        "type": "dropdown",
+        "values": [
+          "Multi-AZ",
+          "Single-AZ"
+        ]
+      },
+      "Utilization (On-Demand only)": {
+        "fieldId": "columnFormIPM[0].undefined.unit",
+        "type": "input"
+      },
+      "Storage amount": {
+        "fieldId": "storageAmount",
+        "type": "input",
+        "unit_field": "storageAmount_unit",
+        "default_unit": "gb|NA"
+      },
+      "Storage type": {
+        "fieldId": "storageVolume",
+        "type": "dropdown"
+      },
+      "RDS Extended Support": {
+        "fieldId": "addRDSExtendedSupport",
+        "type": "radio",
+        "values": [
+          "0",
+          "1"
+        ]
+      }
+    },
+    "version": "0.0.135"
+  },
+  "Amazon RDS for Oracle": {
+    "serviceCode": "amazonRDSOracleDB",
+    "estimateFor": "rdsForOracle",
+    "fields": {
+      "Nodes": {
+        "fieldId": "columnFormIPM[0].Number of Nodes",
+        "type": "input"
+      },
+      "Instance Type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Select an instance"
+      },
+      "Deployment Option": {
+        "fieldId": "columnFormIPM[0].Deployment Option",
+        "type": "dropdown"
+      },
+      "Utilization (On-Demand only)": {
+        "fieldId": "columnFormIPM[0].undefined.unit",
+        "type": "input"
+      },
+      "Storage amount": {
+        "fieldId": "storageAmount",
+        "type": "input",
+        "unit_field": "storageAmount_unit",
+        "default_unit": "gb|NA"
+      }
+    },
+    "version": "0.0.88"
+  },
+  "Amazon RDS for PostgreSQL": {
+    "serviceCode": "amazonRDSPostgreSQLDB",
+    "estimateFor": "rdsForPostgreSQL",
+    "fields": {
+      "Nodes": {
+        "fieldId": "columnFormIPM[0].Number of Nodes",
+        "type": "input",
+        "notes": "Number of nodes in the instance table row"
+      },
+      "Instance Type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Select an instance"
+      },
+      "Deployment Option": {
+        "fieldId": "columnFormIPM[0].Deployment Option",
+        "type": "dropdown",
+        "values": [
+          "Multi-AZ",
+          "Single-AZ"
+        ]
+      },
+      "Utilization (On-Demand only)": {
+        "fieldId": "columnFormIPM[0].undefined.unit",
+        "type": "input",
+        "notes": "Percentage utilization stored in undefined.value.unit"
+      },
+      "Storage amount": {
+        "fieldId": "storageAmount",
+        "type": "input",
+        "unit_field": "storageAmount_unit",
+        "default_unit": "gb|NA",
+        "defaultValue": "20",
+        "unit": "gb|NA"
+      },
+      "Storage type": {
+        "fieldId": "storageVolume",
+        "type": "dropdown",
+        "values": [
+          "General Purpose-GP2",
+          "General Purpose-GP3",
+          "Provisioned IOPS-io1",
+          "Provisioned IOPS-io2"
+        ],
+        "defaultValue": "General Purpose-GP3",
+        "allowedValues": [
+          "General Purpose-GP2",
+          "General Purpose-GP3",
+          "Provisioned IOPS-io1",
+          "Provisioned IOPS-io2"
+        ]
+      },
+      "Create RDS Proxy": {
+        "fieldId": "createRDSProxy",
+        "type": "radio",
+        "values": [
+          "0",
+          "1"
+        ],
+        "defaultValue": "0"
+      },
+      "Database Insights": {
+        "fieldId": "DatabaseInsightsSelected",
+        "type": "radio",
+        "values": [
+          "0",
+          "1"
+        ],
+        "defaultValue": "0"
+      },
+      "Retention Period": {
+        "fieldId": "retentionPeriod",
+        "type": "input",
+        "defaultValue": "0"
+      },
+      "RDS Extended Support": {
+        "fieldId": "addRDSExtendedSupport",
+        "type": "radio",
+        "values": [
+          "0",
+          "1"
+        ],
+        "defaultValue": "0"
+      },
+      "RDS Extended Support Year": {
+        "fieldId": "RDSExtendedSupportYear",
+        "type": "dropdown",
+        "values": [
+          "year12",
+          "year3"
+        ],
+        "defaultValue": "year12",
+        "allowedValues": [
+          "year12",
+          "year3"
+        ]
+      },
+      "TermType": {
+        "fieldId": "columnFormIPM[0].TermType",
+        "type": "dropdown",
+        "values": [
+          "OnDemand",
+          "Reserved"
+        ]
+      }
+    },
+    "version": "0.0.110"
+  },
+  "Amazon RDS for SQL server": {
+    "serviceCode": "amazonRDSSQLServerDB",
+    "estimateFor": "rdsForSQLServer",
+    "fields": {
+      "Nodes": {
+        "fieldId": "columnFormIPM[0].Number of Nodes",
+        "type": "input"
+      },
+      "Instance Type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Select an instance"
+      },
+      "Deployment Option": {
+        "fieldId": "columnFormIPM[0].Deployment Option",
+        "type": "dropdown"
+      },
+      "Utilization (On-Demand only)": {
+        "fieldId": "columnFormIPM[0].undefined.unit",
+        "type": "input"
+      },
+      "Storage amount": {
+        "fieldId": "storageAmount",
+        "type": "input",
+        "unit_field": "storageAmount_unit",
+        "default_unit": "gb|NA"
+      }
+    },
+    "version": "0.0.123"
+  },
+  "Amazon RDS on AWS Outposts": {
+    "serviceCode": "amazonRDSOnAWSOutposts",
+    "estimateFor": "rdsForOutposts",
+    "fields": {
+      "Number of RDS for Outposts instances": {
+        "fieldId": "numberOfRdsForOutpostsInstances",
+        "type": "input"
+      },
+      "Instance Type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Select an instance"
+      },
+      "Utilization (On-Demand only)": {
+        "fieldId": "utilizationOndemandOnly",
+        "type": "input"
+      }
+    },
+    "version": "0.0.12"
+  },
+  "Amazon Redshift": {
+    "serviceCode": "amazonRedshift",
+    "estimateFor": "redshift",
+    "fields": {
+      "Nodes": {
+        "fieldId": "columnFormIPM[0].Number of Nodes",
+        "type": "input"
+      },
+      "Instance Type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Select an instance"
+      },
+      "Utilization (On-Demand only)": {
+        "fieldId": "columnFormIPM[0].undefined.unit",
+        "type": "input"
+      }
+    },
+    "version": "0.0.83"
+  },
+  "Amazon Rekognition": {
+    "serviceCode": "amazonRekognition",
+    "estimateFor": "rekognitionImage",
+    "fields": {
+      "Number of images processed with labels API calls per month": {
+        "fieldId": "numberOfImagesProcessedWithLabelsApiCallsP",
+        "type": "input"
+      },
+      "Number of images processed with content moderation API calls per month": {
+        "fieldId": "numberOfImagesProcessedWithContentModeration",
+        "type": "input"
+      },
+      "Number of images processed with detect text API calls per month": {
+        "fieldId": "numberOfImagesProcessedWithDetectTextApiCa",
+        "type": "input"
+      },
+      "Number of images processed with celebrity API calls per month": {
+        "fieldId": "numberOfImagesProcessedWithCelebrityApiCall",
+        "type": "input"
+      },
+      "Number of images processed with PPE detection API calls per month": {
+        "fieldId": "numberOfImagesProcessedWithPpeDetectionApi",
+        "type": "input"
+      },
+      "Number of images processed with Image Properties API calls per month": {
+        "fieldId": "numberOfImagesProcessedWithImagePropertiesA",
+        "type": "input"
+      },
+      "Number of DetectFaces API calls per month": {
+        "fieldId": "numberOfDetectfacesApiCallsPerMonth",
+        "type": "input"
+      }
+    },
+    "version": "0.0.11"
+  },
+  "Amazon Route 53": {
+    "serviceCode": "amazonRoute53",
+    "estimateFor": "Route53",
+    "fields": {
+      "Hosted Zones": {
+        "fieldId": "numberOfHostedZones",
+        "type": "input",
+        "defaultValue": "1"
+      },
+      "Additional Records in Hosted Zones": {
+        "fieldId": "additionalRecords",
+        "type": "input"
+      },
+      "Traffic Flow": {
+        "fieldId": "trafficFlow",
+        "type": "input"
+      },
+      "Standard queries": {
+        "fieldId": "numberOfStandardQueries",
+        "type": "input",
+        "unit_field": "numberOfStandardQueries_unit",
+        "default_unit": "millionPerMonth",
+        "defaultValue": "1",
+        "unit": "millionPerMonth"
+      },
+      "Basic Checks Within AWS": {
+        "fieldId": "basicChecksWithinAWS",
+        "type": "input"
+      },
+      "HTTPS Checks Within AWS": {
+        "fieldId": "httpsChecksWithinAWS",
+        "type": "input"
+      },
+      "Number of domains stored": {
+        "fieldId": "numberOfDomainsStored",
+        "type": "input"
+      },
+      "DNS queries": {
+        "fieldId": "dnsQueries",
+        "type": "input"
+      }
+    },
+    "version": "0.0.88"
+  },
+  "Amazon SageMaker": {
+    "serviceCode": "amazonSageMaker",
+    "estimateFor": "sageMakerStudioNotebooks",
+    "fields": {
+      "Number of data scientist(s)": {
+        "fieldId": "numberOfDataScientists",
+        "type": "input"
+      },
+      "Number of Studio Notebook instances per data scientist": {
+        "fieldId": "numberOfStudioNotebookInstances",
+        "type": "input"
+      },
+      "Studio Notebook hour(s) per day": {
+        "fieldId": "studioNotebookHoursPerDay",
+        "type": "input"
+      },
+      "Studio Notebook day(s) per month": {
+        "fieldId": "studioNotebookDaysPerMonth",
+        "type": "input"
+      },
+      "Number of On-Demand Notebook instances per data scientist": {
+        "fieldId": "numberOfOnDemandNotebookInstances",
+        "type": "input"
+      },
+      "On-Demand Notebook hour(s) per day": {
+        "fieldId": "onDemandNotebookHoursPerDay",
+        "type": "input"
+      },
+      "On-Demand Notebook day(s) per month": {
+        "fieldId": "onDemandNotebookDaysPerMonth",
+        "type": "input"
+      },
+      "Storage amount": {
+        "fieldId": "storageAmount",
+        "type": "input",
+        "unit_field": "storageAmount_unit",
+        "default_unit": "gb|NA"
+      }
+    },
+    "version": "0.0.60"
+  },
+  "Amazon SageMaker Ground Truth": {
+    "serviceCode": "amazonSageMakerGroundTruth",
+    "estimateFor": "sagemakerGT",
+    "fields": {
+      "Number of dataset objects": {
+        "fieldId": "numberOfDatasetObjects",
+        "type": "input"
+      },
+      "Number of workers per dataset object": {
+        "fieldId": "numberOfWorkersPerDatasetObject",
+        "type": "input"
+      },
+      "Number of human tasks per month": {
+        "fieldId": "numberOfHumanTasksPerMonth",
+        "type": "input"
+      }
+    },
+    "version": "0.0.21"
+  },
+  "Amazon Security Lake": {
+    "serviceCode": "amazonSecurityLake",
+    "estimateFor": "template_securitylake",
+    "fields": {
+      "CloudTrail events": {
+        "fieldId": "cloudtrailEvents",
+        "type": "input"
+      }
+    },
+    "version": "0.0.72"
+  },
+  "Amazon Simple Email Service (SES)": {
+    "serviceCode": "amazonSES",
+    "estimateFor": "simpleEmailService",
+    "fields": {
+      "Number of Open Ingress Endpoint(s)": {
+        "fieldId": "numberOfOpenIngressEndpoints",
+        "type": "input"
+      },
+      "Number of Emails processed by Mail Manager": {
+        "fieldId": "numberOfEmailsProcessedByMailManager",
+        "type": "input"
+      },
+      "Email messages sent from EC2": {
+        "fieldId": "emailMessagesSentFromEc2",
+        "type": "input"
+      },
+      "Attachment data sent from EC2": {
+        "fieldId": "attachmentDataSentFromEc2",
+        "type": "input"
+      },
+      "Email messages sent from email client": {
+        "fieldId": "emailMessagesSentFromEmailClient",
+        "type": "input"
+      },
+      "Attachment data sent from email client": {
+        "fieldId": "attachmentDataSentFromEmailClient",
+        "type": "input"
+      },
+      "Email messages received": {
+        "fieldId": "emailMessagesReceived",
+        "type": "input"
+      },
+      "Average size of email processed by Mail Manager": {
+        "fieldId": "averageSizeOfEmailProcessedByMailManager",
+        "type": "input"
+      },
+      "Email message sent via dedicated IPs (managed)": {
+        "fieldId": "emailMessageSentViaDedicatedIpsManaged",
+        "type": "input"
+      },
+      "Number of dedicated IP(standard) addresses": {
+        "fieldId": "numberOfDedicatedIpstandardAddresses",
+        "type": "input"
+      },
+      "Gigabytes Inserted & Indexed": {
+        "fieldId": "gigabytesInsertedIndexed",
+        "type": "input"
+      },
+      "Gigabytes Already Stored": {
+        "fieldId": "gigabytesAlreadyStored",
+        "type": "input"
+      }
+    },
+    "version": "0.0.52"
+  },
+  "Amazon Simple Notification Service (SNS)": {
+    "serviceCode": "amazonSNS",
+    "estimateFor": "standardTopics",
+    "fields": {
+      "Requests": {
+        "fieldId": "requests",
+        "type": "input",
+        "unit_field": "requests_unit",
+        "default_unit": "perMonth",
+        "defaultValue": "1000000",
+        "unit": "perMonth"
+      },
+      "HTTP/HTTPS Notifications": {
+        "fieldId": "httpHttpsNotifications",
+        "type": "input",
+        "unit_field": "httpHttpsNotifications_unit",
+        "default_unit": "perMonth",
+        "defaultValue": "100000",
+        "unit": "perMonth"
+      },
+      "EMAIL/EMAIL-JSON Notifications": {
+        "fieldId": "emailNotifications",
+        "type": "input"
+      },
+      "SQS Notifications": {
+        "fieldId": "sqsNotifications",
+        "type": "input"
+      },
+      "Mobile Push Notifications": {
+        "fieldId": "mobilePushNotifications",
+        "type": "input"
+      }
+    },
+    "version": "0.0.24"
+  },
+  "Amazon Simple Queue Service (SQS)": {
+    "serviceCode": "amazonSQS",
+    "estimateFor": "simpleQueueService",
+    "fields": {
+      "Standard queue requests": {
+        "fieldId": "standardQueueRequests",
+        "type": "input",
+        "unit_field": "standardQueueRequests_unit",
+        "default_unit": "perMonth",
+        "defaultValue": "1000000",
+        "unit": "perMonth"
+      },
+      "FIFO queue requests": {
+        "fieldId": "fifoQueueRequests",
+        "type": "input",
+        "unit_field": "fifoQueueRequests_unit",
+        "default_unit": "perMonth",
+        "defaultValue": "0",
+        "unit": "perMonth"
+      },
+      "Fair queue requests": {
+        "fieldId": "fairQueueRequests",
+        "type": "input",
+        "unit_field": "fairQueueRequests_unit",
+        "default_unit": "perMonth"
+      },
+      "Enter Amount": {
+        "fieldId": "dataTransfer",
+        "type": "input"
+      }
+    },
+    "version": "0.0.47"
+  },
+  "Amazon Simple Storage Service (S3)": {
+    "serviceCode": "amazonS3",
+    "estimateFor": "template_0",
+    "fields": {
+      "S3 Standard storage": {
+        "fieldId": "s3StandardStorage",
+        "type": "input",
+        "unit_field": "s3StandardStorage_unit",
+        "default_unit": "gb|month",
+        "defaultValue": "100",
+        "unit": "gb|month"
+      },
+      "PUT, COPY, POST, LIST requests to S3 Standard": {
+        "fieldId": "putCopyPostListRequests",
+        "type": "input",
+        "unit_field": "putCopyPostListRequests_unit",
+        "default_unit": "perMonth",
+        "defaultValue": "100000",
+        "unit": "perMonth"
+      },
+      "GET, SELECT, and all other requests from S3 Standard": {
+        "fieldId": "getSelectRequests",
+        "type": "input",
+        "unit_field": "getSelectRequests_unit",
+        "default_unit": "perMonth",
+        "defaultValue": "100000",
+        "unit": "perMonth"
+      },
+      "Data returned by S3 Select": {
+        "fieldId": "dataReturnedByS3Select",
+        "type": "input",
+        "unit_field": "dataReturnedByS3Select_unit",
+        "default_unit": "gb|month"
+      },
+      "Enter Amount": {
+        "fieldId": "dataTransfer",
+        "type": "input",
+        "notes": "Data transfer out amount"
+      }
+    },
+    "version": "0.0.1"
+  },
+  "Amazon Simple Workflow Service (SWF)": {
+    "serviceCode": "amazonSWF",
+    "estimateFor": "simpleWorkflow",
+    "fields": {
+      "Workflow Executions": {
+        "fieldId": "workflowExecutions",
+        "type": "input"
+      },
+      "Total Tasks, Markers, Timers and Signals": {
+        "fieldId": "totalTasksMarkersTimersAndSignals",
+        "type": "input"
+      },
+      "Workflow lifetime": {
+        "fieldId": "workflowLifetime",
+        "type": "input"
+      },
+      "Workflow retention": {
+        "fieldId": "workflowRetention",
+        "type": "input"
+      }
+    },
+    "version": "0.0.24"
+  },
+  "Amazon Textract": {
+    "serviceCode": "amazonTextract",
+    "estimateFor": "amazonTextract",
+    "fields": {
+      "Number of pages": {
+        "fieldId": "numberOfPages",
+        "type": "input"
+      },
+      "Percent of pages with text (Detect Document Text API) Enter %": {
+        "fieldId": "percentOfPagesWithTextDetectDocumentTextAp",
+        "type": "input"
+      }
+    },
+    "version": "0.0.39"
+  },
+  "Amazon Timestream": {
+    "serviceCode": "amazonTimestream",
+    "estimateFor": "AmazonTimestream",
+    "fields": {
+      "Estimated Monthly Storage": {
+        "fieldId": "estimatedMonthlyStorage",
+        "type": "input"
+      }
+    },
+    "version": "0.0.79"
+  },
+  "Amazon Transcribe": {
+    "serviceCode": "amazonTranscribe",
+    "estimateFor": "template",
+    "fields": {},
+    "version": "0.0.72"
+  },
+  "Amazon Transcribe Medical": {
+    "serviceCode": "amazonTranscribeMedical",
+    "estimateFor": "template",
+    "fields": {
+      "Number of minutes of medical audio transcription per month": {
+        "fieldId": "numberOfMinutesOfMedicalAudioTranscriptionP",
+        "type": "input"
+      }
+    },
+    "version": "0.0.35"
+  },
+  "Amazon Translate": {
+    "serviceCode": "amazonTranslate",
+    "estimateFor": "standardRealTimeTranslation",
+    "fields": {
+      "Number of characters including white spaces and punctuations (Standard Real-Time Translation)": {
+        "fieldId": "numberOfCharactersIncludingWhiteSpacesAndPu",
+        "type": "input"
+      }
+    },
+    "version": "0.0.8"
+  },
+  "Amazon Verified Permissions": {
+    "serviceCode": "amazonVerifiedPermissions",
+    "estimateFor": "template_verifiedPermissions",
+    "fields": {
+      "Number of Single Authorization Requests": {
+        "fieldId": "numberOfSingleAuthorizationRequests",
+        "type": "input"
+      },
+      "Number of Batch Authorization Requests": {
+        "fieldId": "numberOfBatchAuthorizationRequests",
+        "type": "input"
+      },
+      "Number of Policy Management Requests": {
+        "fieldId": "numberOfPolicyManagementRequests",
+        "type": "input"
+      }
+    },
+    "version": "0.0.78"
+  },
+  "Amazon Virtual Private Cloud (VPC)": {
+    "serviceCode": "amazonVPC",
+    "estimateFor": "vpnConnectionVpc",
+    "fields": {
+      "Number of Instances": {
+        "fieldId": "natGateways",
+        "type": "input",
+        "notes": "NAT Gateway instances",
+        "defaultValue": "1"
+      },
+      "Number of Site-to-Site VPN Connections": {
+        "fieldId": "vpnConnections",
+        "type": "input"
+      },
+      "Average duration for each connection": {
+        "fieldId": "vpnDuration",
+        "type": "input"
+      },
+      "Number of subnet associations": {
+        "fieldId": "subnetAssociations",
+        "type": "input"
+      },
+      "Number of active Client VPN connections (or users)": {
+        "fieldId": "clientVpnConnections",
+        "type": "input"
+      },
+      "Working days per month": {
+        "fieldId": "workingDaysPerMonth",
+        "type": "input"
+      }
+    },
+    "version": "0.0.101"
+  },
+  "Amazon WorkSpaces": {
+    "serviceCode": "amazonWorkSpaces",
+    "estimateFor": "amazonWorkspaces",
+    "fields": {
+      "Number of WorkSpaces": {
+        "fieldId": "numberOfWorkspaces",
+        "type": "input"
+      },
+      "Billing option": {
+        "fieldId": "billingOption",
+        "type": "input"
+      }
+    },
+    "version": "0.0.8"
+  },
+  "Amazon WorkSpaces Applications": {
+    "serviceCode": "amazonWorkSpacesApplications",
+    "estimateFor": "appStream2",
+    "fields": {
+      "Instance Type": {
+        "fieldId": "columnFormIPM[0].Instance Type",
+        "type": "autosuggest",
+        "placeholder": "Select an instance"
+      },
+      "Number of users per month": {
+        "fieldId": "numberOfUsersPerMonth",
+        "type": "input"
+      },
+      "Number of working hours per day": {
+        "fieldId": "numberOfWorkingHoursPerDay",
+        "type": "input"
+      },
+      "Instance Disk Volume size": {
+        "fieldId": "instanceDiskVolumeSize",
+        "type": "input"
+      },
+      "Days in week": {
+        "fieldId": "daysInWeek",
+        "type": "input"
+      },
+      "Peak duration (hours) per day": {
+        "fieldId": "peakDurationHoursPerDay",
+        "type": "input"
+      },
+      "Average off-peak concurrent users per hour": {
+        "fieldId": "averageOffpeakConcurrentUsersPerHour",
+        "type": "input"
+      },
+      "Average peak concurrent users per hour": {
+        "fieldId": "averagePeakConcurrentUsersPerHour",
+        "type": "input"
+      },
+      "Days in weekend": {
+        "fieldId": "daysInWeekend",
+        "type": "input"
+      }
+    },
+    "version": "0.0.26"
+  },
+  "Elastic Load Balancing": {
+    "serviceCode": "elasticLoadBalancing",
+    "estimateFor": "applicationLoadBalancer",
+    "fields": {
+      "Number of Application Load Balancers": {
+        "fieldId": "numberOfALBs",
+        "type": "input",
+        "defaultValue": "1"
+      },
+      "Processed bytes (Lambda functions as targets)": {
+        "fieldId": "processedBytesLambda",
+        "type": "input",
+        "unit_field": "processedBytesLambda_unit",
+        "default_unit": "gb|NA",
+        "defaultValue": "1",
+        "unit": "gb|NA"
+      },
+      "Average number of new connections per ALB": {
+        "fieldId": "averageNewConnectionsPerALB",
+        "type": "input"
+      },
+      "Average number of requests per second per ALB": {
+        "fieldId": "averageRequestsPerSecondPerALB",
+        "type": "input"
+      },
+      "Average number of rule evaluations per request": {
+        "fieldId": "averageRuleEvaluationsPerRequest",
+        "type": "input"
+      }
+    },
+    "version": "0.0.28"
+  },
+  "Windows Server and SQL Server on Amazon EC2": {
+    "serviceCode": "windowsServerAndSQLServerOnEC2",
+    "estimateFor": "sharedTenancy",
+    "fields": {
+      "Machine description": {
+        "fieldId": "machineDescription",
+        "type": "input"
+      },
+      "Storage amount (GB)": {
+        "fieldId": "storageAmountGb",
+        "type": "input"
+      },
+      "IOPS": {
+        "fieldId": "iops",
+        "type": "input"
+      },
+      "Throughput (MiB/s)": {
+        "fieldId": "throughputMibs",
+        "type": "input"
+      },
+      "Number of vCPUs": {
+        "fieldId": "numberOfVcpus",
+        "type": "input"
+      },
+      "Memory (GiB)": {
+        "fieldId": "memoryGib",
+        "type": "input"
+      },
+      "Quantity": {
+        "fieldId": "quantity",
+        "type": "input"
+      },
+      "Number of passive instances": {
+        "fieldId": "numberOfPassiveInstances",
+        "type": "input"
+      }
+    },
+    "version": "1.0.35"
+  }
+}
