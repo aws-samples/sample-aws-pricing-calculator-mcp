@@ -95,23 +95,27 @@ function buildConfig(serviceName, serviceConfig, region) {
     const fieldId = fieldInfo.fieldId;
     if (!fieldId) continue;
 
-    // Use default value if available
+    let valueSet = false;
+
     if (fieldInfo.defaultValue) {
       config[fieldId] = fieldInfo.defaultValue;
-      continue;
-    }
-
-    // Use first allowed value for dropdowns
-    if (fieldInfo.allowedValues && fieldInfo.allowedValues.length > 0) {
+      valueSet = true;
+    } else if (fieldInfo.allowedValues && fieldInfo.allowedValues.length > 0) {
       config[fieldId] = fieldInfo.allowedValues[0];
+      valueSet = true;
+    } else if (fieldInfo.type === 'autosuggest') {
       continue;
+    } else {
+      config[fieldId] = '1';
+      valueSet = true;
     }
 
-    // Skip autosuggest fields (require specific valid values)
-    if (fieldInfo.type === 'autosuggest') continue;
-
-    // Provide a sensible default for numeric inputs
-    config[fieldId] = '1';
+    // Calculator stores units in a sister field (e.g. numberOfRequests_unit).
+    // Without it the API accepts the save, but rehydration silently re-defaults
+    // or drops the value. Send unit when the mapping declares unit_field.
+    if (valueSet && fieldInfo.unit_field) {
+      config[fieldInfo.unit_field] = fieldInfo.unit || fieldInfo.default_unit;
+    }
   }
 
   return config;
