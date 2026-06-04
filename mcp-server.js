@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: MIT-0
+const fs = require('fs');
 const { McpServer } = require('@modelcontextprotocol/sdk/server/mcp.js');
 const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio.js');
 const { z } = require('zod');
@@ -230,21 +231,39 @@ IMPORTANT: Before calling this tool, you MUST confirm the desired AWS region wit
 Config keys are validated against the service definition. Invalid field IDs will be rejected with suggested corrections. Use get_service_fields first to discover valid field IDs for a service.
 
 For batch mode, pass a JSON array in "services":
-[{"service":"aWSLambda","instance":"Compute","group":"Prod","config":{...}},{"service":"amazonS3Standard","group":"Prod","config":{...}}]`,
+[{"service":"aWSLambda","instance":"Compute","group":"Prod","config":{...}},{"service":"amazonS3Standard","group":"Prod","config":{...}}]
+
+For large batches, write that same JSON array to a file and pass its absolute path as "services_file" instead of "services". The server reads the file directly, avoiding the cost of streaming a large payload through the client. Supply exactly one of "services" or "services_file".`,
   {
     estimate_id: z.string().describe('Estimate ID from create_estimate'),
-    services: z.string().describe('JSON array of service entries. Each entry: {"service":"serviceKey","instance":"optional","group":"optional","config":{...with region, description, and field values}}. Example: [{"service":"aWSLambda","group":"Prod","config":{"region":"eu-west-1","description":"Compute","numberOfRequests":{"value":"19","unit":"millionPerMonth"}}}]'),
+    services: z.string().optional().describe('JSON array of service entries. Each entry: {"service":"serviceKey","instance":"optional","group":"optional","config":{...with region, description, and field values}}. Example: [{"service":"aWSLambda","group":"Prod","config":{"region":"eu-west-1","description":"Compute","numberOfRequests":{"value":"19","unit":"millionPerMonth"}}}]. Omit when using services_file.'),
+    services_file: z.string().optional().describe('Absolute path to a JSON file containing the same array that "services" accepts. Use this for large batches to avoid streaming the payload through the client. Supply either services or services_file, not both.'),
   },
-  async ({ estimate_id, services: servicesStr }) => {
+  async ({ estimate_id, services: servicesStr, services_file: servicesFile }) => {
     const estimate = estimates.get(estimate_id);
     if (!estimate) return { content: [{ type: 'text', text: `Estimate "${estimate_id}" not found.` }], isError: true };
 
+    if ((servicesStr == null) === (servicesFile == null)) {
+      return { content: [{ type: 'text', text: 'Supply exactly one of "services" or "services_file".' }], isError: true };
+    }
+
+    let rawJson;
+    if (servicesFile != null) {
+      try {
+        rawJson = fs.readFileSync(servicesFile, 'utf-8');
+      } catch (err) {
+        return { content: [{ type: 'text', text: `Could not read services_file "${servicesFile}": ${err.message}` }], isError: true };
+      }
+    } else {
+      rawJson = servicesStr;
+    }
+
     let entries;
     try {
-      entries = JSON.parse(servicesStr);
+      entries = JSON.parse(rawJson);
       if (!Array.isArray(entries)) entries = [entries];
     } catch {
-      return { content: [{ type: 'text', text: 'Invalid JSON in services parameter.' }], isError: true };
+      return { content: [{ type: 'text', text: `Invalid JSON in ${servicesFile != null ? 'services_file' : 'services parameter'}.` }], isError: true };
     }
 
     const results = [];
