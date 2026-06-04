@@ -229,11 +229,13 @@ IMPORTANT: Before calling this tool, you MUST confirm the desired AWS region wit
 
 Config keys are validated against the service definition. Invalid field IDs will be rejected with suggested corrections. Use get_service_fields first to discover valid field IDs for a service.
 
+The "group" field organizes services into folders. For nested folders, pass either a "/"-delimited string (e.g. "Production/Presentation") or an array of names (e.g. ["Production","Presentation"]). The calculator renders these as a folder hierarchy: Production > Presentation > service.
+
 For batch mode, pass a JSON array in "services":
-[{"service":"aWSLambda","instance":"Compute","group":"Prod","config":{...}},{"service":"amazonS3Standard","group":"Prod","config":{...}}]`,
+[{"service":"aWSLambda","instance":"Compute","group":"Prod","config":{...}},{"service":"amazonS3Standard","group":["Prod","Web"],"config":{...}}]`,
   {
     estimate_id: z.string().describe('Estimate ID from create_estimate'),
-    services: z.string().describe('JSON array of service entries. Each entry: {"service":"serviceKey","instance":"optional","group":"optional","config":{...with region, description, and field values}}. Example: [{"service":"aWSLambda","group":"Prod","config":{"region":"eu-west-1","description":"Compute","numberOfRequests":{"value":"19","unit":"millionPerMonth"}}}]'),
+    services: z.string().describe('JSON array of service entries. Each entry: {"service":"serviceKey","instance":"optional","group":"optional nested folder path as string \"A/B\" or array [\"A\",\"B\"]","config":{...with region, description, and field values}}. Example: [{"service":"aWSLambda","group":"Prod/Web","config":{"region":"eu-west-1","description":"Compute","numberOfRequests":{"value":"19","unit":"millionPerMonth"}}}]'),
   },
   async ({ estimate_id, services: servicesStr }) => {
     const estimate = estimates.get(estimate_id);

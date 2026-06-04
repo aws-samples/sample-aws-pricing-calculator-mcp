@@ -84,6 +84,32 @@ describe('EstimateBuilder', () => {
       assert.equal(Object.keys(eb.groups.Prod.services).length, 1);
     });
   });
+
+  describe('nested groups', () => {
+    it('nests services under a "/"-delimited group path', () => {
+      const eb = new EstimateBuilder('test');
+      eb.addService('aWSLambda', { region: 'us-east-1' }, { group: 'Production/Presentation' });
+      assert.equal(Object.keys(eb.services).length, 0, 'ungrouped should be empty');
+      assert.ok(eb.groups.Production, 'parent group should exist');
+      assert.equal(Object.keys(eb.groups.Production.services).length, 0, 'parent has no direct services');
+      assert.ok(eb.groups.Production.groups.Presentation, 'child group should exist');
+      assert.equal(Object.keys(eb.groups.Production.groups.Presentation.services).length, 1);
+    });
+
+    it('accepts an array group path', () => {
+      const eb = new EstimateBuilder('test');
+      eb.addService('aWSLambda', { region: 'us-east-1' }, { group: ['Production', 'Presentation'] });
+      assert.ok(eb.groups.Production.groups.Presentation.services, 'should build the same tree as the string form');
+    });
+
+    it('merges siblings under a shared parent', () => {
+      const eb = new EstimateBuilder('test');
+      eb.addService('aWSLambda', { region: 'us-east-1', description: 'a' }, { group: 'Prod/Web' });
+      eb.addService('amazonS3Standard', { region: 'us-east-1', description: 'b' }, { group: 'Prod/Data' });
+      const prod = eb.groups.Prod;
+      assert.deepEqual(Object.keys(prod.groups).sort(), ['Data', 'Web'], 'both tiers share one Prod parent');
+    });
+  });
 });
 
 describe('toAWSPayload', () => {
@@ -159,6 +185,36 @@ describe('toAWSPayload', () => {
     assert.equal(groupServices.length, 2);
     const codes = groupServices.map(s => s.serviceCode).sort();
     assert.deepEqual(codes, ['aWSLambda', 'amazonS3Standard']);
+  });
+
+  it('builds payload with nested group hierarchy', async () => {
+    mockFetch([
+      ['manifest/en_US.json', FAKE_MANIFEST],
+      ['data/aWSLambda', FAKE_DEFINITION],
+      ['data/amazonS3Standard', FAKE_S3_DEFINITION],
+    ]);
+
+    const EB = require('../lib/estimate-builder');
+    const eb = new EB('Nested Estimate');
+    eb.addService('aWSLambda', { region: 'us-east-1', description: 'Web' }, { group: 'Production/Presentation' });
+    eb.addService('amazonS3Standard', { region: 'us-east-1', description: 'Blob' }, { group: 'Production/Presentation' });
+
+    const payload = await eb.toAWSPayload();
+
+    const topGroups = Object.values(payload.groups);
+    assert.equal(topGroups.length, 1, 'one top-level (Production) group');
+    const production = topGroups[0];
+    assert.equal(production.name, 'Production');
+    assert.equal(Object.keys(production.services).length, 0, 'Production has no direct services');
+
+    const childGroups = Object.values(production.groups);
+    assert.equal(childGroups.length, 1, 'one child (Presentation) group');
+    const presentation = childGroups[0];
+    assert.equal(presentation.name, 'Presentation');
+    assert.equal(Object.keys(presentation.services).length, 2, 'both services live in the leaf folder');
+    const codes = Object.values(presentation.services).map(s => s.serviceCode).sort();
+    assert.deepEqual(codes, ['aWSLambda', 'amazonS3Standard']);
+    assert.deepEqual(presentation.groups, {}, 'leaf group has empty groups');
   });
 
   it('falls back gracefully when definition fetch fails', async () => {
