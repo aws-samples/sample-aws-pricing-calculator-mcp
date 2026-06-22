@@ -1,7 +1,7 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
-const { loadCatalog, getEntry, listVerified, validateAgainstSchema } = require('../lib/catalog');
+const { loadCatalog, getEntry, listVerified, validateAgainstSchema } = require('../lib/lint/catalog');
 
 const FIXTURES = path.join(__dirname, 'fixtures', 'catalog');
 

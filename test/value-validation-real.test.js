@@ -3,7 +3,7 @@
 
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
-const { validateConfigKeys } = require('../lib/validation');
+const { validateConfigKeys } = require('../lib/lint/validation');
 
 if (process.env.AWS_OFFLINE) {
   describe('value validation against real manifest (AWS_OFFLINE set, skipping)', () => {

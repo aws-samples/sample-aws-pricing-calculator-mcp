@@ -12,16 +12,16 @@ const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio
 const { z } = require('zod');
 const path = require('node:path');
 
-const { PARTITIONS, loadManifest, findService, fetchServiceDefinition, extractInputFields, searchServices, fetchEstimate, estimateToMarkdown } = require('./lib/aws-client');
-const EstimateBuilder = require('./lib/estimate-builder');
-const { createEstimateStore } = require('./lib/estimate-store');
-const { loadCatalog } = require('./lib/catalog');
-const { nextStepFor } = require('./lib/lint-hints');
-const { traceTool } = require('./lib/trace-logger');
-const traceEvents = require('./lib/trace-events');
-const { runWithSession } = require('./lib/request-context');
-const { createHandlerHelpers, mcpJsonOk, mcpTextErr, checkPartition, parseServicesArg } = require('./lib/handler-helpers');
-const desc = require('./lib/tool-descriptions');
+const { PARTITIONS, loadManifest, findService, fetchServiceDefinition, extractInputFields, searchServices, fetchEstimate, estimateToMarkdown } = require('./lib/aws/aws-client');
+const EstimateBuilder = require('./lib/aws/estimate-builder');
+const { createEstimateStore } = require('./lib/store/estimate-store');
+const { loadCatalog } = require('./lib/lint/catalog');
+const { nextStepFor } = require('./lib/lint/lint-hints');
+const { traceTool } = require('./lib/trace/trace-logger');
+const traceEvents = require('./lib/trace/trace-events');
+const { runWithSession } = require('./lib/trace/request-context');
+const { createHandlerHelpers, mcpJsonOk, mcpTextErr, checkPartition, parseServicesArg } = require('./lib/mcp/handler-helpers');
+const desc = require('./lib/mcp/tool-descriptions');
 
 // CALCMCP_CATALOG_DIR is an eval-only override — the eval harness uses
 // it to point the server at a mutated copy of the catalog so probe

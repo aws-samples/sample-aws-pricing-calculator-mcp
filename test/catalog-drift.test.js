@@ -27,8 +27,8 @@
 const { describe, it, before } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
-const { loadCatalog } = require('../lib/catalog');
-const { validateConfigKeys } = require('../lib/validation');
+const { loadCatalog } = require('../lib/lint/catalog');
+const { validateConfigKeys } = require('../lib/lint/validation');
 
 const CATALOG_DIR = path.join(__dirname, '..', 'catalog', 'services');
 const SKIP_NETWORK = process.env.SKIP_NETWORK === '1';

@@ -23,8 +23,8 @@
 'use strict';
 
 const path = require('node:path');
-const { loadCatalog } = require('../lib/catalog');
-const { loadManifest, fetchServiceDefinition } = require('../lib/aws-client');
+const { loadCatalog } = require('../lib/lint/catalog');
+const { loadManifest, fetchServiceDefinition } = require('../lib/aws/aws-client');
 
 const CATALOG_DIR = path.join(__dirname, '..', 'catalog', 'services');
 

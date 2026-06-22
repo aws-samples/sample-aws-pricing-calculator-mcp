@@ -2,12 +2,12 @@ const { describe, it, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert/strict');
 
 function clearCaches() {
-  delete require.cache[require.resolve('../lib/aws-client')];
-  delete require.cache[require.resolve('../lib/validation')];
+  delete require.cache[require.resolve('../lib/aws/aws-client')];
+  delete require.cache[require.resolve('../lib/lint/validation')];
 }
 
 describe('levenshtein', () => {
-  const { levenshtein } = require('../lib/validation');
+  const { levenshtein } = require('../lib/lint/validation');
 
   it('returns 0 for identical strings', () => {
     assert.equal(levenshtein('abc', 'abc'), 0);
@@ -25,7 +25,7 @@ describe('levenshtein', () => {
 });
 
 describe('suggestMatch', () => {
-  const { suggestMatch } = require('../lib/validation');
+  const { suggestMatch } = require('../lib/lint/validation');
 
   const validIds = [
     'numberOfRequests', 'durationOfEachRequest', 'sizeOfMemoryAllocated',
@@ -102,7 +102,7 @@ describe('validateConfigKeys', () => {
       ['manifest/en_US.json', FAKE_MANIFEST],
       ['data/aWSLambda', FAKE_DEFINITION],
     ]);
-    const { validateConfigKeys } = require('../lib/validation');
+    const { validateConfigKeys } = require('../lib/lint/validation');
     const result = await validateConfigKeys('aWSLambda', {
       region: 'us-east-1',
       description: 'test',
@@ -116,7 +116,7 @@ describe('validateConfigKeys', () => {
       ['manifest/en_US.json', FAKE_MANIFEST],
       ['data/aWSLambda', FAKE_DEFINITION],
     ]);
-    const { validateConfigKeys } = require('../lib/validation');
+    const { validateConfigKeys } = require('../lib/lint/validation');
     const result = await validateConfigKeys('aWSLambda', {
       region: 'us-east-1',
       NumberofRequests: '100',
@@ -133,7 +133,7 @@ describe('validateConfigKeys', () => {
       ['regionList/publish.json', { aWSLambda: ['us-east-1', 'eu-west-1'] }],
       ['data/aWSLambda', FAKE_DEFINITION],
     ]);
-    const { validateConfigKeys } = require('../lib/validation');
+    const { validateConfigKeys } = require('../lib/lint/validation');
     const result = await validateConfigKeys('aWSLambda', {
       region: 'ap-northeast-99',
       numberOfRequests: '100',
@@ -150,7 +150,7 @@ describe('validateConfigKeys', () => {
       ['regionList/publish.json', { aWSLambda: ['us-east-1', 'eu-west-1'] }],
       ['data/aWSLambda', FAKE_DEFINITION],
     ]);
-    const { validateConfigKeys } = require('../lib/validation');
+    const { validateConfigKeys } = require('../lib/lint/validation');
     const result = await validateConfigKeys('aWSLambda', {
       region: 'us-east-1',
       numberOfRequests: '100',
@@ -166,7 +166,7 @@ describe('validateConfigKeys', () => {
       ['regionList/publish.json', { someOtherService: ['us-east-1'] }],
       ['data/aWSLambda', FAKE_DEFINITION],
     ]);
-    const { validateConfigKeys } = require('../lib/validation');
+    const { validateConfigKeys } = require('../lib/lint/validation');
     const result = await validateConfigKeys('aWSLambda', {
       region: 'ap-northeast-1',
       numberOfRequests: '100',
@@ -180,7 +180,7 @@ describe('validateConfigKeys', () => {
       ['regionList/publish.json', { aWSLambda: [] }],
       ['data/aWSLambda', FAKE_DEFINITION],
     ]);
-    const { validateConfigKeys } = require('../lib/validation');
+    const { validateConfigKeys } = require('../lib/lint/validation');
     const result = await validateConfigKeys('aWSLambda', {
       region: 'us-east-1',
       numberOfRequests: '100',
@@ -194,7 +194,7 @@ describe('validateConfigKeys', () => {
       // No regionList mock — 404
       ['data/aWSLambda', FAKE_DEFINITION],
     ]);
-    const { validateConfigKeys } = require('../lib/validation');
+    const { validateConfigKeys } = require('../lib/lint/validation');
     const result = await validateConfigKeys('aWSLambda', {
       region: 'us-east-1',
       numberOfRequests: '100',
@@ -216,7 +216,7 @@ describe('validateConfigKeys', () => {
     // "service-unreachable graceful degradation" path. We aren't
     // asserting anything about behavior here beyond the absence of a
     // residual bypass.
-    const { validateConfigKeys } = require('../lib/validation');
+    const { validateConfigKeys } = require('../lib/lint/validation');
     const result = await validateConfigKeys('ec2Enhancement', {
       region: 'us-east-1',
       instanceType: 'm5.large',
@@ -230,7 +230,7 @@ describe('validateConfigKeys', () => {
   });
 
   it('returns null when only meta keys are present', async () => {
-    const { validateConfigKeys } = require('../lib/validation');
+    const { validateConfigKeys } = require('../lib/lint/validation');
     const result = await validateConfigKeys('aWSLambda', {
       region: 'us-east-1',
       description: 'test',
@@ -240,7 +240,7 @@ describe('validateConfigKeys', () => {
 
   it('returns null gracefully when definition fetch fails', async () => {
     mockFetch([]); // everything 404s
-    const { validateConfigKeys } = require('../lib/validation');
+    const { validateConfigKeys } = require('../lib/lint/validation');
     const result = await validateConfigKeys('aWSLambda', {
       region: 'us-east-1',
       badField: '100',
@@ -250,7 +250,7 @@ describe('validateConfigKeys', () => {
 
   it('returns a structured error when service is not found in manifest', async () => {
     mockFetch([['manifest/en_US.json', FAKE_MANIFEST]]);
-    const { validateConfigKeys } = require('../lib/validation');
+    const { validateConfigKeys } = require('../lib/lint/validation');
     const result = await validateConfigKeys('nonexistentService', {
       region: 'us-east-1',
       someField: '100',
@@ -267,7 +267,7 @@ describe('validateConfigKeys', () => {
       ['manifest/en_US.json', FAKE_MANIFEST],
       ['data/aWSLambda', FAKE_DEFINITION],
     ]);
-    const { validateConfigKeys } = require('../lib/validation');
+    const { validateConfigKeys } = require('../lib/lint/validation');
     const result = await validateConfigKeys('aWSLambda', {
       region: 'us-east-1',
       bogusOne: '1',
@@ -313,7 +313,7 @@ describe('validateConfigKeys', () => {
       return { ok: false, status: 404, json: async () => ({}), text: async () => '404' };
     };
 
-    const { validateConfigKeys } = require('../lib/validation');
+    const { validateConfigKeys } = require('../lib/lint/validation');
     const result = await validateConfigKeys('amazonRDSPostgreSQLDB', {
       region: 'us-east-1',
       columnFormIPM: {
@@ -351,7 +351,7 @@ describe('validateConfigKeys', () => {
       ['manifest/en_US.json', FAKE_MANIFEST],
       ['data/aWSLambda', DEF_WITH_DROPDOWN],
     ]);
-    const { validateConfigKeys } = require('../lib/validation');
+    const { validateConfigKeys } = require('../lib/lint/validation');
     const r = await validateConfigKeys('aWSLambda', {
       region: 'us-east-1',
       numberOfRequests: '5',
@@ -381,7 +381,7 @@ describe('validateConfigKeys', () => {
       ['manifest/en_US.json', FAKE_MANIFEST],
       ['data/aWSLambda', DEF_WITH_DROPDOWN],
     ]);
-    const { validateConfigKeys } = require('../lib/validation');
+    const { validateConfigKeys } = require('../lib/lint/validation');
     const r = await validateConfigKeys('aWSLambda', {
       region: 'us-east-1',
       selectedOS: 'completely-bogus-os',
@@ -407,7 +407,7 @@ describe('validateConfigKeys', () => {
       ['manifest/en_US.json', FAKE_MANIFEST],
       ['data/aWSLambda', DEF_WITH_DROPDOWN],
     ]);
-    const { validateConfigKeys } = require('../lib/validation');
+    const { validateConfigKeys } = require('../lib/lint/validation');
     const r = await validateConfigKeys('aWSLambda', {
       region: 'us-east-1',
       NumberofRequests: '5',           // wrong key (typo)
@@ -438,7 +438,7 @@ describe('validateConfigKeys', () => {
       ['manifest/en_US.json', FAKE_MANIFEST],
       ['data/aWSLambda', DEF],
     ]);
-    const { validateConfigKeys } = require('../lib/validation');
+    const { validateConfigKeys } = require('../lib/lint/validation');
     const r = await validateConfigKeys('aWSLambda', {
       region: 'us-east-1',
       numberOfRequests: 5,        // number → string
@@ -463,7 +463,7 @@ describe('validateConfigKeys', () => {
       ['manifest/en_US.json', FAKE_MANIFEST],
       ['data/aWSLambda', DEF],
     ]);
-    const { validateConfigKeys } = require('../lib/validation');
+    const { validateConfigKeys } = require('../lib/lint/validation');
     const cfg = { region: 'us-east-1', numberOfRequests: '5' };
     const r = await validateConfigKeys('aWSLambda', cfg);
     assert.equal(r.error, null);
@@ -494,7 +494,7 @@ describe('validateConfigKeys', () => {
       ['manifest/en_US.json', FAKE_MANIFEST],
       ['data/aWSLambda', DEF],
     ]);
-    const { validateConfigKeys } = require('../lib/validation');
+    const { validateConfigKeys } = require('../lib/lint/validation');
     const r = await validateConfigKeys('aWSLambda', config);
     assert.equal(r.error, null);
     assert.equal(r.corrections.length, 20, 'corrections array must be capped at 20');
@@ -521,7 +521,7 @@ describe('validateConfigKeys', () => {
       ['manifest/en_US.json', FAKE_MANIFEST],
       ['data/aWSLambda', DEF],
     ]);
-    const { validateConfigKeys } = require('../lib/validation');
+    const { validateConfigKeys } = require('../lib/lint/validation');
     const r = await validateConfigKeys('aWSLambda', {
       region: 'us-east-1',
       selectedOS: 'Linux',
@@ -557,7 +557,7 @@ describe('validateConfigKeys', () => {
         ],
       }],
     ]);
-    const { validateConfigKeys } = require('../lib/validation');
+    const { validateConfigKeys } = require('../lib/lint/validation');
     const r = await validateConfigKeys('aWSLambda', {
       region: 'us-east-1',
       numberOfRequests: '5',
@@ -590,7 +590,7 @@ describe('validateConfigKeys', () => {
         required: [{ field: 'a' }, { field: 'b' }, { field: 'c' }],
       }],
     ]);
-    const { validateConfigKeys } = require('../lib/validation');
+    const { validateConfigKeys } = require('../lib/lint/validation');
     // Just region + description, no actual config — Test 5's exact shape.
     const r = await validateConfigKeys('aWSLambda', {
       region: 'us-east-1',
@@ -622,7 +622,7 @@ describe('validateConfigKeys', () => {
         required: [{ field: 'numberOfRequests' }],
       }],
     ]);
-    const { validateConfigKeys } = require('../lib/validation');
+    const { validateConfigKeys } = require('../lib/lint/validation');
     const r = await validateConfigKeys('aWSLambda', {
       region: 'us-east-1',
       numberOfRequests: '5',
@@ -647,7 +647,7 @@ describe('validateConfigKeys', () => {
       ['manifest/en_US.json', FAKE_MANIFEST],
       ['data/aWSLambda', DEF],
     ]);
-    const { validateConfigKeys } = require('../lib/validation');
+    const { validateConfigKeys } = require('../lib/lint/validation');
     // No catalog argument; form-side walk alone must flag mustHave.
     const r = await validateConfigKeys('aWSLambda', {
       region: 'us-east-1',
@@ -698,7 +698,7 @@ describe('validateConfigKeys', () => {
       ['manifest/en_US.json', FAKE_MANIFEST_EC2],
       ['data/ec2Enhancement', FAKE_DEF],
     ]);
-    const { validateConfigKeys } = require('../lib/validation');
+    const { validateConfigKeys } = require('../lib/lint/validation');
     const r = await validateConfigKeys('ec2Enhancement', {
       region: 'us-east-1',
       instanceType: 'm5.large',
@@ -739,7 +739,7 @@ describe('validateConfigKeys', () => {
       ['manifest/en_US.json', FAKE_MANIFEST_EC2],
       ['data/ec2Enhancement', FAKE_DEF],
     ]);
-    const { validateConfigKeys } = require('../lib/validation');
+    const { validateConfigKeys } = require('../lib/lint/validation');
     const r = await validateConfigKeys('ec2Enhancement', {
       region: 'us-east-1',
       instanceType: 'm5.large',
@@ -752,7 +752,7 @@ describe('validateConfigKeys', () => {
 });
 
 describe('validateFieldValue — dropdown', () => {
-  const { validateFieldValue } = require('../lib/validation');
+  const { validateFieldValue } = require('../lib/lint/validation');
   const linuxField = {
     id: 'selectedOS',
     type: 'dropdown',
@@ -841,7 +841,7 @@ describe('validateFieldValue — dropdown', () => {
 });
 
 describe('validateFieldValue — fileSize', () => {
-  const { validateFieldValue } = require('../lib/validation');
+  const { validateFieldValue } = require('../lib/lint/validation');
   const storageField = {
     id: 'storageAmount',
     type: 'fileSize',
@@ -891,7 +891,7 @@ describe('validateFieldValue — fileSize', () => {
 });
 
 describe('validateFieldValue — numeric / frequency / durationInput', () => {
-  const { validateFieldValue } = require('../lib/validation');
+  const { validateFieldValue } = require('../lib/lint/validation');
 
   it('numericInput passes a string value', () => {
     const f = { id: 'count', type: 'numericInput' };
@@ -992,7 +992,7 @@ describe('validateFieldValue — numeric / frequency / durationInput', () => {
 });
 
 describe('validateFieldValue — unknown type', () => {
-  const { validateFieldValue } = require('../lib/validation');
+  const { validateFieldValue } = require('../lib/lint/validation');
 
   it('returns ok for a type we do not model', () => {
     const f = { id: 'whatever', type: 'someNewType' };

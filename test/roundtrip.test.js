@@ -18,8 +18,8 @@
  */
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
-const EstimateBuilder = require('../lib/estimate-builder');
-const { fetchEstimate, saveEstimate } = require('../lib/aws-client');
+const EstimateBuilder = require('../lib/aws/estimate-builder');
+const { fetchEstimate, saveEstimate } = require('../lib/aws/aws-client');
 
 const UUID_RE = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
 

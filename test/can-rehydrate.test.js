@@ -1,6 +1,6 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
-const { canRehydrate } = require('../lib/can-rehydrate');
+const { canRehydrate } = require('../lib/lint/can-rehydrate');
 
 const ANY_MANIFEST = new Map();
 const lambdaDef = {

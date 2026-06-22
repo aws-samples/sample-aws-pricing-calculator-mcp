@@ -45,10 +45,10 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const { loadManifest, fetchServiceDefinition } = require('../lib/aws-client');
-const { suggestConfigFromPCT } = require('../lib/pct-config');
+const { loadManifest, fetchServiceDefinition } = require('../lib/aws/aws-client');
+const { suggestConfigFromPCT } = require('../lib/aws/pct-config');
 const { fetchCostFromDOM } = require('../lib/dom-cost');
-const EstimateBuilder = require('../lib/estimate-builder');
+const EstimateBuilder = require('../lib/aws/estimate-builder');
 
 const REPO_ROOT = path.join(__dirname, '..');
 const CATALOG_DIR = path.join(REPO_ROOT, 'catalog', 'services');

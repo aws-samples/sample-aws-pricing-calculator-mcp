@@ -9,19 +9,19 @@
       ],
       "default": "memory",
       "purpose": "Pluggable estimate store backend. memory = in-process Map (single-replica only); dynamodb = DynamoEstimateStore (required when running behind a stateless multi-replica router or any deployment without sticky-session routing).",
-      "readBy": "lib/estimate-store.js#createEstimateStore"
+      "readBy": "lib/store/estimate-store.js#createEstimateStore"
     },
     "ESTIMATES_TABLE": {
       "type": "string",
       "requiredWhen": "ESTIMATES_STORE=dynamodb",
       "purpose": "DynamoDB table name backing the DynamoEstimateStore. PK=id (S), with optional TTL on expiresAt (N).",
-      "readBy": "lib/estimate-store-dynamodb.js#constructor"
+      "readBy": "lib/store/estimate-store-dynamodb.js#constructor"
     },
     "ESTIMATES_TTL_SECONDS": {
       "type": "integer",
       "default": 0,
       "purpose": "TTL applied to the expiresAt attribute on each estimate snapshot. 0 = no TTL (caller must clean up). Must match the table's configured timeToLiveAttribute.",
-      "readBy": "lib/estimate-store-dynamodb.js#constructor"
+      "readBy": "lib/store/estimate-store-dynamodb.js#constructor"
     },
     "MCP_TRANSPORT": {
       "type": "enum",
@@ -44,13 +44,13 @@
       ],
       "default": "off",
       "purpose": "Enables structured stderr trace events (tool.call, tool.result, save.*, lint, etc.). Off by default — emit() is a no-op and traceTool is a passthrough when unset. Truthy values: on, 1, true, yes (case-insensitive). Anything else, including unset, leaves tracing off.",
-      "readBy": "lib/trace-logger.js#isTraceEnabled"
+      "readBy": "lib/trace/trace-logger.js#isTraceEnabled"
     },
     "TRACE_RESULT_TEXT_MAX": {
       "type": "integer",
       "default": 500,
-      "purpose": "Cap on result.text length in trace events emitted by lib/trace-logger.js. Errors get a separate, larger cap (10000) hardcoded in the logger. Only consulted when TRACE is on.",
-      "readBy": "lib/trace-logger.js#resultTextMax"
+      "purpose": "Cap on result.text length in trace events emitted by lib/trace/trace-logger.js. Errors get a separate, larger cap (10000) hardcoded in the logger. Only consulted when TRACE is on.",
+      "readBy": "lib/trace/trace-logger.js#resultTextMax"
     }
   }
 }

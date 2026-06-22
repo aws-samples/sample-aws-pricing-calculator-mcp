@@ -84,25 +84,30 @@ Then point your client at the built bundle:
 ```
 mcp-server.js              # Entry point — registers the 9 MCP tools, stdio + HTTP transports
 lib/
-  aws-client.js            # Manifest loading, service definitions, save/read APIs
-  estimate-builder.js      # In-memory estimate model, AWS payload assembly
-  ec2.js                   # EC2 agent-friendly → ec2Enhancement transform
-  validation.js            # Pre-save config validation (field-id, value-shape, region, auto-correct)
-  can-rehydrate.js         # Static rehydration linter (12 predicates, pure)
-  can-rehydrate-fetch.js   # Network wrapper around the linter
-  lint-hints.js            # Translates lint failures into agent-actionable next_step text
-  catalog.js               # Loader for catalog/services/*.json curated entries
-  pct-config.js            # PCT-based field suggestion
-  surfaceability.js        # PCT-driven surfaceability index
-  agent-fields.js          # Synthetic field surfacing for fields hidden in composite widgets
-  dom-cost.js              # Playwright DOM scrape of the calculator's rendered cost
-  handler-helpers.js       # Shared internals for the MCP tool handlers
-  tool-descriptions.js     # Long agent-facing tool descriptions (separated from wiring)
-  estimate-store.js        # Pluggable in-flight estimate store (memory default)
-  estimate-store-dynamodb.js # DynamoDB-backed store for stateless multi-replica deployments
-  trace-logger.js          # Structured JSON trace events on stderr
-  trace-events.js          # Trace event name registry
-  request-context.js       # Per-request session id propagation
+  aws/                     # AWS API access + payload construction
+    aws-client.js          #   Manifest loading, service definitions, save/read APIs, selector aggregations
+    estimate-builder.js    #   In-memory estimate model, AWS payload assembly, columnFormIPM remap
+    ec2.js                 #   EC2 agent-friendly → ec2Enhancement transform
+    pct-config.js          #   PCT-based field suggestion
+    surfaceability.js      #   PCT-driven surfaceability index
+    agent-fields.js        #   Synthetic field surfacing for fields hidden in composite widgets
+  lint/                    # Rehydration prediction + pre-save validation
+    can-rehydrate.js       #   Static rehydration linter (pure predicates)
+    can-rehydrate-fetch.js #   Network wrapper around the linter
+    validation.js          #   Pre-save config validation (field-id, value-shape, region, auto-correct)
+    lint-hints.js          #   Translates lint failures into agent-actionable next_step text
+    catalog.js             #   Loader for catalog/services/*.json curated entries
+  mcp/                     # MCP tool plumbing
+    handler-helpers.js     #   Shared internals for the MCP tool handlers
+    tool-descriptions.js   #   Long agent-facing tool descriptions (separated from wiring)
+  trace/                   # Observability
+    trace-logger.js        #   Structured JSON trace events on stderr
+    trace-events.js        #   Trace event name registry
+    request-context.js     #   Per-request session id propagation
+  store/                   # In-flight estimate persistence
+    estimate-store.js      #   Pluggable store (memory default)
+    estimate-store-dynamodb.js # DynamoDB-backed store for stateless multi-replica deployments
+  dom-cost.js              # Playwright DOM scrape of the calculator's rendered cost (eval oracle)
 catalog/
   schema.json              # JSON Schema for catalog entries
   services/                # Verified configs catalog (minimalConfig, traps, subServices)
@@ -112,7 +117,7 @@ scripts/                   # Maintainer tools (catalog authoring, sweep, diagnos
 dist/                      # Build output: mcp-server.js bundle, aws-calculator.zip, bundle-contract.json
 ```
 
-The `lib/` listing is exhaustive at 1.2.0. The architecture diagram below highlights the load-bearing modules; minor helpers are not shown.
+The `lib/` tree groups modules by layer (aws, lint, mcp, trace, store). The architecture diagram below highlights the load-bearing modules; minor helpers are not shown.
 
 ## Build
 
@@ -142,12 +147,12 @@ Three layers, no overlap:
 │   MCP Client    │◄───────────────────►│         MCP Server                   │
 │ (Kiro, Claude,  │   JSON-RPC over     │                                      │
 │  Cursor, etc.)  │   stdin/stdout      │  mcp-server.js (entry point)         │
-│                 │   — or, with        │    ├── lib/aws-client.js             │
-│                 │   MCP_TRANSPORT     │    ├── lib/estimate-builder.js       │
-│                 │   =http, JSON-RPC   │    ├── lib/ec2.js (EC2 transform)    │
-│                 │   over HTTPS        │    ├── lib/validation.js             │
-└─────────────────┘                     │    ├── lib/can-rehydrate.js (lint)   │
-                                        │    └── lib/catalog.js                │
+│                 │   — or, with        │    ├── lib/aws/    (client, builder) │
+│                 │   MCP_TRANSPORT     │    ├── lib/lint/   (can-rehydrate,   │
+│                 │   =http, JSON-RPC   │    │               validation,catalog)│
+│                 │   over HTTPS        │    ├── lib/mcp/    (handler-helpers) │
+└─────────────────┘                     │    ├── lib/trace/  (trace-logger)    │
+                                        │    └── lib/store/  (estimate-store)  │
                                         └──────┬─────────┬─────────┬──────────┘
                                                │         │         │
                                           GET  │     GET │    POST │
@@ -178,7 +183,7 @@ On first use, the server fetches the AWS Calculator manifest from CloudFront (~4
 
 ### EC2 handling
 
-EC2 uses a custom config transform (`lib/ec2.js`) that converts agent-friendly fields (instance type, OS, pricing strategy) into the `ec2Enhancement` format the calculator expects. Supports On-Demand, Savings Plans, Reserved Instances, and Spot pricing.
+EC2 uses a custom config transform (`lib/aws/ec2.js`) that converts agent-friendly fields (instance type, OS, pricing strategy) into the `ec2Enhancement` format the calculator expects. Supports On-Demand, Savings Plans, Reserved Instances, and Spot pricing.
 
 ### Partition support
 
@@ -383,7 +388,7 @@ Trace events are typically captured to log groups that may be queryable by anyon
 
 Both fields are replaced with `[redacted: <N> chars]` in `tool.call` args and `tool.result` resultText. Structure is preserved (you still see "the agent set a description") but the content isn't. `resultLength` reflects the original pre-redaction length. Non-sensitive fields — service codes, region IDs, field IDs, numeric values, UUIDs — pass through untouched.
 
-To extend redaction for a new sensitive field, add the key to `SENSITIVE_KEYS` in `lib/trace-logger.js`. The redactor walks nested structures recursively, including the JSON-stringified `services` arg of `add_service` / `build_estimate`.
+To extend redaction for a new sensitive field, add the key to `SENSITIVE_KEYS` in `lib/trace/trace-logger.js`. The redactor walks nested structures recursively, including the JSON-stringified `services` arg of `add_service` / `build_estimate`.
 
 The `mcpSessionId` field has three states, useful for telling transports apart:
 

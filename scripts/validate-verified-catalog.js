@@ -36,7 +36,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const { loadCatalog, listVerified } = require('../lib/catalog');
+const { loadCatalog, listVerified } = require('../lib/lint/catalog');
 const { fetchCostFromDOM } = require('../lib/dom-cost');
 
 // Concurrency 2 settled empirically — concurrency 3 with 6+ Playwright

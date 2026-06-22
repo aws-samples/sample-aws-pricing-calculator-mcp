@@ -12,13 +12,13 @@
 
 const { describe, it, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert/strict');
-const { extractInputFields } = require('../lib/aws-client');
+const { extractInputFields } = require('../lib/aws/aws-client');
 
 // ─── helpers ────────────────────────────────────────────────
 
 function clearCaches() {
-  delete require.cache[require.resolve('../lib/aws-client')];
-  delete require.cache[require.resolve('../lib/estimate-builder')];
+  delete require.cache[require.resolve('../lib/aws/aws-client')];
+  delete require.cache[require.resolve('../lib/aws/estimate-builder')];
 }
 
 function mockFetch(responses) {
@@ -178,7 +178,7 @@ describe('template inference in _buildServiceConfig', () => {
       ['manifest/en_US.json', FAKE_MANIFEST],
       ['data/amazonMQ', MQ_DEF],
     ]);
-    const EB = require('../lib/estimate-builder');
+    const EB = require('../lib/aws/estimate-builder');
     const eb = new EB('MQ inference test');
     eb.addService('amazonMQ', {
       region: 'eu-south-1',
@@ -198,7 +198,7 @@ describe('template inference in _buildServiceConfig', () => {
       ['manifest/en_US.json', FAKE_MANIFEST],
       ['data/amazonMQ', MQ_DEF],
     ]);
-    const EB = require('../lib/estimate-builder');
+    const EB = require('../lib/aws/estimate-builder');
     const eb = new EB('MQ ActiveMQ test');
     eb.addService('amazonMQ', {
       region: 'us-east-1',
@@ -217,7 +217,7 @@ describe('template inference in _buildServiceConfig', () => {
       ['manifest/en_US.json', FAKE_MANIFEST],
       ['data/amazonMQ', MQ_DEF],
     ]);
-    const EB = require('../lib/estimate-builder');
+    const EB = require('../lib/aws/estimate-builder');
     const eb = new EB('MQ ambiguous test');
     eb.addService('amazonMQ', { region: 'us-east-1', description: 'No fields' });
     const payload = await eb.toAWSPayload();
@@ -231,7 +231,7 @@ describe('template inference in _buildServiceConfig', () => {
       ['manifest/en_US.json', FAKE_MANIFEST],
       ['data/amazonRDSPostgreSQLDB', RDS_DEF],
     ]);
-    const EB = require('../lib/estimate-builder');
+    const EB = require('../lib/aws/estimate-builder');
     const eb = new EB('RDS single template');
     eb.addService('amazonRDSPostgreSQLDB', {
       region: 'eu-south-1',
@@ -268,7 +268,7 @@ describe('columnFormIPM passthrough', () => {
       ['manifest/en_US.json', FAKE_MANIFEST],
       ['data/amazonRDSPostgreSQLDB', RDS_DEF],
     ]);
-    const EB = require('../lib/estimate-builder');
+    const EB = require('../lib/aws/estimate-builder');
     const eb = new EB('RDS IPM test');
 
     const ipmValue = {

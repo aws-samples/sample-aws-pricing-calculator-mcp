@@ -9,8 +9,8 @@ const assert = require('node:assert/strict');
 // behavior is exercised in test/trace-flag.test.js.
 process.env.TRACE = 'on';
 
-const EstimateBuilder = require('../lib/estimate-builder');
-const { canRehydrate } = require('../lib/can-rehydrate');
+const EstimateBuilder = require('../lib/aws/estimate-builder');
+const { canRehydrate } = require('../lib/lint/can-rehydrate');
 
 describe('export_estimate lint preflight', () => {
   it('a healthy Lambda payload lints as editable (would proceed to save)', async () => {
@@ -67,7 +67,7 @@ describe('export_estimate lint preflight', () => {
 describe('exportWithLint trace events', () => {
   it('emits a lint event with verdict + services before deciding to save', async () => {
     const { __test } = require('../mcp-server');
-    const EstimateBuilder = require('../lib/estimate-builder');
+    const EstimateBuilder = require('../lib/aws/estimate-builder');
 
     const writes = [];
     const orig = process.stderr.write.bind(process.stderr);
@@ -99,8 +99,8 @@ describe('exportWithLint trace events', () => {
 
   it('emits lint with mcpSessionId when called inside a session scope', async () => {
     const { __test } = require('../mcp-server');
-    const EstimateBuilder = require('../lib/estimate-builder');
-    const { runWithSession } = require('../lib/request-context');
+    const EstimateBuilder = require('../lib/aws/estimate-builder');
+    const { runWithSession } = require('../lib/trace/request-context');
 
     const writes = [];
     const orig = process.stderr.write.bind(process.stderr);
@@ -123,7 +123,7 @@ describe('exportWithLint trace events', () => {
 
   it('emits lint with estimateId from the EstimateBuilder', async () => {
     const { __test } = require('../mcp-server');
-    const EstimateBuilder = require('../lib/estimate-builder');
+    const EstimateBuilder = require('../lib/aws/estimate-builder');
 
     const writes = [];
     const orig = process.stderr.write.bind(process.stderr);

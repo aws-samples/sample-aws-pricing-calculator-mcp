@@ -16,7 +16,7 @@
     "mcp": "node mcp-server.js",
     "validate-catalog": "node scripts/validate-catalog.js",
     "validate-catalog:cost": "node scripts/validate-verified-catalog.js",
-    "build": "esbuild mcp-server.js --bundle --platform=node --outfile=dist/mcp-server.js --format=cjs --minify --external:@aws-sdk/client-dynamodb --external:@aws-sdk/lib-dynamodb && node scripts/emit-bundle-contract.js && rm -f dist/aws-calculator.zip && zip dist/aws-calculator.zip mcp-server.js lib/aws-client.js lib/estimate-builder.js lib/ec2.js package.json"
+    "build": "esbuild mcp-server.js --bundle --platform=node --outfile=dist/mcp-server.js --format=cjs --minify --external:@aws-sdk/client-dynamodb --external:@aws-sdk/lib-dynamodb && node scripts/emit-bundle-contract.js && rm -f dist/aws-calculator.zip && zip dist/aws-calculator.zip mcp-server.js lib/aws/aws-client.js lib/aws/estimate-builder.js lib/aws/ec2.js package.json"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.29.0",

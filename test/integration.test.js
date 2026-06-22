@@ -10,8 +10,8 @@
  */
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
-const EstimateBuilder = require('../lib/estimate-builder');
-const { fetchEstimate } = require('../lib/aws-client');
+const EstimateBuilder = require('../lib/aws/estimate-builder');
+const { fetchEstimate } = require('../lib/aws/aws-client');
 
 describe('integration: export to calculator.aws', () => {
   it('builds and saves a Lambda estimate, returns a working URL', async () => {
@@ -172,15 +172,15 @@ describe('integration: roundtrip (save → fetch → compare)', () => {
 describe('estimate-store integration', () => {
   it('create_estimate + add_service share state through the configured store', async () => {
     delete require.cache[require.resolve('../mcp-server.js')];
-    delete require.cache[require.resolve('../lib/estimate-store')];
-    delete require.cache[require.resolve('../lib/estimate-builder')];
+    delete require.cache[require.resolve('../lib/store/estimate-store')];
+    delete require.cache[require.resolve('../lib/aws/estimate-builder')];
     process.env.ESTIMATES_STORE = 'memory';
 
     const { __test } = require('../mcp-server.js');
     assert.ok(__test, 'mcp-server.js must export a __test handle');
     const store = __test.store;
 
-    const EstimateBuilder = require('../lib/estimate-builder');
+    const EstimateBuilder = require('../lib/aws/estimate-builder');
     const estimate = new EstimateBuilder('integ', 'aws');
     await store.put(estimate);
 

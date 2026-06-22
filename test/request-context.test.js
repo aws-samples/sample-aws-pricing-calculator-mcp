@@ -1,6 +1,6 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
-const { runWithSession, currentSessionId } = require('../lib/request-context');
+const { runWithSession, currentSessionId } = require('../lib/trace/request-context');
 
 describe('request-context session scope', () => {
   it('returns undefined outside a session scope', () => {

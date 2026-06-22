@@ -1,15 +1,15 @@
 const { describe, it, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
-const EstimateBuilder = require('../lib/estimate-builder');
+const EstimateBuilder = require('../lib/aws/estimate-builder');
 
 // --- helpers for toAWSPayload tests ---
 
 function clearAwsClientCache() {
-  const mod = require.resolve('../lib/aws-client');
+  const mod = require.resolve('../lib/aws/aws-client');
   delete require.cache[mod];
   // estimate-builder caches the require too, so clear it as well
-  const ebMod = require.resolve('../lib/estimate-builder');
+  const ebMod = require.resolve('../lib/aws/estimate-builder');
   delete require.cache[ebMod];
 }
 
@@ -49,7 +49,7 @@ const FAKE_S3_DEFINITION = {
 describe('EstimateBuilder', () => {
   describe('description field', () => {
     it('defaults to empty string when no description provided', async () => {
-      const { sanitize } = require('../lib/estimate-builder');
+      const { sanitize } = require('../lib/aws/estimate-builder');
       const result = sanitize(undefined);
       assert.equal(result, '', 'sanitize(undefined) should return empty string');
       assert.equal(sanitize(undefined) || null, null, 'demonstrates the bug with || null');
@@ -57,7 +57,7 @@ describe('EstimateBuilder', () => {
   });
 
   describe('sanitize', () => {
-    const { sanitize } = require('../lib/estimate-builder');
+    const { sanitize } = require('../lib/aws/estimate-builder');
 
     it('passes plain ASCII through unchanged', () => {
       assert.equal(sanitize('Plain description'), 'Plain description');
@@ -154,7 +154,7 @@ describe('toAWSPayload', () => {
       ['data/aWSLambda', FAKE_DEFINITION],
     ]);
 
-    const EB = require('../lib/estimate-builder');
+    const EB = require('../lib/aws/estimate-builder');
     const eb = new EB('Test Estimate');
     eb.addService('aWSLambda', {
       region: 'us-east-1',
@@ -192,7 +192,7 @@ describe('toAWSPayload', () => {
       ['data/amazonS3Standard', FAKE_S3_DEFINITION],
     ]);
 
-    const EB = require('../lib/estimate-builder');
+    const EB = require('../lib/aws/estimate-builder');
     const eb = new EB('Grouped Estimate');
     eb.addService('aWSLambda', { region: 'eu-west-1', description: 'Compute' }, { group: 'Prod' });
     eb.addService('amazonS3Standard', { region: 'eu-west-1', description: 'Storage' }, { group: 'Prod' });
@@ -236,7 +236,7 @@ describe('toAWSPayload', () => {
         templates: [{ id: 'apiquerydatamodification' }] }],
     ]);
 
-    const EB = require('../lib/estimate-builder');
+    const EB = require('../lib/aws/estimate-builder');
     const eb = new EB('AppSync multi-child');
     eb.addService('appSyncApiCall',  { region: 'us-east-1', description: 'API queries' });
     eb.addService('appSyncCaching',  { region: 'us-east-1', description: 'Cache' });
@@ -281,7 +281,7 @@ describe('toAWSPayload', () => {
         templates: [{ id: 'sns_t1' }] }],
     ]);
 
-    const EB = require('../lib/estimate-builder');
+    const EB = require('../lib/aws/estimate-builder');
     const eb = new EB('SNS single child');
     eb.addService('standardTopics', { region: 'us-east-1', description: 'Notifications' });
 
@@ -325,7 +325,7 @@ describe('toAWSPayload', () => {
       ['data/workSpacesCore', WSC_DEFINITION],
     ]);
 
-    const EB = require('../lib/estimate-builder');
+    const EB = require('../lib/aws/estimate-builder');
     const eb = new EB('WSC');
     eb.addService('workSpacesCore', {
       region: 'us-east-1',
@@ -380,7 +380,7 @@ describe('toAWSPayload', () => {
       ['data/workSpacesCore', WSC_SUB_DEFINITION],
     ]);
 
-    const EB = require('../lib/estimate-builder');
+    const EB = require('../lib/aws/estimate-builder');
     const eb = new EB('WSC sub');
     eb.addService('workSpacesCore', {
       region: 'us-east-1',
@@ -426,7 +426,7 @@ describe('toAWSPayload', () => {
       ['data/aWSLambda', FAKE_DEFINITION],
     ]);
 
-    const EB = require('../lib/estimate-builder');
+    const EB = require('../lib/aws/estimate-builder');
     const eb = new EB('Idempotency');
     // Already-remapped (stored) values supplied directly.
     eb.addService('workSpacesCore', {
@@ -463,7 +463,7 @@ describe('toAWSPayload', () => {
       // no definition response — will 404
     ]);
 
-    const EB = require('../lib/estimate-builder');
+    const EB = require('../lib/aws/estimate-builder');
     const eb = new EB('Fallback Test');
     eb.addService('aWSLambda', { region: 'us-east-1', description: 'Test' });
 
@@ -489,7 +489,7 @@ describe('partition support', () => {
   });
 
   it('resolvePartition maps regions correctly', () => {
-    const { resolvePartition } = require('../lib/aws-client');
+    const { resolvePartition } = require('../lib/aws/aws-client');
     assert.equal(resolvePartition('us-east-1'), 'aws');
     assert.equal(resolvePartition('eu-west-1'), 'aws');
     assert.equal(resolvePartition('us-iso-east-1'), 'aws-iso');
@@ -501,7 +501,7 @@ describe('partition support', () => {
   });
 
   it('_buildShareUrl includes contract param for ISO partitions', () => {
-    const EB = require('../lib/estimate-builder');
+    const EB = require('../lib/aws/estimate-builder');
     const eb = new EB('test');
     const awsUrl = eb._buildShareUrl('abc-123', 'aws');
     assert.ok(!awsUrl.includes('ctrct='), 'aws should not have contract param');
@@ -524,7 +524,7 @@ describe('partition support', () => {
       ['aws-iso/data/aWSLambda', FAKE_DEFINITION],
     ]);
 
-    const EB = require('../lib/estimate-builder');
+    const EB = require('../lib/aws/estimate-builder');
     const eb = new EB('ISO Test');
     eb.addService('aWSLambda', { region: 'us-iso-east-1', description: 'Test' });
 
@@ -535,7 +535,7 @@ describe('partition support', () => {
   });
 
   it('rejects mixed-partition estimates', () => {
-    const EB = require('../lib/estimate-builder');
+    const EB = require('../lib/aws/estimate-builder');
     const eb = new EB('Mixed Test');
     eb.addService('aWSLambda', { region: 'us-east-1', description: 'Commercial' });
     eb.addService('amazonS3Standard', { region: 'us-iso-east-1', description: 'ISO' });
@@ -552,7 +552,7 @@ describe('partition support', () => {
       ['aws-iso/data/aWSLambda', FAKE_DEFINITION],
     ]);
 
-    const EB = require('../lib/estimate-builder');
+    const EB = require('../lib/aws/estimate-builder');
     const eb = new EB('Explicit Partition', 'aws-iso');
     eb.addService('aWSLambda', { region: 'us-iso-east-1', description: 'Test' });
 
@@ -561,7 +561,7 @@ describe('partition support', () => {
   });
 
   it('loadManifest rejects unknown partition', async () => {
-    const { loadManifest } = require('../lib/aws-client');
+    const { loadManifest } = require('../lib/aws/aws-client');
     await assert.rejects(() => loadManifest('aws-govcloud'), /Unknown partition/);
   });
 });

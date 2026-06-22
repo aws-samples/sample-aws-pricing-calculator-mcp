@@ -1,6 +1,6 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
-const { transformConfig } = require('../lib/ec2');
+const { transformConfig } = require('../lib/aws/ec2');
 
 describe('EC2 transformConfig', () => {
   it('produces required fields with minimal config', () => {
@@ -194,9 +194,9 @@ describe('EC2 tenancy-remap trace event', () => {
   // a trace event so observability can detect the asked-X-got-Y
   // divergence, since the saved blob alone shows only the post-remap
   // state. Capture the trace stream by stubbing trace-logger.
-  const TRACE_LOGGER_PATH = require.resolve('../lib/trace-logger');
-  const TRACE_EVENTS_PATH = require.resolve('../lib/trace-events');
-  const EC2_PATH = require.resolve('../lib/ec2');
+  const TRACE_LOGGER_PATH = require.resolve('../lib/trace/trace-logger');
+  const TRACE_EVENTS_PATH = require.resolve('../lib/trace/trace-events');
+  const EC2_PATH = require.resolve('../lib/aws/ec2');
 
   function withCapturedEmits(fn) {
     delete require.cache[TRACE_LOGGER_PATH];
@@ -208,7 +208,7 @@ describe('EC2 tenancy-remap trace event', () => {
         emit: (event, payload) => { captured.push({ event, payload }); },
       },
     };
-    const { transformConfig: tc } = require('../lib/ec2');
+    const { transformConfig: tc } = require('../lib/aws/ec2');
     fn(tc);
     delete require.cache[TRACE_LOGGER_PATH];
     delete require.cache[TRACE_EVENTS_PATH];

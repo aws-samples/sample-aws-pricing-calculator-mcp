@@ -1,6 +1,6 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
-const { nextStepFor, notFoundHintFor, invalidFieldIdsHintFor } = require('../lib/lint-hints');
+const { nextStepFor, notFoundHintFor, invalidFieldIdsHintFor } = require('../lib/lint/lint-hints');
 
 // Synthetic catalog mirroring the real shape: parent envelope with a
 // trap line and a subServices array. Used to verify nextStepFor surfaces

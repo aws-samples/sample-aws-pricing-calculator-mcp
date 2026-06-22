@@ -8,7 +8,7 @@ const {
   surfaceableLabels,
   EC2_ENHANCEMENT_SURFACED,
   NEVER_SURFACES_SUBTYPES,
-} = require('../lib/surfaceability');
+} = require('../lib/aws/surfaceability');
 
 describe('buildSurfaceabilityIndex', () => {
   it('returns empty for falsy input', () => {

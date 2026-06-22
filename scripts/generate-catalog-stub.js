@@ -40,7 +40,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const { loadManifest, fetchServiceDefinition, extractInputFields, enrichFieldsWithMetadata } = require('../lib/aws-client');
+const { loadManifest, fetchServiceDefinition, extractInputFields, enrichFieldsWithMetadata } = require('../lib/aws/aws-client');
 
 const args = process.argv.slice(2);
 function getArg(flag) {
