@@ -382,7 +382,7 @@ async function main() {
     // nosemgrep: lazy-load-module
     const express = require('express');
     const app = express();
-    app.use(express.json());
+    app.use(express.json({ limit: '10mb' }));
     // No CSRF middleware: this endpoint speaks JSON-RPC, not HTML forms.
     // It uses no cookies and relies on transport-level auth (bearer token /
     // SigV4 / network policy) configured by the deployment, not browser
