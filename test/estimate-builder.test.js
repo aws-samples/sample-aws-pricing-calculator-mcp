@@ -765,4 +765,21 @@ describe('normalizeFieldKeys (FSx for Lustre $0 regression)', () => {
     const input = { storageCapacity: { value: '1200' } };
     assert.deepEqual(normalizeFieldKeys(input, null, 'persistent'), input);
   });
+
+  it('the real field id wins over an alias regardless of key order', () => {
+    // A caller who supplies BOTH the friendly alias and the real field id must
+    // not have the real value silently clobbered by the alias (or vice-versa).
+    const aliasFirst = normalizeFieldKeys(
+      { storageCapacity: '1200', persistent_generated_0: { value: '999', unit: 'gb|NA' } },
+      FSX_DEF, 'persistent'
+    );
+    const idFirst = normalizeFieldKeys(
+      { persistent_generated_0: { value: '999', unit: 'gb|NA' }, storageCapacity: '1200' },
+      FSX_DEF, 'persistent'
+    );
+    assert.equal(aliasFirst.persistent_generated_0.value, '999', 'alias-first: real id wins');
+    assert.equal(idFirst.persistent_generated_0.value, '999', 'id-first: real id wins');
+    assert.equal(aliasFirst.storageCapacity, undefined);
+    assert.equal(idFirst.storageCapacity, undefined);
+  });
 });
