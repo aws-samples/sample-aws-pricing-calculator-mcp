@@ -1,0 +1,69 @@
+{
+    "$schema": "../schema.json",
+    "serviceCode": "amazonFSxForLustre",
+    "displayName": "Amazon FSx for Lustre",
+    "templateId": "persistent",
+    "status": "verified",
+    "required": [
+        {
+            "field": "columnFormIPM",
+            "hint": "Storage Type and throughput matrix. One row selects Storage type (SSD/HDD), Throughput capacity, and Cache Type. disableCalculation:true — the row rate is a mapping-table (monthly_ipm) lookup, so this MUST be present or storage prices at $0. Selector values may be sent in raw form (e.g. Throughput '1000', Cache 'N/A'); the builder's columnFormRemap translates them to the stored labels ('1000 MBps/TiB', 'No Cache').",
+            "shape": "{ value: [{ 'Storage type': {value: 'SSD'|'HDD'}, 'Throughput capacity': {value: '<MBps/TiB>'}, 'Cache Type': {value: 'N/A'|'RC20'} }] }",
+            "example": {
+                "value": [
+                    {
+                        "Storage type": {
+                            "value": "SSD"
+                        },
+                        "Throughput capacity": {
+                            "value": "1000"
+                        },
+                        "Cache Type": {
+                            "value": "N/A"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "field": "persistent_generated_0",
+            "hint": "Storage capacity. The real field id is persistent_generated_0, NOT 'storageCapacity' — but the builder's label→id normalization accepts the friendly 'storageCapacity' key too. fileSize, minimum 1200 GB. Unit must be the size|frequency form 'gb|NA'; a bare 'gb' or a plain number is repaired to 'gb|NA' automatically.",
+            "shape": "{ value: '<gb>', unit: 'gb|NA' }",
+            "example": {
+                "value": "1200",
+                "unit": "gb|NA"
+            }
+        }
+    ],
+    "traps": [
+        "The storage field id is persistent_generated_0, not 'storageCapacity'. Sending 'storageCapacity' verbatim (pre-normalization) lands in the saved blob but the engine finds no matching field and prices storage at $0. The label→fieldId normalization in estimate-builder maps the friendly 'storageCapacity' key onto persistent_generated_0 so either form works.",
+        "fileSize units must be 'size|frequency' (e.g. 'gb|NA'), not a bare 'gb'. A bare size or a plain number renders $0 until repaired to the full unit.",
+        "Without the columnFormIPM Storage-type/throughput row, storage cannot price at all — the row drives the per-GB rate via a mapping-table (monthly_ipm) lookup, and the whole component is disableCalculation:true.",
+        "HDD throughput is limited to 12 or 40 MBps/TiB; SSD supports 50/100/125/200/250/500/1000. Off-list throughput rehydrates as the default."
+    ],
+    "minimalConfig": {
+        "region": "us-east-1",
+        "description": "FSx for Lustre 1200 GB SSD Persistent, 1000 MBps/TiB",
+        "columnFormIPM": {
+            "value": [
+                {
+                    "Storage type": {
+                        "value": "SSD"
+                    },
+                    "Throughput capacity": {
+                        "value": "1000"
+                    },
+                    "Cache Type": {
+                        "value": "N/A"
+                    }
+                }
+            ]
+        },
+        "persistent_generated_0": {
+            "value": "1200",
+            "unit": "gb|NA"
+        }
+    },
+    "lastVerifiedAt": "2026-07-23",
+    "verifiedEstimateId": "f790c38853d5dae8313688fca7457d7bc89b3898"
+}

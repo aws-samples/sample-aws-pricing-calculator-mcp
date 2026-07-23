@@ -46,6 +46,40 @@ const FAKE_S3_DEFINITION = {
   templates: [{ id: 's3-template-1' }],
 };
 
+// FSx-for-Lustre-shaped definition for end-to-end payload tests. The real
+// storage field id is persistent_generated_0 (label "Storage capacity",
+// fileSize, default unit gb|NA) — NOT "storageCapacity". This mirrors the
+// live service definition that extractInputFields walks.
+const FAKE_FSX_MANIFEST = {
+  awsServices: [
+    { key: 'amazonFSxForLustre', name: 'Amazon FSx for Lustre', serviceCode: 'amazonFSxForLustre' },
+  ],
+};
+
+const FAKE_FSX_DEFINITION = {
+  version: '0.0.94',
+  serviceCode: 'amazonFSxForLustre',
+  templates: [
+    {
+      id: 'persistent',
+      components: [
+        {
+          type: 'input', subType: 'fileSize', id: 'persistent_generated_0',
+          label: 'Storage capacity',
+          dropDownSize: [{ id: 'gb' }, { id: 'tb' }],
+          defaultOption: { size: 'gb', frequency: 'NA' },
+        },
+        {
+          type: 'input', subType: 'fileSize', id: 'backupStorage',
+          label: 'Backup storage',
+          dropDownSize: [{ id: 'gb' }, { id: 'tb' }],
+          defaultOption: { size: 'gb', frequency: 'NA' },
+        },
+      ],
+    },
+  ],
+};
+
 describe('EstimateBuilder', () => {
   describe('description field', () => {
     it('defaults to empty string when no description provided', async () => {
@@ -183,6 +217,44 @@ describe('toAWSPayload', () => {
     assert.equal(svc.estimateFor, 'lambda-template-1');
     assert.equal(svc.description, 'API handler');
     assert.deepEqual(svc.calculationComponents.numberOfRequests, { value: '1000', unit: 'millionPerMonth' });
+  });
+
+  it('maps a friendly config label to the real field id in the payload (FSx $0 fix)', async () => {
+    mockFetch([
+      ['manifest/en_US.json', FAKE_FSX_MANIFEST],
+      ['data/amazonFSxForLustre', FAKE_FSX_DEFINITION],
+    ]);
+
+    const EB = require('../lib/estimate-builder');
+    const eb = new EB('FSx Estimate');
+    // The caller uses the friendly key "storageCapacity" and a bare number —
+    // the pre-fix builder would emit that verbatim and the engine would price
+    // storage at $0. normalizeFieldKeys must route it to persistent_generated_0
+    // with the gb|NA unit.
+    eb.addService('amazonFSxForLustre', {
+      region: 'us-east-1',
+      description: 'FSx Lustre 1200GB',
+      storageCapacity: '1200',
+      backupStorage: { value: '500', unit: 'gb' },
+    });
+
+    const payload = await eb.toAWSPayload();
+    const svc = Object.values(payload.services)[0];
+
+    assert.equal(svc.serviceCode, 'amazonFSxForLustre');
+    assert.equal(svc.estimateFor, 'persistent');
+    // storageCapacity must have been rewritten to the real field id + unit.
+    assert.deepEqual(
+      svc.calculationComponents.persistent_generated_0,
+      { value: '1200', unit: 'gb|NA' },
+      'friendly storageCapacity should become persistent_generated_0 with gb|NA'
+    );
+    assert.equal(
+      svc.calculationComponents.storageCapacity, undefined,
+      'the bogus friendly key must not leak into the payload'
+    );
+    // A bare "gb" unit on a real field id must be repaired to "gb|NA".
+    assert.equal(svc.calculationComponents.backupStorage.unit, 'gb|NA');
   });
 
   it('builds payload with grouped services', async () => {
@@ -608,5 +680,89 @@ describe('EstimateBuilder serialization', () => {
     const snapshot = e.toJSON();
     const round = JSON.parse(JSON.stringify(snapshot));
     assert.deepEqual(round, snapshot);
+  });
+});
+
+describe('normalizeFieldKeys (FSx for Lustre $0 regression)', () => {
+  const { normalizeFieldKeys, _normKey } = require('../lib/estimate-builder');
+
+  // Minimal FSx-for-Lustre-shaped definition: the real storage field id is
+  // persistent_generated_0 (label "Storage capacity", fileSize, defaultUnit
+  // gb|NA) — NOT "storageCapacity". Mirrors what extractInputFields parses.
+  const FSX_DEF = {
+    templates: [
+      {
+        id: 'persistent',
+        components: [
+          {
+            type: 'input', subType: 'fileSize', id: 'persistent_generated_0',
+            label: 'Storage capacity',
+            dropDownSize: [{ id: 'gb' }, { id: 'tb' }],
+            defaultOption: { size: 'gb', frequency: 'NA' },
+          },
+          {
+            type: 'input', subType: 'fileSize', id: 'backupStorage',
+            label: 'Backup storage',
+            dropDownSize: [{ id: 'gb' }, { id: 'tb' }],
+            defaultOption: { size: 'gb', frequency: 'NA' },
+          },
+        ],
+      },
+    ],
+  };
+
+  it('_normKey collapses label and camelCase alias to the same token', () => {
+    assert.equal(_normKey('Storage capacity'), _normKey('storageCapacity'));
+    assert.equal(_normKey('Storage capacity'), 'storagecapacity');
+  });
+
+  it('maps a friendly label key to the real field id', () => {
+    const out = normalizeFieldKeys(
+      { storageCapacity: { value: '1200' } }, FSX_DEF, 'persistent'
+    );
+    assert.ok(out.persistent_generated_0, 'storageCapacity should route to persistent_generated_0');
+    assert.equal(out.persistent_generated_0.value, '1200');
+    assert.equal(out.storageCapacity, undefined, 'the bogus friendly key must not survive');
+  });
+
+  it('repairs a bare fileSize unit to the field default (gb -> gb|NA)', () => {
+    const out = normalizeFieldKeys(
+      { persistent_generated_0: { value: '1200', unit: 'gb' } }, FSX_DEF, 'persistent'
+    );
+    assert.equal(out.persistent_generated_0.unit, 'gb|NA');
+  });
+
+  it('wraps a bare numeric/string fileSize value with the default unit', () => {
+    const out = normalizeFieldKeys(
+      { storageCapacity: '1200' }, FSX_DEF, 'persistent'
+    );
+    assert.deepEqual(out.persistent_generated_0, { value: '1200', unit: 'gb|NA' });
+  });
+
+  it('injects the default unit when a fileSize value object has none', () => {
+    const out = normalizeFieldKeys(
+      { backupStorage: { value: '500' } }, FSX_DEF, 'persistent'
+    );
+    assert.equal(out.backupStorage.unit, 'gb|NA');
+  });
+
+  it('leaves an already-valid field id + full unit untouched', () => {
+    const out = normalizeFieldKeys(
+      { persistent_generated_0: { value: '1200', unit: 'tb|NA' } }, FSX_DEF, 'persistent'
+    );
+    assert.equal(out.persistent_generated_0.unit, 'tb|NA');
+  });
+
+  it('preserves region and description', () => {
+    const out = normalizeFieldKeys(
+      { region: 'us-east-1', description: 'x', storageCapacity: '1200' }, FSX_DEF, 'persistent'
+    );
+    assert.equal(out.region, 'us-east-1');
+    assert.equal(out.description, 'x');
+  });
+
+  it('is a no-op without a definition', () => {
+    const input = { storageCapacity: { value: '1200' } };
+    assert.deepEqual(normalizeFieldKeys(input, null, 'persistent'), input);
   });
 });
