@@ -269,3 +269,73 @@ describe('partition support', () => {
     await assert.rejects(() => loadManifest('aws-govcloud'), /Unknown partition/);
   });
 });
+
+describe('normalizeFieldKeys (FSx for Lustre $0 regression)', () => {
+  const { normalizeFieldKeys, _normKey } = require('../lib/estimate-builder');
+
+  // Minimal FSx-for-Lustre-shaped definition: the real storage field id is
+  // persistent_generated_0 (label "Storage capacity", fileSize, defaultUnit
+  // gb|NA) — NOT "storageCapacity". This mirrors the live service definition
+  // that extractInputFields parses.
+  const FSX_DEF = {
+    templates: [
+      {
+        id: 'persistent',
+        components: [
+          {
+            type: 'input', subType: 'fileSize', id: 'persistent_generated_0',
+            label: 'Storage capacity',
+            dropDownSize: [{ id: 'gb' }, { id: 'tb' }],
+            defaultOption: { size: 'gb', frequency: 'NA' },
+          },
+          {
+            type: 'input', subType: 'fileSize', id: 'backupStorage',
+            label: 'Backup storage',
+            dropDownSize: [{ id: 'gb' }, { id: 'tb' }],
+            defaultOption: { size: 'gb', frequency: 'NA' },
+          },
+        ],
+      },
+    ],
+  };
+
+  it('_normKey collapses label and camelCase alias to the same token', () => {
+    assert.equal(_normKey('Storage capacity'), _normKey('storageCapacity'));
+    assert.equal(_normKey('Storage capacity'), 'storagecapacity');
+  });
+
+  it('maps a friendly label key to the real field id', () => {
+    const out = normalizeFieldKeys(
+      { storageCapacity: { value: '1200' } }, FSX_DEF, 'persistent'
+    );
+    assert.ok(out.persistent_generated_0, 'storageCapacity should route to persistent_generated_0');
+    assert.equal(out.persistent_generated_0.value, '1200');
+    assert.equal(out.storageCapacity, undefined, 'the bogus friendly key must not survive');
+  });
+
+  it('repairs a bare fileSize unit to the field default (gb -> gb|NA)', () => {
+    const out = normalizeFieldKeys(
+      { persistent_generated_0: { value: '1200', unit: 'gb' } }, FSX_DEF, 'persistent'
+    );
+    assert.equal(out.persistent_generated_0.unit, 'gb|NA');
+  });
+
+  it('injects the default unit when a fileSize value has none', () => {
+    const out = normalizeFieldKeys(
+      { backupStorage: { value: '500' } }, FSX_DEF, 'persistent'
+    );
+    assert.equal(out.backupStorage.unit, 'gb|NA');
+  });
+
+  it('leaves an already-valid field id + full unit untouched', () => {
+    const out = normalizeFieldKeys(
+      { persistent_generated_0: { value: '1200', unit: 'tb|NA' } }, FSX_DEF, 'persistent'
+    );
+    assert.equal(out.persistent_generated_0.unit, 'tb|NA');
+  });
+
+  it('is a no-op without a definition', () => {
+    const input = { storageCapacity: { value: '1200' } };
+    assert.deepEqual(normalizeFieldKeys(input, null, 'persistent'), input);
+  });
+});

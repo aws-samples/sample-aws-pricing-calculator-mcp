@@ -2463,17 +2463,25 @@
     "serviceCode": "amazonFSxForLustre",
     "estimateFor": "persistent",
     "fields": {
+      "Storage Type and throughput": {
+        "fieldId": "columnFormIPM",
+        "type": "columnFormIPM",
+        "notes": "Row selects Storage type (SSD/HDD), Throughput capacity (remapped label, e.g. '1000 MBps/TiB'), Cache Type ('No Cache'/'SSD cache'). disableCalculation:true — the row rate is a mapping-table (monthly_ipm) lookup, so it MUST be present for storage to price."
+      },
       "Storage capacity": {
-        "fieldId": "storageCapacity",
-        "type": "input"
+        "fieldId": "persistent_generated_0",
+        "type": "fileSize",
+        "unit": "gb|NA",
+        "notes": "Real field id is persistent_generated_0, NOT storageCapacity. minValue 1200 GB."
       },
       "Metadata IOPS (optional)": {
-        "fieldId": "metadataIopsOptional",
+        "fieldId": "metadata_iops_input",
         "type": "input"
       },
       "Backup storage": {
         "fieldId": "backupStorage",
-        "type": "input"
+        "type": "fileSize",
+        "unit": "gb|NA"
       }
     },
     "version": "0.0.94"
