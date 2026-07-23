@@ -3,8 +3,8 @@
   "serviceCode": "awsStepFunctions",
   "displayName": "AWS Step Functions",
   "status": "verified",
-  "lastVerifiedAt": "2026-05-30",
-  "verifiedEstimateId": "fc5ad3a2865d3ba360e0d599cf3fed56661b157e",
+  "lastVerifiedAt": "2026-07-23",
+  "verifiedEstimateId": "a8add11e9464c5b4472e11c54495920ef5a620a4",
   "required": [],
   "traps": [
     "awsStepFunctions is a subServiceSelector parent. Call addService('stepFunctionStandard', ...) and/or addService('stepFunctionExpress', ...). EstimateBuilder merges children into a single parent envelope with estimateFor: awsStepFunctionGroups.",
@@ -86,7 +86,7 @@
         "value": "10000000",
         "unit": "perMonth"
       },
-      "Average duration of workflow": "30",
+      "Average duration of workflow": "100",
       "stateMachineDefinitionSize": {
         "value": "64",
         "unit": "mb|NA"

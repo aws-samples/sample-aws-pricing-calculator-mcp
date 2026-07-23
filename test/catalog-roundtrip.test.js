@@ -77,11 +77,25 @@ describe('catalog roundtrip', () => {
           }
         } else {
           // Plain service: assert serviceCode + estimateFor match the entry.
-          if (top.serviceCode !== entry.serviceCode) {
-            failures.push(`${entry.serviceCode}: serviceCode mismatch (got ${top.serviceCode})`);
+          //
+          // Some catalog entries are `subService`-typed in the manifest even
+          // though the catalog models them as plain (single-service) configs
+          // (e.g. applicationLoadBalancer, NAT/Transit Gateway). For those the
+          // calculator wraps the service in a PARENT envelope on save, so the
+          // top-level entry carries the parent's serviceCode/estimateFor and the
+          // real service is in top.subServices[]. Match against the top entry OR
+          // any of its children so the assertion tracks the service the entry
+          // actually declares, not the synthetic parent.
+          const candidates = [top, ...(Array.isArray(top.subServices) ? top.subServices : [])];
+          const codeOk = candidates.some(c => c.serviceCode === entry.serviceCode);
+          if (!codeOk) {
+            failures.push(`${entry.serviceCode}: serviceCode mismatch (got ${candidates.map(c => c.serviceCode).join(', ')})`);
           }
-          if (entry.templateId && top.estimateFor !== entry.templateId) {
-            failures.push(`${entry.serviceCode}: estimateFor mismatch (expected ${entry.templateId}, got ${top.estimateFor})`);
+          if (entry.templateId) {
+            const match = candidates.find(c => c.serviceCode === entry.serviceCode) || top;
+            if (match.estimateFor !== entry.templateId) {
+              failures.push(`${entry.serviceCode}: estimateFor mismatch (expected ${entry.templateId}, got ${match.estimateFor})`);
+            }
           }
         }
       } catch (e) {
