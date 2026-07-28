@@ -2,6 +2,10 @@
 
 All notable changes to the AWS Pricing Calculator MCP server are documented here.
 
+## [1.2.8] - 2026-07-28
+
+- New/updated catalog entries for StepFunction, Cognito, FsX Lustre
+
 ## [1.2.7] - 2026-07-13
 
 - Added [MCP tool annotations](https://blog.modelcontextprotocol.io/posts/2026-03-16-tool-annotations/)
