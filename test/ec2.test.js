@@ -120,6 +120,36 @@ describe('EC2 pricing strategy', () => {
     assert.equal(ps.term, '1 Year');
   });
 
+  it('object format: documented "3 Year" yields 3-Year term (issue #33)', () => {
+    // Regression: object-form term was forwarded verbatim and missed the
+    // old `=== '3yr'` check, silently pricing as 1-Year.
+    const result = transformConfig({
+      pricingStrategy: { model: 'computeSavings', term: '3 Year', upfrontPayment: 'None' },
+    });
+    assert.equal(result.pricingStrategy.value.term, '3 Year');
+  });
+
+  it('object format: term is case-insensitive ("3 year" -> "3 Year")', () => {
+    const result = transformConfig({
+      pricingStrategy: { model: 'instanceSavings', term: '3 year', upfrontPayment: 'All' },
+    });
+    assert.equal(result.pricingStrategy.value.term, '3 Year');
+  });
+
+  it('object format: explicit "1 Year" is honored', () => {
+    const result = transformConfig({
+      pricingStrategy: { model: 'computeSavings', term: '1 Year', upfrontPayment: 'None' },
+    });
+    assert.equal(result.pricingStrategy.value.term, '1 Year');
+  });
+
+  it('object format: omitted term defaults to 3 Year (cheapest commitment)', () => {
+    const result = transformConfig({
+      pricingStrategy: { model: 'computeSavings', upfrontPayment: 'None' },
+    });
+    assert.equal(result.pricingStrategy.value.term, '3 Year');
+  });
+
   it('remaps reserved to instanceSavings for shared tenancy', () => {
     const result = transformConfig({ pricingStrategy: 'reserved1yrNoUpfront', tenancy: 'shared' });
     assert.equal(result.pricingStrategy.value.selectedOption, 'instance-savings');

@@ -19,7 +19,7 @@
     "build": "esbuild mcp-server.js --bundle --platform=node --outfile=dist/mcp-server.js --format=cjs --minify --external:@aws-sdk/client-dynamodb --external:@aws-sdk/lib-dynamodb && node scripts/emit-bundle-contract.js && rm -f dist/aws-calculator.zip && zip dist/aws-calculator.zip mcp-server.js lib/aws-client.js lib/estimate-builder.js lib/ec2.js package.json"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "1.29.0",
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "express": "5.2.1"
   },
   "peerDependencies": {

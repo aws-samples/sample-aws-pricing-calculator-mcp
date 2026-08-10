@@ -2,6 +2,12 @@
 
 All notable changes to the AWS Pricing Calculator MCP server are documented here.
 
+## [1.2.9] - 2026-08-04
+
+- Improved instructions for import_estimate tool to handle ESC urls
+- Fixed a TOCTOU race in `loadCatalog` that could crash startup with `ENOENT` when a catalog file was removed mid-scan (concurrent edit/deploy or parallel tests). Stale listing entries are now skipped.
+- Fixed [Bug #33](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/issues/33)
+
 ## [1.2.8] - 2026-07-28
 
 - New/updated catalog entries for StepFunction, Cognito, FsX Lustre

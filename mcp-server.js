@@ -357,7 +357,7 @@ server.tool(
   'import_estimate',
   desc.IMPORT_ESTIMATE,
   {
-    estimate_id: z.string().describe('Estimate ID or full calculator.aws URL (e.g. "bedb9a10..." or "https://calculator.aws/#/estimate?id=bedb9a10...")'),
+    estimate_id: z.string().describe('A full estimate URL or a bare ID. If you were given a URL, pass the whole URL rather than reducing it to the ID — the domain identifies which calculator stores the estimate (standard "calculator.aws" vs European Sovereign Cloud "pricing.calculator.aws.eu"). A bare ID is always read from the standard calculator, so an ESC estimate is only importable as its full pricing.calculator.aws.eu URL.'),
     format: z.enum(['json', 'markdown']).optional().describe('Output format: "json" for raw data (default), "markdown" for LLM-friendly summary'),
   },
   { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true },
