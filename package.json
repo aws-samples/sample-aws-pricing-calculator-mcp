@@ -1,6 +1,6 @@
 {
   "name": "sample-aws-pricing-calculator-mcp",
-  "version": "1.2.8",
+  "version": "1.2.9",
   "bin": "dist/mcp-server.js",
   "files": [
     "dist/mcp-server.js",
