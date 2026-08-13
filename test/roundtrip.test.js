@@ -12,7 +12,7 @@
  * 8 shapes, only `metaData.estimateId` ever differs. These tests pin that
  * invariant for the two shapes that aren't already covered by
  * integration.test.js: AppSync multi-child sub-service collapse, and the
- * EC2 dedicated-tenancy reserved-instance branch in lib/ec2.js.
+ * EC2 dedicated-tenancy reserved-instance branch in lib/aws/ec2.js.
  *
  * Network required.
  */

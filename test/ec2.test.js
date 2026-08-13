@@ -14,7 +14,7 @@ describe('EC2 transformConfig', () => {
     assert.equal(result.ec2AdvancedPricingMetrics.value, 1);
     assert.equal(result.detailedMonitoringCheckbox.value, false);
     // dataTransferForEC2 is no longer injected by transformConfig — that
-    // responsibility moved to lib/handler-helpers.js#applyDefaultFields
+    // responsibility moved to lib/mcp/handler-helpers.js#applyDefaultFields
     // (sub-task A 2026-06-03), which reads the catalog's defaultFields
     // block. transformConfig now passes through whatever the merged
     // config supplied.
@@ -58,7 +58,7 @@ describe('EC2 transformConfig', () => {
 
   // Production regression 2026-06-07: agents pass workload as an object
   // that does NOT match the canonical { value: { workloadType, data } }
-  // envelope. Pre-fix: lib/ec2.js fell through to `String(workloadInput)`
+  // envelope. Pre-fix: lib/aws/ec2.js fell through to `String(workloadInput)`
   // which produced "[object Object]" in the saved blob, rendering the
   // estimate read-only. Post-fix: malformed object input gets a
   // best-effort coercion (numeric-shaped value extracted if findable)

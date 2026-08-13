@@ -661,7 +661,7 @@ describe('validateConfigKeys', () => {
   // unconditional early return for `ec2Enhancement` that bypassed all
   // checks (field-name validity, value shape, required-field-presence).
   // Agents passed `numberOfInstances` (a made-up field) and the
-  // bypass let it through; downstream lib/ec2.js had no idea the
+  // bypass let it through; downstream lib/aws/ec2.js had no idea the
   // field was bogus. The fix removes the early return so EC2 gets
   // the same validation every other service gets.
   //

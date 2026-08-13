@@ -54,7 +54,7 @@
     "defaultFields": {
       "type": "object",
       "additionalProperties": true,
-      "description": "Per-field literal saved-blob shapes injected at add_service time when the agent omits the key. Use for fields the calculator silently demands but the manifest does NOT mark validations.required (the case where get_service_fields doesn't expose them and the lint can't refuse without them). Authors declare the canonical envelope; lib/handler-helpers.js#applyDefaultFields merges any missing keys into the user's config before estimate.addService."
+      "description": "Per-field literal saved-blob shapes injected at add_service time when the agent omits the key. Use for fields the calculator silently demands but the manifest does NOT mark validations.required (the case where get_service_fields doesn't expose them and the lint can't refuse without them). Authors declare the canonical envelope; lib/mcp/handler-helpers.js#applyDefaultFields merges any missing keys into the user's config before estimate.addService."
     }
   },
   "allOf": [

@@ -46,7 +46,7 @@ class TraceResult:
     `calls` is the ordered list of MCP tool calls the driver executed.
     `final_url` is set when an export_estimate / build_estimate succeeded.
     `events` (optional) is the structured trace events emitted by
-    lib/trace-logger.js, when the driver captures stderr.
+    lib/trace/trace-logger.js, when the driver captures stderr.
     `assistant_messages` is the ordered list of plain-text content
     blocks the model emitted across the conversation (LLM scenarios
     only; empty for scripted runs). Captures reasoning between tool

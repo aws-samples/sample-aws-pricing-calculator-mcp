@@ -334,7 +334,7 @@ describe('build_estimate helpers', () => {
     // Catalog declares a defaultFields shape; agent's config omits the key.
     // applyDefaultFields merges the catalog default before addService, so
     // the saved entry carries the canonical envelope. Closes the EC2
-    // dataTransferForEC2 special-case (which used to live in lib/ec2.js).
+    // dataTransferForEC2 special-case (which used to live in lib/aws/ec2.js).
     stubAwsClient();
     const { createHandlerHelpers } = require('../lib/mcp/handler-helpers');
     const EstimateBuilder = require('../lib/aws/estimate-builder');
@@ -620,7 +620,7 @@ describe('build_estimate response includes estimate_id on failure paths', () => 
     stubAwsClient();
     const { __test } = require('../mcp-server.js');
 
-    // Capture stderr (where lib/trace-logger.js writes events).
+    // Capture stderr (where lib/trace/trace-logger.js writes events).
     const writes = [];
     const orig = process.stderr.write.bind(process.stderr);
     process.stderr.write = (s) => { writes.push(s.toString()); return true; };

@@ -66,7 +66,7 @@ a probe + browser check.`);
   process.exit(args.includes('--help') ? 0 : 1);
 }
 
-// PCT-required fields, recursively. Mirrors the lib/can-rehydrate.js
+// PCT-required fields, recursively. Mirrors the lib/lint/can-rehydrate.js
 // findRequiredComponentIds walk so the two stay in agreement.
 function findPctRequired(template) {
   const out = [];

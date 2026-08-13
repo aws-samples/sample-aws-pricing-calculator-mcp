@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: MIT-0
 //
 // Entry point. The 9 tool registrations live here; their long
-// descriptions are in lib/tool-descriptions.js and the helpers each
-// handler calls into are in lib/handler-helpers.js. Read this file
+// descriptions are in lib/mcp/tool-descriptions.js and the helpers each
+// handler calls into are in lib/mcp/handler-helpers.js. Read this file
 // to understand the wiring; read those files for the prose and logic.
 
 const { McpServer } = require('@modelcontextprotocol/sdk/server/mcp.js');
@@ -180,7 +180,7 @@ server.tool(
     await estimates.put(estimate);
     // Mark the start of an estimate flow so observability can derive a
     // session-shaped denominator instead of per-estimateId. See
-    // lib/trace-events.js#session for why build_estimate intentionally
+    // lib/trace/trace-events.js#session for why build_estimate intentionally
     // doesn't fire this event.
     traceEvents.session.start({
       estimateId: estimate.id,
@@ -410,7 +410,7 @@ async function main() {
       // expected to set the Mcp-Session-Id header on every request).
       // Tool handlers and any helpers they call see this via
       // currentSessionId() in lib/request-context (consumed by trace
-      // events and lib/aws-client.js's save logs).
+      // events and lib/aws/aws-client.js's save logs).
       const mcpSessionId = req.headers['mcp-session-id'] || null;
       await runWithSession(mcpSessionId, () =>
         transport.handleRequest(req, res, req.body),

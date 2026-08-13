@@ -208,7 +208,7 @@ describe('saveEstimate trace events', () => {
   it('emits save.send and save.ok for a successful save, stamped with session id', async () => {
     // The AWS save endpoint returns a Lambda proxy-shaped response:
     // outer JSON has statusCode + body, body is a JSON string. See
-    // parseDoubleEncodedResponse in lib/aws-client.js and its existing
+    // parseDoubleEncodedResponse in lib/aws/aws-client.js and its existing
     // test on line 62-70 of test/aws-client.test.js for the exact shape.
     global.fetch = async () => ({
       ok: true, status: 200,
