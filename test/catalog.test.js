@@ -30,6 +30,31 @@ describe('catalog loader', () => {
     const entry = cat.get('aWSLambda');
     assert.equal(entry.displayName, 'AWS Lambda');
   });
+
+  it('skips a file that vanishes between readdir and read (TOCTOU), even in strict mode', () => {
+    // Regression: loadCatalog scans a directory (readdirSync) then reads each
+    // entry (readFileSync). A concurrent writer can remove a file in that
+    // window — a stale listing entry, never a real catalog error. Simulate it
+    // deterministically by making readdir report a "ghost.json" that isn't on
+    // disk, so the subsequent read throws ENOENT.
+    const fs = require('node:fs');
+    const os = require('node:os');
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'catalog-toctou-'));
+    const realReaddir = fs.readdirSync;
+    try {
+      fs.copyFileSync(path.join(FIXTURES, 'valid-entry.json'), path.join(tmp, 'valid-entry.json'));
+      fs.readdirSync = (d, ...rest) => {
+        const listing = realReaddir.call(fs, d, ...rest);
+        return d === tmp ? [...listing, 'ghost.json'] : listing;
+      };
+      const cat = loadCatalog(tmp, { strict: true });
+      assert.ok(cat.has('aWSLambda'), 'the valid entry still loads');
+      assert.equal(cat.size, 1, 'the vanished ghost.json is skipped, not counted');
+    } finally {
+      fs.readdirSync = realReaddir;
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
 });
 
 describe('getEntry', () => {

@@ -83,6 +83,7 @@ server.tool(
   'get_server_info',
   desc.GET_SERVER_INFO,
   {},
+  { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   traceTool('get_server_info', async () => mcpJsonOk({
     name: pkg.name,
     version: pkg.version,
@@ -99,6 +100,7 @@ server.tool(
     query: z.string().describe('One or more search terms, comma-separated (e.g. "Lambda, S3, Amazon Personalize, API Gateway, CloudWatch")'),
     partition: z.string().optional().describe('AWS partition to search in (default: "aws"). Valid values: "aws", "aws-iso", "aws-iso-b", "aws-eusc"'),
   },
+  { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   traceTool('search_services', async ({ query, partition }) => {
     const p = partition || 'aws';
     const partErr = checkPartition(p);
@@ -120,6 +122,7 @@ server.tool(
     service: z.string().describe('One or more service keys, comma-separated (e.g. "aWSLambda, amazonS3, stepFunctionStandard, amazonApiGateway")'),
     partition: z.string().optional().describe('AWS partition to fetch from (default: "aws"). Valid values: "aws", "aws-iso", "aws-iso-b", "aws-eusc"'),
   },
+  { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true },
   traceTool('get_service_fields', async ({ service, partition }) => {
     const p = partition || 'aws';
     const partErr = checkPartition(p);
@@ -169,6 +172,7 @@ server.tool(
     name: z.string().optional().describe('Name for the estimate (default: "My Estimate")'),
     partition: z.string().optional().describe('AWS partition for this estimate (default: "aws"). Valid values: "aws", "aws-iso", "aws-iso-b", "aws-eusc"'),
   },
+  { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   traceTool('create_estimate', async ({ name, partition }) => {
     const partErr = checkPartition(partition);
     if (partErr) return partErr;
@@ -194,6 +198,7 @@ server.tool(
     estimate_id: z.string().describe('Estimate ID from create_estimate'),
     services: z.string().describe('JSON array of service entries. Each entry: {"service":"serviceKey","instance":"optional","group":"optional","config":{...with region, description, and field values}}. Example: [{"service":"aWSLambda","group":"Prod","config":{"region":"eu-west-1","description":"Compute","numberOfRequests":{"value":"19","unit":"millionPerMonth"}}}]'),
   },
+  { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   traceTool('add_service', async ({ estimate_id, services: servicesStr }) => {
     const estimate = await estimates.get(estimate_id);
     if (!estimate) return estimateNotFoundResult(estimate_id);
@@ -217,6 +222,7 @@ server.tool(
   'validate_estimate',
   desc.VALIDATE_ESTIMATE,
   { estimate_id: z.string().describe('Estimate ID from create_estimate or build_estimate') },
+  { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true },
   traceTool('validate_estimate', async ({ estimate_id }) => {
     const estimate = await estimates.get(estimate_id);
     if (!estimate) return estimateNotFoundResult(estimate_id);
@@ -245,6 +251,7 @@ server.tool(
   'export_estimate',
   desc.EXPORT_ESTIMATE,
   { estimate_id: z.string().describe('Estimate ID from create_estimate') },
+  { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
   traceTool('export_estimate', async ({ estimate_id }) => {
     const estimate = await estimates.get(estimate_id);
     if (!estimate) return estimateNotFoundResult(estimate_id);
@@ -342,6 +349,7 @@ server.tool(
     name: z.string().optional().describe('Estimate name (default: "My Estimate")'),
     partition: z.string().optional().describe('AWS partition (default: "aws"). Valid values: "aws", "aws-iso", "aws-iso-b", "aws-eusc", "aws-eusc"'),
   },
+  { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
   traceTool('build_estimate', buildEstimateHandler)
 );
 
@@ -349,9 +357,10 @@ server.tool(
   'import_estimate',
   desc.IMPORT_ESTIMATE,
   {
-    estimate_id: z.string().describe('Estimate ID or full calculator.aws URL (e.g. "bedb9a10..." or "https://calculator.aws/#/estimate?id=bedb9a10...")'),
+    estimate_id: z.string().describe('A full estimate URL or a bare ID. If you were given a URL, pass the whole URL rather than reducing it to the ID — the domain identifies which calculator stores the estimate (standard "calculator.aws" vs European Sovereign Cloud "pricing.calculator.aws.eu"). A bare ID is always read from the standard calculator, so an ESC estimate is only importable as its full pricing.calculator.aws.eu URL.'),
     format: z.enum(['json', 'markdown']).optional().describe('Output format: "json" for raw data (default), "markdown" for LLM-friendly summary'),
   },
+  { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true },
   traceTool('import_estimate', async ({ estimate_id, format }) => {
     // Extract ID from URL if needed
     let id = estimate_id;
@@ -382,7 +391,7 @@ async function main() {
     // nosemgrep: lazy-load-module
     const express = require('express');
     const app = express();
-    app.use(express.json());
+    app.use(express.json({ limit: '10mb' }));
     // No CSRF middleware: this endpoint speaks JSON-RPC, not HTML forms.
     // It uses no cookies and relies on transport-level auth (bearer token /
     // SigV4 / network policy) configured by the deployment, not browser

@@ -6,16 +6,15 @@
   "status": "verified",
   "traps": [
     "Cognito has THREE pricing tiers selected via the `estimateFor` template id: 'Cognito' (Lite, legacy, includes a 10,000-MAU FREE TIER), 'CognitoEssentials' (paid from MAU 1, the modern default for auth-heavy apps), 'CognitoPlus' (premium with advanced security). Pick the right TEMPLATE ID for the use case — sending Essentials-tier fields under the Lite template silently produces $0 estimates because Lite's pricing engine ignores Essentials-prefixed components and 10K MAU is inside Lite's free tier.",
-    "Each tier has its own field-name prefix that must match the chosen template: Lite uses cognito_NumberOfMAUs + cognito_NumberOfTokenRequests; Essentials uses cognito_NumberOfMAUs_Essential + cognitoEssentials_*; Plus uses cognito_NumberOfMAUs_Plus + cognitoPlus_*. Mixing prefixes across tiers, or mixing a tier's fields with another tier's templateId, produces a saved estimate that 'looks editable' but renders $0 because the pricing engine for the active tier has nothing to charge against."
+    "Each tier has its own field-name prefix that must match the chosen template: Lite uses cognito_NumberOfMAUs + cognito_NumberOfTokenRequests; Essentials uses cognito_NumberOfMAUs_Essential + cognitoEssentials_*; Plus uses cognito_NumberOfMAUs_Plus + cognitoPlus_*. Mixing prefixes across tiers, or mixing a tier's fields with another tier's templateId, produces a saved estimate that 'looks editable' but renders $0 because the pricing engine for the active tier has nothing to charge against.",
+    "Do NOT include Lite-tier fields (optimizationRateTokenRequests, optimizationRateAppClients) in an Essentials config: they belong to the 'Cognito' (Lite) template, so template inference scores Lite and Essentials evenly and falls back to the FIRST template (Lite) — which prices 10K MAU at $0 inside its free tier. Keep the config to Essentials-prefixed fields only so inference resolves CognitoEssentials unambiguously (no templateIdHint needed)."
   ],
   "minimalConfig": {
     "region": "us-east-1",
-    "description": "Cognito Essentials, 10K MAU",
-    "cognito_NumberOfMAUs_Essential": "10000",
-    "cognitoEssentials_userTokenRequests": "50000",
-    "optimizationRateTokenRequests": "0",
-    "optimizationRateAppClients": "0"
+    "description": "Cognito Essentials, 100K MAU",
+    "cognito_NumberOfMAUs_Essential": "100000",
+    "cognitoEssentials_userTokenRequests": "1000000"
   },
-  "lastVerifiedAt": "2026-05-29",
-  "verifiedEstimateId": "3d2d14ff0fa058fb796d6d0560c621079e3171f1"
+  "lastVerifiedAt": "2026-07-23",
+  "verifiedEstimateId": "bb4a30d7d17de5bedc2d33390841b782c8c7c4d6"
 }
