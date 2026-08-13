@@ -1,0 +1,61 @@
+id: ec2-pricing-model-standard-dedicated
+description: |
+  Regression lock 2026-08-12 — catalog-documented model "standard"
+  silently falls back to On-Demand.
+
+  catalog/services/ec2Enhancement.json documents Standard Reserved
+  Instances (dedicated tenancy only) as:
+    {"model":"standard","term":"1 Year","upfrontPayment":"None"}
+
+  But lib/aws/ec2.js has no 'standard' key anywhere: MODEL_ALIASES
+  maps 'ri'/'reserved' → 'reserved', and SELECTED_OPTION maps
+  'reserved' → 'standard' (as an OUTPUT value only). Object-form
+  model "standard" reaches `SELECTED_OPTION['standard'] || 'on-demand'`
+  → undefined → silent On-Demand fallback. It also skips the
+  shared-tenancy remap guard (which matches `model === 'reserved'`).
+
+  Tenancy is "dedicated" here, exactly as the catalog instructs, so
+  a Standard RI is a legitimate, calculator-visible choice — the
+  fallback is purely the missing alias.
+
+  PRE-FIX: the selectedOption assertion FAILS (blob shows
+  "on-demand"). POST-FIX: either "standard" resolves to a Standard
+  RI (assertion passes) or add_service rejects it loudly — in which
+  case update this scenario to assert the validation error, and fix
+  the catalog hint to the accepted spelling.
+calls:
+  - tool: create_estimate
+    args:
+      name: ec2-pricing-model-standard-dedicated
+  - tool: add_service
+    args:
+      estimate_id: ${estimate_id}
+      services: |
+        [{"service":"ec2Enhancement","group":"Compute","config":{
+          "region":"us-east-1",
+          "description":"Standard RI 1yr on dedicated tenancy per catalog-documented format",
+          "instanceType":"m5.large",
+          "selectedOS":"linux",
+          "workload":1,
+          "tenancy":"dedicated",
+          "pricingStrategy":{"model":"standard","term":"1 Year","upfrontPayment":"None"}
+        }}]
+  - tool: export_estimate
+    args:
+      estimate_id: ${estimate_id}
+expectations:
+  - predicate: save_succeeded
+  # Standard RI under dedicated tenancy — the calculator's own label
+  # for this selectedOption is "standard". Pre-fix: blob holds
+  # "on-demand".
+  - predicate: saved_blob_field_equals
+    paths:
+      - services.*.calculationComponents.pricingStrategy.value.selectedOption
+      - groups.*.services.*.calculationComponents.pricingStrategy.value.selectedOption
+    equals: standard
+  # Tenancy must remain dedicated (no remap should fire).
+  - predicate: saved_blob_field_equals
+    paths:
+      - services.*.calculationComponents.tenancy.value
+      - groups.*.services.*.calculationComponents.tenancy.value
+    equals: dedicated

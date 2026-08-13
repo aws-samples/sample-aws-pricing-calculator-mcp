@@ -1,0 +1,68 @@
+id: ec2-pricing-object-display-label
+description: |
+  Regression lock for agent-reported bug 2026-08-12 — silent
+  On-Demand fallback for object-form pricingStrategy with a display
+  label model.
+
+  The reporting agent sent the exact config below:
+    pricingStrategy: {"model": "EC2 Instance Savings Plans", "term": "3 Year"}
+  and the saved blob rendered selectedOption "on-demand".
+
+  Root cause (lib/aws/ec2.js): the OBJECT path (parsePricing →
+  normalize) passes `model` through verbatim — no MODEL_ALIASES
+  lookup, no fuzzy match (only the STRING path has those). Then
+  buildPricingStrategy does `SELECTED_OPTION[model] || 'on-demand'`,
+  silently falling back. Ironically the plain STRING
+  "EC2 Instance Savings Plans" would have fuzzy-matched
+  /instance.savings/i and worked.
+
+  Compound failure: `term: "3 Year"` also degrades to "1 Year"
+  because buildPricingStrategy only recognizes the '3yr' shorthand
+  (`term === '3yr' ? '3 Year' : '1 Year'`).
+
+  PRE-FIX: both saved_blob assertions FAIL (blob shows
+  selectedOption "on-demand", term "1 Year"). POST-FIX: the expected
+  behavior is either (a) normalization maps the display label to
+  instance-savings and "3 Year" survives — these assertions pass —
+  or (b) add_service rejects the unknown model loudly, in which case
+  this scenario should be updated to assert the validation error.
+calls:
+  - tool: create_estimate
+    args:
+      name: ec2-pricing-object-display-label
+  - tool: add_service
+    args:
+      estimate_id: ${estimate_id}
+      services: |
+        [{"service":"ec2Enhancement","group":"Compute","config":{
+          "region":"us-east-1",
+          "description":"3yr EC2 Instance Savings Plans via display-label object form",
+          "instanceType":"m5.large",
+          "selectedOS":"linux",
+          "workload":1,
+          "tenancy":"shared",
+          "pricingStrategy":{"model":"EC2 Instance Savings Plans","term":"3 Year"}
+        }}]
+  - tool: export_estimate
+    args:
+      estimate_id: ${estimate_id}
+expectations:
+  - predicate: save_succeeded
+  # What the agent asked for. Pre-fix the blob holds "on-demand".
+  - predicate: saved_blob_field_equals
+    paths:
+      - services.*.calculationComponents.pricingStrategy.value.selectedOption
+      - groups.*.services.*.calculationComponents.pricingStrategy.value.selectedOption
+    equals: instance-savings
+  # The requested commitment term. Pre-fix the blob holds "1 Year".
+  - predicate: saved_blob_field_equals
+    paths:
+      - services.*.calculationComponents.pricingStrategy.value.term
+      - groups.*.services.*.calculationComponents.pricingStrategy.value.term
+    equals: 3 Year
+  # Cost oracle: m5.large us-east-1 3yr Instance Savings no-upfront
+  # ≈ $31/mo. Band excludes silent-$0 (the trap class) below and
+  # on-demand ≈ $70/mo (the fallback bug) above.
+  - predicate: estimate_renders_cost
+    min_monthly_usd: 10.0
+    max_monthly_usd: 55.0

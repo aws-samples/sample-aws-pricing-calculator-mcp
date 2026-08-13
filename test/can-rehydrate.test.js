@@ -2080,6 +2080,118 @@ describe('canRehydrate — tenancy-pricing-mismatch', () => {
   });
 });
 
+describe('canRehydrate — ec2-pricing-invalid-value', () => {
+  // Backstop for the 2026-08-12 silent-fallback fix in lib/aws/ec2.js.
+  // add_service now rejects invalid pricingStrategy values, so this
+  // predicate only fires on bypass paths (import_estimate of hand-edited
+  // blobs, external construction). Same role column-form-unremapped-value
+  // plays for the remap fix.
+  const ec2Def = {
+    serviceCode: 'ec2Enhancement',
+    templates: [{ id: 'template' }],
+  };
+  const PER_SVC = new Map([['ec2Enhancement', ec2Def]]);
+
+  function blob(cc, serviceCode = 'ec2Enhancement') {
+    return {
+      services: { s1: { serviceCode, estimateFor: 'template', calculationComponents: cc } },
+    };
+  }
+
+  it('flags an invalid selectedOption (the pre-fix fallback artifact)', () => {
+    const r = canRehydrate({
+      savedBlob: blob({
+        pricingStrategy: { value: { selectedOption: 'EC2 Instance Savings Plans', term: '1 Year', upfrontPayment: 'None' } },
+      }),
+      manifest: ANY_MANIFEST, perServiceDefinitions: PER_SVC,
+    });
+    const fails = r.services[0].failures.filter(f => f.predicate === 'ec2-pricing-invalid-value');
+    assert.equal(fails.length, 1);
+    assert.match(fails[0].message, /selectedOption "EC2 Instance Savings Plans"/);
+  });
+
+  it('flags an invalid term (lowercase / shorthand leaked into the blob)', () => {
+    const r = canRehydrate({
+      savedBlob: blob({
+        pricingStrategy: { value: { selectedOption: 'instance-savings', term: '3yr', upfrontPayment: 'None' } },
+      }),
+      manifest: ANY_MANIFEST, perServiceDefinitions: PER_SVC,
+    });
+    const fails = r.services[0].failures.filter(f => f.predicate === 'ec2-pricing-invalid-value');
+    assert.equal(fails.length, 1);
+    assert.match(fails[0].message, /term "3yr"/);
+  });
+
+  it('flags an invalid upfrontPayment and reports multiple invalids together', () => {
+    const r = canRehydrate({
+      savedBlob: blob({
+        pricingStrategy: { value: { selectedOption: 'banana', term: 'forever', upfrontPayment: 'half' } },
+      }),
+      manifest: ANY_MANIFEST, perServiceDefinitions: PER_SVC,
+    });
+    const fails = r.services[0].failures.filter(f => f.predicate === 'ec2-pricing-invalid-value');
+    assert.equal(fails.length, 1, 'one failure per service, listing all invalid keys');
+    assert.match(fails[0].message, /selectedOption/);
+    assert.match(fails[0].message, /term/);
+    assert.match(fails[0].message, /upfrontPayment/);
+  });
+
+  it('does NOT flag a canonical committed-pricing envelope', () => {
+    const r = canRehydrate({
+      savedBlob: blob({
+        pricingStrategy: { value: { selectedOption: 'instance-savings', term: '3 Year', upfrontPayment: 'None' } },
+      }),
+      manifest: ANY_MANIFEST, perServiceDefinitions: PER_SVC,
+    });
+    const fails = r.services[0].failures.filter(f => f.predicate === 'ec2-pricing-invalid-value');
+    assert.equal(fails.length, 0);
+  });
+
+  it('does NOT flag the on-demand envelope (no upfrontPayment key)', () => {
+    const r = canRehydrate({
+      savedBlob: blob({
+        pricingStrategy: { value: { selectedOption: 'on-demand', term: '1 Year', utilizationValue: '80', utilizationUnit: '%Utilized/Month' } },
+      }),
+      manifest: ANY_MANIFEST, perServiceDefinitions: PER_SVC,
+    });
+    const fails = r.services[0].failures.filter(f => f.predicate === 'ec2-pricing-invalid-value');
+    assert.equal(fails.length, 0,
+      'on-demand envelopes omit upfrontPayment — absence must not flag');
+  });
+
+  it('does NOT flag when pricingStrategy is absent', () => {
+    const r = canRehydrate({
+      savedBlob: blob({ instanceType: { value: 'm5.large' } }),
+      manifest: ANY_MANIFEST, perServiceDefinitions: PER_SVC,
+    });
+    const fails = (r.services[0]?.failures || []).filter(f => f.predicate === 'ec2-pricing-invalid-value');
+    assert.equal(fails.length, 0);
+  });
+
+  it('does NOT fire on non-EC2 services with a pricingStrategy-shaped component', () => {
+    const otherDef = { serviceCode: 'someOtherService', templates: [{ id: 'template' }] };
+    const r = canRehydrate({
+      savedBlob: blob({
+        pricingStrategy: { value: { selectedOption: 'weird-thing' } },
+      }, 'someOtherService'),
+      manifest: ANY_MANIFEST,
+      perServiceDefinitions: new Map([['someOtherService', otherDef]]),
+    });
+    const fails = (r.services[0]?.failures || []).filter(f => f.predicate === 'ec2-pricing-invalid-value');
+    assert.equal(fails.length, 0, 'predicate is scoped to ec2Enhancement only');
+  });
+
+  it('service status goes to required-input (refuses export) on an invalid value', () => {
+    const r = canRehydrate({
+      savedBlob: blob({
+        pricingStrategy: { value: { selectedOption: 'banana', term: '1 Year', upfrontPayment: 'None' } },
+      }),
+      manifest: ANY_MANIFEST, perServiceDefinitions: PER_SVC,
+    });
+    assert.equal(r.services[0].status, 'required-input');
+  });
+});
+
 describe('canRehydrate — column-form-unremapped-value', () => {
   // columnFormIPM cells must store REMAPPED (target) values, not raw
   // selector (UI) values. The service definition's columnFormIPM carries

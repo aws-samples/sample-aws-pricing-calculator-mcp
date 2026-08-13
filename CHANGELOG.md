@@ -59,6 +59,53 @@ documented here.
 
 ### Fixed
 
+- **EC2 pricingStrategy no longer silently falls back to On-Demand /
+  1 Year** (`lib/aws/ec2.js`). Agent report 2026-08-12: object-form
+  `pricingStrategy: {"model": "EC2 Instance Savings Plans", "term":
+  "3 Year"}` saved as `selectedOption: "on-demand"`, `term: "1 Year"`
+  — a valid-looking estimate with wrong pricing, and every tool call
+  returned success. Three distinct silent-mismatch paths, all fixed:
+
+  1. **Object-form model skipped normalization.** Only the string
+     path had alias/fuzzy matching; the object path passed `model`
+     through verbatim into `SELECTED_OPTION[model] || 'on-demand'`.
+     The paths now share one resolver (`resolveModel`) covering
+     aliases, display labels ("EC2 Instance Savings Plans"), the
+     catalog-documented `"standard"` spelling, and saved-blob
+     `selectedOption` forms (`"instance-savings"`).
+  2. **Full-word terms degraded.** `term === '3yr' ? '3 Year' :
+     '1 Year'` turned the catalog's own documented `"3 Year"` into a
+     1-year commitment. `resolveTerm` now accepts `1yr`/`3yr`,
+     `1 Year`/`3 Years`, bare `1`/`3`, any case.
+  3. **The `|| 'on-demand'` fallback is gone.** Anything unresolvable
+     (model, term, upfrontPayment) throws with the valid values
+     listed. `validateConfigKeys` runs the same check at add_service
+     time via the new `validatePricingStrategy` export, so agents get
+     the rejection on the first call, not a wrong estimate.
+
+  Discovery surface: `get_service_fields` now carries `validModels`
+  / `validTerms` / `validUpfrontPayments` directly on the
+  `pricingStrategy` field (agent-fields enrichment) instead of only
+  in catalog trap prose; the ec2Enhancement catalog hint/traps were
+  rewritten to match the enforced contract (the old text documented
+  formats the code didn't accept). Regression locks: 4 new eval
+  scenarios (`ec2-pricing-object-display-label` with a cost-band
+  oracle excluding both $0 and on-demand, `ec2-pricing-term-full-word`,
+  `ec2-pricing-model-standard-dedicated`,
+  `ec2-pricing-string-display-label-control`) + 14 unit tests.
+
+  Defense-in-depth: new **`ec2-pricing-invalid-value` lint predicate**
+  (`lib/lint/can-rehydrate.js`) fires (required-input) when a saved
+  ec2Enhancement blob carries a `pricingStrategy.value` whose
+  `selectedOption` / `term` / `upfrontPayment` is outside the
+  calculator's accepted enums — the bypass-path backstop for
+  `import_estimate` of hand-edited blobs and external construction,
+  the same role `column-form-unremapped-value` plays for the remap
+  fix. Only checks keys present in the envelope (on-demand envelopes
+  without `upfrontPayment`, utilization-only shapes stay silent) and
+  is scoped to ec2Enhancement. Paired `lint-hints` recovery text
+  shows the accepted object form.
+
 - **columnFormIPM `remap.keyValue` is now applied at build time.** The
   calculator stores the *remapped* selector value in a saved estimate
   (the service def's columnFormIPM component carries a
