@@ -2,7 +2,27 @@
 
 All notable changes to the AWS Pricing Calculator MCP server are documented here.
 
-## Unreleased
+## [1.3.0] - 2026-08-16
+
+Merges upstream `aws-samples` 1.2.4–1.2.9. Minor rather than patch
+because two changes are visible to consumers: `lib/` module paths moved
+(below), and the new `ec2-pricing-invalid-value` lint predicate refuses
+saves that 1.2.9 accepted.
+
+### Changed
+
+- **`lib/` regrouped into subdirectories** — the flat `lib/*.js` layout
+  became `lib/aws/` (`aws-client`, `ec2`, `estimate-builder`,
+  `agent-fields`, `pct-config`, `surfaceability`), `lib/lint/`
+  (`can-rehydrate`, `can-rehydrate-fetch`, `catalog`, `lint-hints`,
+  `validation`), `lib/mcp/` (`handler-helpers`, `tool-descriptions`),
+  `lib/store/` (`estimate-store`, `estimate-store-dynamodb`), and
+  `lib/trace/` (`trace-logger`, `trace-events`, `request-context`).
+  Pure moves — no behavior change — but **breaking for anything
+  requiring `lib/*.js` paths directly**; e.g. `lib/ec2.js` is now
+  `lib/aws/ec2.js`. The MCP tool surface is unaffected, as is the
+  bundled `dist/mcp-server.js`. `lib/dom-cost.js` stays at the root:
+  it is a validation oracle, not part of any of the five groups.
 
 ### Fixed
 
