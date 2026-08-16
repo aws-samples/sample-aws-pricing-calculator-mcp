@@ -132,13 +132,29 @@ Produces:
 
 ## Tests
 
-Three layers, no overlap:
+Four layers, no overlap:
 
-- **`npm test`** — node:test suite (424/429 pass with mocked I/O). Per-commit gate. Covers pure functions (validation, lint, surfaceability), payload construction, EC2 transforms, catalog schema.
+- **`npm test`** — node:test suite, **hermetic**: 491 pass / 10 skipped, no network, ~1.5s. Per-commit gate, and the only layer that runs in CI. Covers pure functions (validation, lint, surfaceability), payload construction, EC2 transforms, catalog schema.
+- **`npm run test:network`** — the same suite with `SKIP_NETWORK` unset, so the 10 skipped tests run. They fetch the live manifest and POST real estimates to the save API, which is why they are not in CI. Run before a release.
 - **`npm run validate-catalog:cost`** — sweeps verified catalog entries against the live cost oracle. Catches stale URLs and pricing-engine drift.
-- **`python eval/run.py`** — 87 YAML scenarios (scripted MCP calls + LLM-driven). Each does a real save, then asserts on the saved blob (DOM-rendered cost, structural field equality, lint-must-pass). Run on demand (~1-2 min for stdio scenarios; LLM scenarios cost a few cents on Bedrock Haiku).
+- **`python eval/run.py`** — 87 YAML scenarios (scripted MCP calls + LLM-driven). Each does a real save, then asserts on the saved blob (DOM-rendered cost, structural field equality, lint-must-pass). Read `eval/README.md` on interpreting failures — a raw count is not meaningful; use `--compare-baseline`.
 
-424/429 tests pass with mocked I/O (5 skipped, network-dependent). Set `SKIP_NETWORK=1` for offline runs.
+`npm test` sets `SKIP_NETWORK=1` itself, so a clean checkout is green offline. The
+network-dependent tests declare the gate at their `describe`, following the
+convention in `test/author-catalog.test.js`.
+
+### CI
+
+`.github/workflows/ci.yml` runs two jobs on every push to `main` and every PR:
+
+- **test** — `npm ci && npm test` on Node 22 and 24.
+- **dist-freshness** — rebuilds the bundle and requires `dist/mcp-server.js` and
+  `dist/bundle-contract.json` to be byte-identical to what is committed. `dist/`
+  is a tracked artifact that consumers install (see `files` in `package.json`),
+  so a source change with a stale bundle ships nothing. Expect this job to fail
+  on a dependency bump until you rerun `npm run build` — deps are bundled, so
+  that is a true positive. `dist/aws-calculator.zip` is not compared, since zip
+  embeds mtimes.
 
 ## Architecture
 

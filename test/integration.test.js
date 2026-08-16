@@ -6,14 +6,26 @@
  *   1. Build → save → URL works (smoke).
  *   2. Build → save → fetch back → field-by-field comparison (true roundtrip).
  *
- * Run with: npm test (or `node --test test/integration.test.js`).
+ * Run with: npm run test:network (or `node --test test/integration.test.js`).
+ *
+ * SKIP_NETWORK gate: every test here POSTs a real estimate to the save
+ * API, so `npm test` (which sets SKIP_NETWORK=1) skips them. The
+ * estimate-store describe at the bottom is in-process and runs
+ * unconditionally.
  */
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
 const EstimateBuilder = require('../lib/aws/estimate-builder');
 const { fetchEstimate } = require('../lib/aws/aws-client');
 
-describe('integration: export to calculator.aws', () => {
+const SKIP_NETWORK = process.env.SKIP_NETWORK === '1';
+
+describe('integration: export to calculator.aws (network)', () => {
+  if (SKIP_NETWORK) {
+    it.skip('SKIP_NETWORK=1; not running', () => {});
+    return;
+  }
+
   it('builds and saves a Lambda estimate, returns a working URL', async () => {
     const eb = new EstimateBuilder('Integration Test');
     eb.addService('aWSLambda', {
@@ -40,7 +52,12 @@ describe('integration: export to calculator.aws', () => {
   });
 });
 
-describe('integration: roundtrip (save → fetch → compare)', () => {
+describe('integration: roundtrip (save → fetch → compare) (network)', () => {
+  if (SKIP_NETWORK) {
+    it.skip('SKIP_NETWORK=1; not running', () => {});
+    return;
+  }
+
   it('preserves estimate name, service, region, description, and calculation components', async () => {
     const NAME = `Roundtrip Test ${Date.now()}`;
     const DESCRIPTION = 'Compute for API';

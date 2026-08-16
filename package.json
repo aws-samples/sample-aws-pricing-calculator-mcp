@@ -12,6 +12,7 @@
   "main": "mcp-server.js",
   "scripts": {
     "test": "npm run validate-catalog && SKIP_NETWORK=1 node --test test/*.test.js",
+    "test:network": "npm run validate-catalog && node --test test/*.test.js",
     "test:roundtrip": "node --test test/catalog-roundtrip.test.js",
     "mcp": "node mcp-server.js",
     "validate-catalog": "node scripts/validate-catalog.js",

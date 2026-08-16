@@ -2,6 +2,12 @@
 
 All notable changes to the AWS Pricing Calculator MCP server are documented here.
 
+## [Unreleased]
+
+- Added **CI** (`.github/workflows/ci.yml`) — `npm test` on Node 22 and 24, plus a dist-freshness check that the committed bundle matches a fresh build
+- **`npm test` is now hermetic** — 10 tests that ignored `SKIP_NETWORK=1` and fetched anyway now honor it; new `npm run test:network` runs the full set with the gate off
+- Known issue: `npm run test:network` is not green — `test/catalog-roundtrip.test.js` fails for ALB, NAT Gateway, and Transit Gateway on `serviceCode`/`estimateFor` (pre-existing)
+
 ## [1.3.0] - 2026-08-16
 
 Merges upstream `aws-samples` 1.2.4–1.2.9. Minor rather than patch
