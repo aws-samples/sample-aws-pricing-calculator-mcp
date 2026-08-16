@@ -101,14 +101,29 @@ saves that 1.2.9 accepted.
   answer from the server and pass straight through; retrying a 400
   from the save API would only replay a payload rejected on its merits.
 
-  `POST /saveAs` is deliberately **excluded from retry** (`retry:
-  false`, timeout still applies). It mints a fresh `estimateId` per
-  call, so an `ECONNRESET` raised *after* the lambda accepted the body
-  is ambiguous and a retry would orphan a duplicate estimate. This is
-  the one place where the fix is a timeout only, and #7's headline
-  symptom was `export_estimate` failing — so if reset-during-save is
-  the real trigger, this mitigates the hang but not the failure. 23
-  unit tests pin the contract.
+  `POST /saveAs` retries too, but on a **smaller budget (2 attempts)**
+  and it is the one genuinely debatable call in this change. The POST is
+  not idempotent — it mints a fresh `estimateId` per call — so a network
+  error raised *after* the lambda accepted the body is ambiguous, and the
+  re-attempt may leave a duplicate blob server-side.
+
+  It was initially excluded for exactly that reason, and that was wrong:
+  #7's headline symptom was `export_estimate` failing, i.e. this exact
+  call, so excluding it would have hardened the six read paths and left
+  the one that actually broke unprotected. The cost of being wrong is
+  asymmetric. A duplicate blob is unreachable (nobody holds its URL),
+  belongs to no estimate, and inflates no cost — unlike a duplicate
+  `add_service` entry, which silently inflates the total by the price of
+  the service. A save that fails on a transient reset is a real
+  user-visible failure. Cheap orphan beats lost save.
+
+  Every re-attempt emits a new **`save.retry`** trace event carrying
+  `mayHaveOrphaned: true`, the error code, and the local `estimateId`, so
+  the orphans stay attributable after the fact rather than being
+  invisible. 28 unit tests pin the contract, 5 of them driving
+  `saveEstimate` against a stubbed `fetch` (no estimate is actually
+  saved) to cover retry, the attempt cap, the `save.retry` payload, and
+  the no-retry-on-HTTP-400 case.
 
 ### Security
 

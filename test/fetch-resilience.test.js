@@ -100,16 +100,76 @@ describe('resilientFetch retry behavior', () => {
     assert.equal(calls, 1);
   });
 
-  it('honors retry:false so a non-idempotent POST is attempted exactly once', async () => {
-    // The save POST mints a new estimateId per call. An ECONNRESET after
-    // the lambda already processed the body is ambiguous, so retrying
-    // would orphan a duplicate estimate blob.
+  it('honors retry:false so a caller can opt out entirely', async () => {
     let calls = 0;
     globalThis.fetch = async () => { calls++; throw netError('ECONNRESET'); };
     await assert.rejects(
       () => resilientFetch('https://example.test/save', { method: 'POST' }, { retry: false, sleep: async () => {} }),
     );
     assert.equal(calls, 1);
+  });
+
+  it('honors a reduced maxAttempts, for callers on a smaller budget', async () => {
+    // The save POST takes 2 rather than the default 3: it is not
+    // idempotent, so each extra attempt is another chance to orphan a
+    // duplicate blob. See saveEstimate in lib/aws/aws-client.js.
+    let calls = 0;
+    globalThis.fetch = async () => { calls++; throw netError('ECONNRESET'); };
+    await assert.rejects(
+      () => resilientFetch('https://example.test/save', { method: 'POST' },
+        { maxAttempts: 2, sleep: async () => {} }),
+    );
+    assert.equal(calls, 2);
+  });
+
+  it('fires onRetry before each re-attempt, not before the first', async () => {
+    let calls = 0;
+    const seen = [];
+    globalThis.fetch = async () => {
+      calls++;
+      if (calls < 3) throw netError('ECONNRESET');
+      return new Response('ok', { status: 200 });
+    };
+    const res = await resilientFetch('https://example.test/h', undefined, {
+      sleep: async () => {},
+      onRetry: (info) => seen.push(info),
+    });
+    assert.equal(res.status, 200);
+    assert.equal(calls, 3);
+    assert.equal(seen.length, 2, 'two re-attempts means two onRetry calls');
+    assert.deepEqual(seen.map(s => s.attempt), [1, 2],
+      'attempt is the number of the attempt that just FAILED');
+    assert.equal(seen[0].error.cause.code, 'ECONNRESET');
+  });
+
+  it('does not fire onRetry when the first attempt succeeds', async () => {
+    let fired = 0;
+    globalThis.fetch = async () => new Response('ok', { status: 200 });
+    await resilientFetch('https://example.test/i', undefined, {
+      sleep: async () => {}, onRetry: () => { fired++; },
+    });
+    assert.equal(fired, 0);
+  });
+
+  it('does not fire onRetry on a non-retryable error', async () => {
+    let fired = 0;
+    globalThis.fetch = async () => { throw new TypeError('Invalid URL'); };
+    await assert.rejects(() => resilientFetch('nonsense', undefined, {
+      sleep: async () => {}, onRetry: () => { fired++; },
+    }));
+    assert.equal(fired, 0, 'a bad URL is not worth re-attempting or recording');
+  });
+
+  it('does not fire onRetry on the final failed attempt', async () => {
+    // The last failure is reported by the thrown error, not by onRetry.
+    // A caller using onRetry to count "possible duplicates server-side"
+    // must not over-count the attempt that never went out again.
+    let fired = 0;
+    globalThis.fetch = async () => { throw netError('ECONNRESET'); };
+    await assert.rejects(() => resilientFetch('https://example.test/j', undefined, {
+      maxAttempts: 2, sleep: async () => {}, onRetry: () => { fired++; },
+    }));
+    assert.equal(fired, 1, '2 attempts means exactly 1 re-attempt');
   });
 
   it('backs off with growing delays between attempts', async () => {
