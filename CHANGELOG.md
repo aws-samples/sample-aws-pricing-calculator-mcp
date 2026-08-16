@@ -75,6 +75,75 @@ saves that 1.2.9 accepted.
   is scoped to ec2Enhancement. Paired `lint-hints` recovery text
   shows the accepted object form.
 
+- **Every calculator HTTP call now has a timeout and bounded retry**
+  (new `lib/aws/fetch-resilience.js`, wired into the six GETs and the
+  save POST in `lib/aws/aws-client.js`). Mitigates
+  [#7](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/issues/7):
+  repeated `fetch failed` / `ECONNRESET` against all three CloudFront
+  distributions on Windows 11 / Node 22, where `curl` on the same host
+  worked.
+
+  **The root cause is still unknown, and this release does not claim
+  otherwise.** Two theories were probed and both fail on the evidence:
+  the reporter's CloudFront-WAF-fingerprints-undici theory does not fit
+  their own repro (a fingerprint block rejects request *#1*, theirs
+  failed only after several successes), and the competing stale-keep-
+  alive-socket theory does not hold either (these distributions
+  advertise no Keep-Alive timeout, and undici socket reuse after a 9s
+  idle gap succeeds). The symptom did not reproduce on macOS.
+
+  What was never in doubt is the defect underneath it: **no call site
+  had a timeout or a retry**, so one transient reset was an
+  unrecoverable tool failure and a stalled socket hung the MCP tool
+  forever with no path for the agent to recover. That is what is fixed
+  — 3 attempts with exponentially-backed-off jittered delays, 30s
+  timeout, retry only on socket-level errors. HTTP statuses are a real
+  answer from the server and pass straight through; retrying a 400
+  from the save API would only replay a payload rejected on its merits.
+
+  `POST /saveAs` is deliberately **excluded from retry** (`retry:
+  false`, timeout still applies). It mints a fresh `estimateId` per
+  call, so an `ECONNRESET` raised *after* the lambda accepted the body
+  is ambiguous and a retry would orphan a duplicate estimate. This is
+  the one place where the fix is a timeout only, and #7's headline
+  symptom was `export_estimate` failing — so if reset-during-save is
+  the real trigger, this mitigates the hang but not the failure. 23
+  unit tests pin the contract.
+
+### Security
+
+- Dependency bumps, superseding dependabot
+  [#30](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/pull/30),
+  [#31](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/pull/31),
+  and [#32](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/pull/32):
+  `@modelcontextprotocol/sdk` 1.29.0 → 1.30.0 (direct),
+  `ip-address` 10.2.0 → 10.5.0 and `hono` 4.12.32 → 4.13.2 (both
+  transitive, lockfile only). `npm audit` reported 0 vulnerabilities
+  before and after — these are currency bumps, not CVE fixes.
+
+### Investigated, not changed
+
+- **[#13](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/issues/13)
+  (sub-service rows render `$0`) is not reproducible as a save-payload
+  bug and needs no code change here.** Recording the evidence so nobody
+  re-derives it: on the reporter's own estimate, 10/10 drill-in rows
+  show `0.00 USD` while the group total is correct ($80,943.91). Two
+  candidate causes were tested and both refuted. (a) *Envelope shape* —
+  the builder already collapses multi-child sub-services into one
+  envelope as of `158f974` (2026-05-15), which **predates the report**;
+  a freshly-saved, correctly-shaped estimate
+  (`7200827712498e3329dbd014d4a262ab444626cd`, 1 envelope / 3
+  subServices) still renders $0. (b) *Grouping* — an ungrouped control
+  (`571560fab77a50eca687a0dd7b0d517ffa044dea`) renders the service row
+  at $0 too, with a correct $18,122.90 summary.
+
+  So the calculator computes the cost correctly and simply does not
+  paint it into the per-service row until an interaction — client-side
+  render gating, not something the save payload controls (consistent
+  with the already-known Lambda/VPC asymmetry). **The summary total is
+  authoritative; per-row values may need an Update click.** The
+  reporter most likely ran a build predating `158f974`.
+
 ## [1.2.9] - 2026-08-04
 
 - Improved instructions for import_estimate tool to handle ESC urls
