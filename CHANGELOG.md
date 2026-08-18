@@ -2,168 +2,18 @@
 
 All notable changes to the AWS Pricing Calculator MCP server are documented here.
 
-## [Unreleased]
-
-- Added **CI** (`.github/workflows/ci.yml`) — `npm test` on Node 22 and 24, plus a dist-freshness check that the committed bundle matches a fresh build
-- **`npm test` is now hermetic** — 10 tests that ignored `SKIP_NETWORK=1` and fetched anyway now honor it; new `npm run test:network` runs the full set with the gate off
-- Known issue: `npm run test:network` is not green — `test/catalog-roundtrip.test.js` fails for ALB, NAT Gateway, and Transit Gateway on `serviceCode`/`estimateFor` (pre-existing)
-
 ## [1.3.0] - 2026-08-16
 
-Merges upstream `aws-samples` 1.2.4–1.2.9. Minor rather than patch
-because two changes are visible to consumers: `lib/` module paths moved
-(below), and the new `ec2-pricing-invalid-value` lint predicate refuses
-saves that 1.2.9 accepted.
-
-### Changed
-
-- **`lib/` regrouped into subdirectories** — the flat `lib/*.js` layout
-  became `lib/aws/` (`aws-client`, `ec2`, `estimate-builder`,
-  `agent-fields`, `pct-config`, `surfaceability`), `lib/lint/`
-  (`can-rehydrate`, `can-rehydrate-fetch`, `catalog`, `lint-hints`,
-  `validation`), `lib/mcp/` (`handler-helpers`, `tool-descriptions`),
-  `lib/store/` (`estimate-store`, `estimate-store-dynamodb`), and
-  `lib/trace/` (`trace-logger`, `trace-events`, `request-context`).
-  Pure moves — no behavior change — but **breaking for anything
-  requiring `lib/*.js` paths directly**; e.g. `lib/ec2.js` is now
-  `lib/aws/ec2.js`. The MCP tool surface is unaffected, as is the
-  bundled `dist/mcp-server.js`. `lib/dom-cost.js` stays at the root:
-  it is a validation oracle, not part of any of the five groups.
-
-### Fixed
-
-- **EC2 pricingStrategy no longer silently falls back to On-Demand /
-  1 Year** (`lib/aws/ec2.js`). Agent report 2026-08-12: object-form
-  `pricingStrategy: {"model": "EC2 Instance Savings Plans", "term":
-  "3 Year"}` saved as `selectedOption: "on-demand"`, `term: "1 Year"`
-  — a valid-looking estimate with wrong pricing, and every tool call
-  returned success. Three distinct silent-mismatch paths, all fixed:
-
-  1. **Object-form model skipped normalization.** Only the string
-     path had alias/fuzzy matching; the object path passed `model`
-     through verbatim into `SELECTED_OPTION[model] || 'on-demand'`.
-     The paths now share one resolver (`resolveModel`) covering
-     aliases, display labels ("EC2 Instance Savings Plans"), the
-     catalog-documented `"standard"` spelling, and saved-blob
-     `selectedOption` forms (`"instance-savings"`).
-  2. **Full-word terms degraded.** `term === '3yr' ? '3 Year' :
-     '1 Year'` turned the catalog's own documented `"3 Year"` into a
-     1-year commitment. `resolveTerm` now accepts `1yr`/`3yr`,
-     `1 Year`/`3 Years`, bare `1`/`3`, any case. Omitted terms default
-     to `3 Year` (upstream 1.2.9 decision, kept on merge); present-but-
-     unresolvable terms fail fast.
-  3. **The `|| 'on-demand'` fallback is gone.** Anything unresolvable
-     (model, term, upfrontPayment) throws with the valid values
-     listed. `validateConfigKeys` runs the same check at add_service
-     time via the new `validatePricingStrategy` export, so agents get
-     the rejection on the first call, not a wrong estimate.
-
-  Discovery surface: `get_service_fields` now carries `validModels`
-  / `validTerms` / `validUpfrontPayments` directly on the
-  `pricingStrategy` field (agent-fields enrichment) instead of only
-  in catalog trap prose; the ec2Enhancement catalog hint/traps were
-  rewritten to match the enforced contract (the old text documented
-  formats the code didn't accept). Regression locks: 4 new eval
-  scenarios (`ec2-pricing-object-display-label` with a cost-band
-  oracle excluding both $0 and on-demand, `ec2-pricing-term-full-word`,
-  `ec2-pricing-model-standard-dedicated`,
-  `ec2-pricing-string-display-label-control`) + 14 unit tests.
-
-  Defense-in-depth: new **`ec2-pricing-invalid-value` lint predicate**
-  (`lib/lint/can-rehydrate.js`) fires (required-input) when a saved
-  ec2Enhancement blob carries a `pricingStrategy.value` whose
-  `selectedOption` / `term` / `upfrontPayment` is outside the
-  calculator's accepted enums — the bypass-path backstop for
-  `import_estimate` of hand-edited blobs and external construction,
-  the same role `column-form-unremapped-value` plays for the remap
-  fix. Only checks keys present in the envelope (on-demand envelopes
-  without `upfrontPayment`, utilization-only shapes stay silent) and
-  is scoped to ec2Enhancement. Paired `lint-hints` recovery text
-  shows the accepted object form.
-
-- **Every calculator HTTP call now has a timeout and bounded retry**
-  (new `lib/aws/fetch-resilience.js`, wired into the six GETs and the
-  save POST in `lib/aws/aws-client.js`). Mitigates
-  [#7](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/issues/7):
-  repeated `fetch failed` / `ECONNRESET` against all three CloudFront
-  distributions on Windows 11 / Node 22, where `curl` on the same host
-  worked.
-
-  **The root cause is still unknown, and this release does not claim
-  otherwise.** Two theories were probed and both fail on the evidence:
-  the reporter's CloudFront-WAF-fingerprints-undici theory does not fit
-  their own repro (a fingerprint block rejects request *#1*, theirs
-  failed only after several successes), and the competing stale-keep-
-  alive-socket theory does not hold either (these distributions
-  advertise no Keep-Alive timeout, and undici socket reuse after a 9s
-  idle gap succeeds). The symptom did not reproduce on macOS.
-
-  What was never in doubt is the defect underneath it: **no call site
-  had a timeout or a retry**, so one transient reset was an
-  unrecoverable tool failure and a stalled socket hung the MCP tool
-  forever with no path for the agent to recover. That is what is fixed
-  — 3 attempts with exponentially-backed-off jittered delays, 30s
-  timeout, retry only on socket-level errors. HTTP statuses are a real
-  answer from the server and pass straight through; retrying a 400
-  from the save API would only replay a payload rejected on its merits.
-
-  `POST /saveAs` retries too, but on a **smaller budget (2 attempts)**
-  and it is the one genuinely debatable call in this change. The POST is
-  not idempotent — it mints a fresh `estimateId` per call — so a network
-  error raised *after* the lambda accepted the body is ambiguous, and the
-  re-attempt may leave a duplicate blob server-side.
-
-  It was initially excluded for exactly that reason, and that was wrong:
-  #7's headline symptom was `export_estimate` failing, i.e. this exact
-  call, so excluding it would have hardened the six read paths and left
-  the one that actually broke unprotected. The cost of being wrong is
-  asymmetric. A duplicate blob is unreachable (nobody holds its URL),
-  belongs to no estimate, and inflates no cost — unlike a duplicate
-  `add_service` entry, which silently inflates the total by the price of
-  the service. A save that fails on a transient reset is a real
-  user-visible failure. Cheap orphan beats lost save.
-
-  Every re-attempt emits a new **`save.retry`** trace event carrying
-  `mayHaveOrphaned: true`, the error code, and the local `estimateId`, so
-  the orphans stay attributable after the fact rather than being
-  invisible. 28 unit tests pin the contract, 5 of them driving
-  `saveEstimate` against a stubbed `fetch` (no estimate is actually
-  saved) to cover retry, the attempt cap, the `save.retry` payload, and
-  the no-retry-on-HTTP-400 case.
-
-### Security
-
-- Dependency bumps, superseding dependabot
-  [#30](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/pull/30),
-  [#31](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/pull/31),
-  and [#32](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/pull/32):
-  `@modelcontextprotocol/sdk` 1.29.0 → 1.30.0 (direct),
-  `ip-address` 10.2.0 → 10.5.0 and `hono` 4.12.32 → 4.13.2 (both
-  transitive, lockfile only). `npm audit` reported 0 vulnerabilities
-  before and after — these are currency bumps, not CVE fixes.
-
-### Investigated, not changed
-
-- **[#13](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/issues/13)
-  (sub-service rows render `$0`) is not reproducible as a save-payload
-  bug and needs no code change here.** Recording the evidence so nobody
-  re-derives it: on the reporter's own estimate, 10/10 drill-in rows
-  show `0.00 USD` while the group total is correct ($80,943.91). Two
-  candidate causes were tested and both refuted. (a) *Envelope shape* —
-  the builder already collapses multi-child sub-services into one
-  envelope as of `158f974` (2026-05-15), which **predates the report**;
-  a freshly-saved, correctly-shaped estimate
-  (`7200827712498e3329dbd014d4a262ab444626cd`, 1 envelope / 3
-  subServices) still renders $0. (b) *Grouping* — an ungrouped control
-  (`571560fab77a50eca687a0dd7b0d517ffa044dea`) renders the service row
-  at $0 too, with a correct $18,122.90 summary.
-
-  So the calculator computes the cost correctly and simply does not
-  paint it into the per-service row until an interaction — client-side
-  render gating, not something the save payload controls (consistent
-  with the already-known Lambda/VPC asymmetry). **The summary total is
-  authoritative; per-row values may need an Update click.** The
-  reporter most likely ran a build predating `158f974`.
+- **`lib/` regrouped** into `aws/`, `lint/`, `mcp/`, `store/`, and `trace/` subdirectories — breaking for anything requiring `lib/*.js` directly (`lib/ec2.js` → `lib/aws/ec2.js`)
+- Fixed **EC2 `pricingStrategy` silently falling back to On-Demand / 1 Year** (`lib/aws/ec2.js`)
+- Added **`ec2-pricing-invalid-value` lint predicate** — refuses a saved ec2Enhancement blob whose `selectedOption`/`term`/`upfrontPayment` is out of enum
+- Added **timeout + bounded retry on every calculator HTTP call** (`lib/aws/fetch-resilience.js`) — mitigates [#7](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/issues/7); root cause still unknown
+- `POST /saveAs` retries on a smaller budget of 2 attempts and emits a new `save.retry` trace event, since it is not idempotent
+- Added **CI** (`.github/workflows/ci.yml`) — `npm test` on Node 22 and 24, plus a dist-freshness check that the committed bundle matches a fresh build
+- **`npm test` is now hermetic** — 10 tests that ignored `SKIP_NETWORK=1` and fetched anyway now honor it; new `npm run test:network` runs the full set with the gate off
+- Dependency bumps, superseding dependabot [#30](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/pull/30), [#31](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/pull/31), [#32](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/pull/32): `@modelcontextprotocol/sdk` 1.29.0 → 1.30.0, `ip-address` 10.2.0 → 10.5.0, `hono` 4.12.32 → 4.13.2
+- Investigated [#13](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/issues/13) (sub-service rows render `$0`) — not a save-payload bug and no code change needed
+- Known issue: `npm run test:network` is not green — `test/catalog-roundtrip.test.js` fails for ALB, NAT Gateway, and Transit Gateway on `serviceCode`/`estimateFor` (pre-existing)
 
 ## [1.2.9] - 2026-08-04
 
