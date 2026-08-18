@@ -3,8 +3,8 @@ const assert = require('node:assert/strict');
 
 let canRehydrateFetch;
 beforeEach(() => {
-  delete require.cache[require.resolve('../lib/can-rehydrate-fetch')];
-  delete require.cache[require.resolve('../lib/aws-client')];
+  delete require.cache[require.resolve('../lib/lint/can-rehydrate-fetch')];
+  delete require.cache[require.resolve('../lib/aws/aws-client')];
 });
 
 describe('canRehydrateFetch', () => {
@@ -23,9 +23,9 @@ describe('canRehydrateFetch', () => {
         return null;
       }),
     };
-    require.cache[require.resolve('../lib/aws-client')] = { exports: fakeAwsClient };
+    require.cache[require.resolve('../lib/aws/aws-client')] = { exports: fakeAwsClient };
 
-    canRehydrateFetch = require('../lib/can-rehydrate-fetch').canRehydrateFetch;
+    canRehydrateFetch = require('../lib/lint/can-rehydrate-fetch').canRehydrateFetch;
 
     const r = await canRehydrateFetch({
       savedBlob: {
@@ -60,9 +60,9 @@ describe('canRehydrateFetch', () => {
         return null;
       }),
     };
-    require.cache[require.resolve('../lib/aws-client')] = { exports: fakeAwsClient };
+    require.cache[require.resolve('../lib/aws/aws-client')] = { exports: fakeAwsClient };
 
-    canRehydrateFetch = require('../lib/can-rehydrate-fetch').canRehydrateFetch;
+    canRehydrateFetch = require('../lib/lint/can-rehydrate-fetch').canRehydrateFetch;
 
     const r = await canRehydrateFetch({
       savedBlob: {
@@ -95,9 +95,9 @@ describe('canRehydrateFetch', () => {
         return code === 'aWSLambda' ? fakeDef : null;
       }),
     };
-    require.cache[require.resolve('../lib/aws-client')] = { exports: fakeAwsClient };
+    require.cache[require.resolve('../lib/aws/aws-client')] = { exports: fakeAwsClient };
 
-    canRehydrateFetch = require('../lib/can-rehydrate-fetch').canRehydrateFetch;
+    canRehydrateFetch = require('../lib/lint/can-rehydrate-fetch').canRehydrateFetch;
 
     const r = await canRehydrateFetch({
       savedBlob: {
@@ -163,9 +163,9 @@ describe('canRehydrateFetch', () => {
         return validTuples;
       }),
     };
-    require.cache[require.resolve('../lib/aws-client')] = { exports: fakeAwsClient };
+    require.cache[require.resolve('../lib/aws/aws-client')] = { exports: fakeAwsClient };
 
-    canRehydrateFetch = require('../lib/can-rehydrate-fetch').canRehydrateFetch;
+    canRehydrateFetch = require('../lib/lint/can-rehydrate-fetch').canRehydrateFetch;
 
     const r = await canRehydrateFetch({
       savedBlob: {
@@ -205,7 +205,7 @@ describe('canRehydrateFetch', () => {
   });
 
   it('throws TypeError when savedBlob is null/undefined', async () => {
-    canRehydrateFetch = require('../lib/can-rehydrate-fetch').canRehydrateFetch;
+    canRehydrateFetch = require('../lib/lint/can-rehydrate-fetch').canRehydrateFetch;
     await assert.rejects(
       () => canRehydrateFetch({ savedBlob: null }),
       /requires a savedBlob/

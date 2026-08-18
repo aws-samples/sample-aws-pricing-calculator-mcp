@@ -92,7 +92,7 @@ async function cmdResolve(serviceCode) {
   // scripts: each subcommand pays only for what it needs. The scanner's
   // "block other requests" warning doesn't apply — this is a one-shot CLI,
   // not a request handler. nosemgrep: lazy-load-module
-  const { loadManifest } = require('../lib/aws-client');
+  const { loadManifest } = require('../lib/aws/aws-client');
 
   const manifest = await loadManifest('aws');
   const inManifest = manifest.has(serviceCode);
@@ -208,11 +208,11 @@ async function cmdPad(serviceCode, flags) {
   if (!entry) return fail(`No catalog entry for '${serviceCode}'. Run \`generate\` first.`);
 
   // nosemgrep: lazy-load-module
-  const { loadManifest, fetchServiceDefinition } = require('../lib/aws-client');
+  const { loadManifest, fetchServiceDefinition } = require('../lib/aws/aws-client');
   // nosemgrep: lazy-load-module
-  const { buildSurfaceabilityIndex } = require('../lib/surfaceability');
+  const { buildSurfaceabilityIndex } = require('../lib/aws/surfaceability');
   // nosemgrep: lazy-load-module
-  const { suggestValue } = require('../lib/pct-config');
+  const { suggestValue } = require('../lib/aws/pct-config');
 
   const manifest = await loadManifest('aws');
 
@@ -290,7 +290,7 @@ async function cmdPreflight(serviceCode) {
 
   // Schema validation first — no network needed.
   // nosemgrep: lazy-load-module
-  const { validateAgainstSchema } = require('../lib/catalog');
+  const { validateAgainstSchema } = require('../lib/lint/catalog');
   const schemaErrors = validateAgainstSchema(entry);
   if (schemaErrors) {
     return emit({
@@ -307,9 +307,9 @@ async function cmdPreflight(serviceCode) {
   // calculator MCP server's validate_estimate tool does, but here we
   // drive it directly from the catalog entry.
   // nosemgrep: lazy-load-module
-  const EstimateBuilder = require('../lib/estimate-builder');
+  const EstimateBuilder = require('../lib/aws/estimate-builder');
   // nosemgrep: lazy-load-module
-  const { canRehydrateFetch } = require('../lib/can-rehydrate-fetch');
+  const { canRehydrateFetch } = require('../lib/lint/can-rehydrate-fetch');
 
   const eb = new EstimateBuilder(`Preflight: ${serviceCode}`);
   let addServiceCode = serviceCode;
@@ -361,9 +361,9 @@ async function cmdSave(serviceCode) {
   if (!entry) return fail(`No catalog entry for '${serviceCode}'. Run \`generate\` first.`);
 
   // nosemgrep: lazy-load-module
-  const EstimateBuilder = require('../lib/estimate-builder');
+  const EstimateBuilder = require('../lib/aws/estimate-builder');
   // nosemgrep: lazy-load-module
-  const { fetchEstimate } = require('../lib/aws-client');
+  const { fetchEstimate } = require('../lib/aws/aws-client');
 
   const eb = new EstimateBuilder(`Catalog save: ${serviceCode}`);
 
@@ -487,7 +487,7 @@ async function cmdVerify(serviceCode, flags) {
   };
 
   // nosemgrep: lazy-load-module
-  const { validateAgainstSchema } = require('../lib/catalog');
+  const { validateAgainstSchema } = require('../lib/lint/catalog');
   const errors = validateAgainstSchema(updated);
   if (errors) {
     return fail('Schema validation failed after applying verify changes.', { errors });

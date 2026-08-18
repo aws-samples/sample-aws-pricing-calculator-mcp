@@ -8,7 +8,7 @@
  * entry pins (catches the EC2 `quantity` class — a synthetic field
  * declared required while the lint runs against the post-transform blob).
  *
- * Synthetic fields (transformed at save time by lib/ec2.js) opt out via
+ * Synthetic fields (transformed at save time by lib/aws/ec2.js) opt out via
  * `"synthetic": true` on the field entry. The auditor reports how many
  * fields each entry uses synthetic vs. manifest-backed.
  *
@@ -23,8 +23,8 @@
 'use strict';
 
 const path = require('node:path');
-const { loadCatalog } = require('../lib/catalog');
-const { loadManifest, fetchServiceDefinition } = require('../lib/aws-client');
+const { loadCatalog } = require('../lib/lint/catalog');
+const { loadManifest, fetchServiceDefinition } = require('../lib/aws/aws-client');
 
 const CATALOG_DIR = path.join(__dirname, '..', 'catalog', 'services');
 

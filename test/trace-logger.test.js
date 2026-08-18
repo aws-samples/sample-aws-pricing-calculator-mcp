@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 // behavior is exercised in trace-flag.test.js.
 process.env.TRACE = 'on';
 
-const { emit } = require('../lib/trace-logger');
+const { emit } = require('../lib/trace/trace-logger');
 
 describe('trace-logger emit', () => {
   it('writes a single JSON line to stderr with ts, event, and payload', () => {
@@ -30,8 +30,8 @@ describe('trace-logger emit', () => {
   });
 });
 
-const { traceTool } = require('../lib/trace-logger');
-const { runWithSession } = require('../lib/request-context');
+const { traceTool } = require('../lib/trace/trace-logger');
+const { runWithSession } = require('../lib/trace/request-context');
 
 describe('traceTool wrapper', () => {
   function captureWrites(fn) {
@@ -498,7 +498,7 @@ describe('traceEvents.session.start', () => {
     // observability a session-shaped denominator: one event per
     // create_estimate-rooted flow. Pin the event shape so observability
     // can rely on it.
-    const traceEvents = require('../lib/trace-events');
+    const traceEvents = require('../lib/trace/trace-events');
     const lines = await captureWrites(() => {
       runWithSession('test-session-id', () => {
         traceEvents.session.start({

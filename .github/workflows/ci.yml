@@ -1,0 +1,72 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: MIT-0
+#
+# Hermetic CI. Both jobs must be runnable with no network egress beyond the
+# npm registry and no AWS credentials.
+#
+# What is deliberately NOT here:
+#   - `npm run test:network` (integration/roundtrip/lint-preflight). Those
+#     POST real estimates to the calculator save API, so running them per
+#     push would write blobs to a third-party service on every commit and
+#     would let a CDN hiccup turn a green change red. Run them locally
+#     before a release.
+#   - The eval harness (eval/run.py). The scripted half needs Playwright +
+#     live CloudFront; the LLM half needs Bedrock credentials this repo does
+#     not have. Interpretation also needs `--compare-baseline`, which is a
+#     human judgement call about eval/baseline-failures.txt.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: test (node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['22.x', '24.x']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      # Sets SKIP_NETWORK=1, so the network-dependent tests self-skip.
+      - run: npm test
+
+  dist-freshness:
+    # dist/ is committed (consumers install the bundle, not lib/ — see the
+    # `files` field in package.json), so a source change with a stale bundle
+    # ships nothing. Rebuild and require a byte-identical result.
+    #
+    # This is only sound because esbuild is pinned exactly (0.28.1) and
+    # scripts/emit-bundle-contract.js is deterministic. dist/aws-calculator.zip
+    # is NOT compared — zip embeds mtimes.
+    name: dist is in sync with source
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: npm
+      - run: npm ci
+      - name: Rebuild bundle
+        run: npm run build
+      - name: Assert committed dist matches the rebuild
+        run: |
+          if ! git diff --quiet -- dist/mcp-server.js dist/bundle-contract.json; then
+            echo "::error::dist/ is stale. Run 'npm run build' and commit the result."
+            git diff --stat -- dist/mcp-server.js dist/bundle-contract.json
+            exit 1
+          fi
+          echo "dist/mcp-server.js and dist/bundle-contract.json match a fresh build."

@@ -1,7 +1,7 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
-const { MemoryEstimateStore, createEstimateStore } = require('../lib/estimate-store');
-const EstimateBuilder = require('../lib/estimate-builder');
+const { MemoryEstimateStore, createEstimateStore } = require('../lib/store/estimate-store');
+const EstimateBuilder = require('../lib/aws/estimate-builder');
 
 describe('MemoryEstimateStore', () => {
   it('returns null for unknown id', async () => {

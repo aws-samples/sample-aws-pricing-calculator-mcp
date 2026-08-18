@@ -1,6 +1,6 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
-const { nextStepFor, notFoundHintFor, invalidFieldIdsHintFor } = require('../lib/lint-hints');
+const { nextStepFor, notFoundHintFor, invalidFieldIdsHintFor } = require('../lib/lint/lint-hints');
 
 // Synthetic catalog mirroring the real shape: parent envelope with a
 // trap line and a subServices array. Used to verify nextStepFor surfaces
@@ -319,6 +319,32 @@ describe('nextStepFor', () => {
     assert.match(out, /dedicated/, 'names recovery path (a) — switch tenancy');
     assert.match(out, /instance-savings/, 'names recovery path (b) — switch strategy');
     assert.match(out, /add_service/, 'tells agent how to apply the fix');
+  });
+
+  it('hints re-add with accepted form for ec2-pricing-invalid-value', () => {
+    // Backstop predicate for blobs built outside add_service (which
+    // rejects invalid pricingStrategy values since the 2026-08-12 fix).
+    const out = nextStepFor({
+      status: 'required-input',
+      services: [{
+        failures: [{
+          predicate: 'ec2-pricing-invalid-value',
+          severity: 'required-only',
+          message: 'ec2Enhancement: pricingStrategy carries invalid selectedOption',
+          context: {
+            serviceCode: 'ec2Enhancement',
+            invalid: ['selectedOption "EC2 Instance Savings Plans" (valid: on-demand, standard, convertible, instance-savings, compute-savings, spot)'],
+            selectedOption: 'EC2 Instance Savings Plans',
+            term: '1 Year',
+            upfrontPayment: 'None',
+          },
+        }],
+      }],
+    });
+    assert.match(out, /EC2 Instance Savings Plans/, 'names the offending value');
+    assert.match(out, /On-Demand/, 'states the silent consequence');
+    assert.match(out, /add_service/, 'tells agent the recovery tool');
+    assert.match(out, /instanceSavings/, 'shows the accepted form');
   });
 
   it('points to search_services for unknown service code', () => {

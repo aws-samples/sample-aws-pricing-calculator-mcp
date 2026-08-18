@@ -12,12 +12,12 @@
 const { describe, it, beforeEach } = require('node:test');
 const assert = require('node:assert/strict');
 
-const AWS_CLIENT_PATH = require.resolve('../lib/aws-client');
-const VALIDATION_PATH = require.resolve('../lib/validation');
-const REHYDRATE_FETCH_PATH = require.resolve('../lib/can-rehydrate-fetch');
-const SURFACEABILITY_PATH = require.resolve('../lib/surfaceability');
-const ESTIMATE_BUILDER_PATH = require.resolve('../lib/estimate-builder');
-const HANDLER_HELPERS_PATH = require.resolve('../lib/handler-helpers');
+const AWS_CLIENT_PATH = require.resolve('../lib/aws/aws-client');
+const VALIDATION_PATH = require.resolve('../lib/lint/validation');
+const REHYDRATE_FETCH_PATH = require.resolve('../lib/lint/can-rehydrate-fetch');
+const SURFACEABILITY_PATH = require.resolve('../lib/aws/surfaceability');
+const ESTIMATE_BUILDER_PATH = require.resolve('../lib/aws/estimate-builder');
+const HANDLER_HELPERS_PATH = require.resolve('../lib/mcp/handler-helpers');
 const MCP_SERVER_PATH = require.resolve('../mcp-server.js');
 
 function reset() {
@@ -28,8 +28,8 @@ function reset() {
   delete require.cache[ESTIMATE_BUILDER_PATH];
   delete require.cache[HANDLER_HELPERS_PATH];
   delete require.cache[MCP_SERVER_PATH];
-  delete require.cache[require.resolve('../lib/estimate-store')];
-  delete require.cache[require.resolve('../lib/catalog')];
+  delete require.cache[require.resolve('../lib/store/estimate-store')];
+  delete require.cache[require.resolve('../lib/lint/catalog')];
 }
 
 const fakeManifest = new Map([
@@ -79,7 +79,7 @@ describe('validate_estimate helpers', () => {
   it('lintEstimate: returns blob + lint verdict for a healthy estimate', async () => {
     stubAwsClient();
     const { __test } = require('../mcp-server.js');
-    const EstimateBuilder = require('../lib/estimate-builder');
+    const EstimateBuilder = require('../lib/aws/estimate-builder');
     const eb = new EstimateBuilder('test', 'aws');
     eb.addService('aWSLambda', {
       region: 'us-east-1',
@@ -110,7 +110,7 @@ describe('validate_estimate helpers', () => {
     };
 
     const { __test } = require('../mcp-server.js');
-    const EstimateBuilder = require('../lib/estimate-builder');
+    const EstimateBuilder = require('../lib/aws/estimate-builder');
     const eb = new EstimateBuilder('test', 'aws');
     eb.addService('aWSLambda', {
       region: 'us-east-1',

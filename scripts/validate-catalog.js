@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const path = require('node:path');
-const { loadCatalog } = require('../lib/catalog');
+const { loadCatalog } = require('../lib/lint/catalog');
 
 const dir = path.join(__dirname, '..', 'catalog', 'services');
 

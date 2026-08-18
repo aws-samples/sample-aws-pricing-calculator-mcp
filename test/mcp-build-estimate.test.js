@@ -21,11 +21,11 @@ const assert = require('node:assert/strict');
 // TRACE=on. Off-state behavior is covered in test/trace-flag.test.js.
 process.env.TRACE = 'on';
 
-const AWS_CLIENT_PATH = require.resolve('../lib/aws-client');
-const VALIDATION_PATH = require.resolve('../lib/validation');
-const REHYDRATE_FETCH_PATH = require.resolve('../lib/can-rehydrate-fetch');
-const ESTIMATE_BUILDER_PATH = require.resolve('../lib/estimate-builder');
-const HANDLER_HELPERS_PATH = require.resolve('../lib/handler-helpers');
+const AWS_CLIENT_PATH = require.resolve('../lib/aws/aws-client');
+const VALIDATION_PATH = require.resolve('../lib/lint/validation');
+const REHYDRATE_FETCH_PATH = require.resolve('../lib/lint/can-rehydrate-fetch');
+const ESTIMATE_BUILDER_PATH = require.resolve('../lib/aws/estimate-builder');
+const HANDLER_HELPERS_PATH = require.resolve('../lib/mcp/handler-helpers');
 const MCP_SERVER_PATH = require.resolve('../mcp-server.js');
 
 function reset() {
@@ -35,8 +35,8 @@ function reset() {
   delete require.cache[ESTIMATE_BUILDER_PATH];
   delete require.cache[HANDLER_HELPERS_PATH];
   delete require.cache[MCP_SERVER_PATH];
-  delete require.cache[require.resolve('../lib/estimate-store')];
-  delete require.cache[require.resolve('../lib/catalog')];
+  delete require.cache[require.resolve('../lib/store/estimate-store')];
+  delete require.cache[require.resolve('../lib/lint/catalog')];
 }
 
 const fakeManifest = new Map([
@@ -91,7 +91,7 @@ describe('build_estimate helpers', () => {
   it('addEntries: happy path adds the service and returns success result', async () => {
     stubAwsClient();
     const { __test } = require('../mcp-server.js');
-    const EstimateBuilder = require('../lib/estimate-builder');
+    const EstimateBuilder = require('../lib/aws/estimate-builder');
 
     const eb = new EstimateBuilder('test', 'aws');
     const results = await __test.addEntries(eb, [{
@@ -112,7 +112,7 @@ describe('build_estimate helpers', () => {
   it('addEntries: validation errors short-circuit per-entry without polluting estimate', async () => {
     stubAwsClient();
     const { __test } = require('../mcp-server.js');
-    const EstimateBuilder = require('../lib/estimate-builder');
+    const EstimateBuilder = require('../lib/aws/estimate-builder');
 
     const eb = new EstimateBuilder('test', 'aws');
     const results = await __test.addEntries(eb, [{
@@ -134,7 +134,7 @@ describe('build_estimate helpers', () => {
     // the actual store the handler uses.
     stubAwsClient();
     const { __test } = require('../mcp-server.js');
-    const EstimateBuilder = require('../lib/estimate-builder');
+    const EstimateBuilder = require('../lib/aws/estimate-builder');
 
     // Seed a fresh estimate in the store the way create_estimate does.
     const estimate = new EstimateBuilder('rollback-test', 'aws');
@@ -174,7 +174,7 @@ describe('build_estimate helpers', () => {
   it('addEntries: missing service or config produces a structured error', async () => {
     stubAwsClient();
     const { __test } = require('../mcp-server.js');
-    const EstimateBuilder = require('../lib/estimate-builder');
+    const EstimateBuilder = require('../lib/aws/estimate-builder');
 
     const eb = new EstimateBuilder('test', 'aws');
     const results = await __test.addEntries(eb, [
@@ -194,7 +194,7 @@ describe('build_estimate helpers', () => {
     // create_estimate instead.
     stubAwsClient();
     const { __test } = require('../mcp-server.js');
-    const EstimateBuilder = require('../lib/estimate-builder');
+    const EstimateBuilder = require('../lib/aws/estimate-builder');
 
     const eb = new EstimateBuilder('dup-test', 'aws');
     const cfg = {
@@ -232,7 +232,7 @@ describe('build_estimate helpers', () => {
     // are NOT a duplicate. The dedup key is (service, description, group).
     stubAwsClient();
     const { __test } = require('../mcp-server.js');
-    const EstimateBuilder = require('../lib/estimate-builder');
+    const EstimateBuilder = require('../lib/aws/estimate-builder');
 
     const eb = new EstimateBuilder('dup-test', 'aws');
     await __test.addEntries(eb, [{
@@ -270,8 +270,8 @@ describe('build_estimate helpers', () => {
     // assertion is decoupled from the production aWSLambda catalog's
     // specific required[] choices.
     stubAwsClient();
-    const { createHandlerHelpers } = require('../lib/handler-helpers');
-    const EstimateBuilder = require('../lib/estimate-builder');
+    const { createHandlerHelpers } = require('../lib/mcp/handler-helpers');
+    const EstimateBuilder = require('../lib/aws/estimate-builder');
     const catalog = new Map([
       ['aWSLambda', {
         serviceCode: 'aWSLambda',
@@ -301,8 +301,8 @@ describe('build_estimate helpers', () => {
 
   it('addEntries: complete config does NOT set partial', async () => {
     stubAwsClient();
-    const { createHandlerHelpers } = require('../lib/handler-helpers');
-    const EstimateBuilder = require('../lib/estimate-builder');
+    const { createHandlerHelpers } = require('../lib/mcp/handler-helpers');
+    const EstimateBuilder = require('../lib/aws/estimate-builder');
     const catalog = new Map([
       ['aWSLambda', {
         serviceCode: 'aWSLambda',
@@ -334,10 +334,10 @@ describe('build_estimate helpers', () => {
     // Catalog declares a defaultFields shape; agent's config omits the key.
     // applyDefaultFields merges the catalog default before addService, so
     // the saved entry carries the canonical envelope. Closes the EC2
-    // dataTransferForEC2 special-case (which used to live in lib/ec2.js).
+    // dataTransferForEC2 special-case (which used to live in lib/aws/ec2.js).
     stubAwsClient();
-    const { createHandlerHelpers } = require('../lib/handler-helpers');
-    const EstimateBuilder = require('../lib/estimate-builder');
+    const { createHandlerHelpers } = require('../lib/mcp/handler-helpers');
+    const EstimateBuilder = require('../lib/aws/estimate-builder');
     const dtShape = {
       value: [{ entryType: 'INBOUND', value: '', unit: 'tb_month', fromRegion: '' }],
     };
@@ -366,8 +366,8 @@ describe('build_estimate helpers', () => {
 
   it('addEntries: agent-supplied value WINS over catalog defaultFields', async () => {
     stubAwsClient();
-    const { createHandlerHelpers } = require('../lib/handler-helpers');
-    const EstimateBuilder = require('../lib/estimate-builder');
+    const { createHandlerHelpers } = require('../lib/mcp/handler-helpers');
+    const EstimateBuilder = require('../lib/aws/estimate-builder');
     const catalogDt = {
       value: [{ entryType: 'INBOUND', value: '', unit: 'tb_month', fromRegion: '' }],
     };
@@ -400,8 +400,8 @@ describe('build_estimate helpers', () => {
 
   it('addEntries: services without defaultFields behave unchanged', async () => {
     stubAwsClient();
-    const { createHandlerHelpers } = require('../lib/handler-helpers');
-    const EstimateBuilder = require('../lib/estimate-builder');
+    const { createHandlerHelpers } = require('../lib/mcp/handler-helpers');
+    const EstimateBuilder = require('../lib/aws/estimate-builder');
     const catalog = new Map([
       ['aWSLambda', {
         serviceCode: 'aWSLambda',
@@ -443,7 +443,7 @@ describe('build_estimate helpers', () => {
     };
 
     const { __test } = require('../mcp-server.js');
-    const EstimateBuilder = require('../lib/estimate-builder');
+    const EstimateBuilder = require('../lib/aws/estimate-builder');
     const eb = new EstimateBuilder('test', 'aws');
     eb.addService('aWSLambda', {
       region: 'us-east-1',
@@ -480,7 +480,7 @@ describe('build_estimate helpers', () => {
     };
 
     const { __test } = require('../mcp-server.js');
-    const EstimateBuilder = require('../lib/estimate-builder');
+    const EstimateBuilder = require('../lib/aws/estimate-builder');
     const eb = new EstimateBuilder('test', 'aws');
     eb.addService('aWSLambda', {
       region: 'us-east-1',
@@ -523,7 +523,7 @@ describe('build_estimate helpers', () => {
     };
 
     const { __test } = require('../mcp-server.js');
-    const EstimateBuilder = require('../lib/estimate-builder');
+    const EstimateBuilder = require('../lib/aws/estimate-builder');
     const eb = new EstimateBuilder('test', 'aws');
     eb.addService('aWSLambda', {
       region: 'us-east-1',
@@ -541,7 +541,7 @@ describe('build_estimate helpers', () => {
   it('build_estimate flow: store retains the estimate so add_service can extend it', async () => {
     stubAwsClient();
     const { __test } = require('../mcp-server.js');
-    const EstimateBuilder = require('../lib/estimate-builder');
+    const EstimateBuilder = require('../lib/aws/estimate-builder');
 
     // Simulate what build_estimate does internally: create, add, store.
     const eb = new EstimateBuilder('combo', 'aws');
@@ -620,7 +620,7 @@ describe('build_estimate response includes estimate_id on failure paths', () => 
     stubAwsClient();
     const { __test } = require('../mcp-server.js');
 
-    // Capture stderr (where lib/trace-logger.js writes events).
+    // Capture stderr (where lib/trace/trace-logger.js writes events).
     const writes = [];
     const orig = process.stderr.write.bind(process.stderr);
     process.stderr.write = (s) => { writes.push(s.toString()); return true; };

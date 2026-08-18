@@ -5,9 +5,9 @@ const assert = require('node:assert/strict');
 // asserts the off-by-default contract. Each test toggles TRACE
 // inside its own scope and restores the prior value afterwards.
 
-const { emit, traceTool, isTraceEnabled } = require('../lib/trace-logger');
-const traceEvents = require('../lib/trace-events');
-const { runWithSession, currentSessionId } = require('../lib/request-context');
+const { emit, traceTool, isTraceEnabled } = require('../lib/trace/trace-logger');
+const traceEvents = require('../lib/trace/trace-events');
+const { runWithSession, currentSessionId } = require('../lib/trace/request-context');
 
 function withTrace(value, fn) {
   const prior = process.env.TRACE;

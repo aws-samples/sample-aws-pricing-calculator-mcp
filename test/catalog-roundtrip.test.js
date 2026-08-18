@@ -1,9 +1,9 @@
 const { describe, it, before } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
-const { loadCatalog, listVerified } = require('../lib/catalog');
-const EstimateBuilder = require('../lib/estimate-builder');
-const { fetchEstimate } = require('../lib/aws-client');
+const { loadCatalog, listVerified } = require('../lib/lint/catalog');
+const EstimateBuilder = require('../lib/aws/estimate-builder');
+const { fetchEstimate } = require('../lib/aws/aws-client');
 
 const CATALOG_DIR = path.join(__dirname, '..', 'catalog', 'services');
 const SKIP_NETWORK = process.env.SKIP_NETWORK === '1';

@@ -12,14 +12,17 @@
  * 8 shapes, only `metaData.estimateId` ever differs. These tests pin that
  * invariant for the two shapes that aren't already covered by
  * integration.test.js: AppSync multi-child sub-service collapse, and the
- * EC2 dedicated-tenancy reserved-instance branch in lib/ec2.js.
+ * EC2 dedicated-tenancy reserved-instance branch in lib/aws/ec2.js.
  *
- * Network required.
+ * Network required — both tests POST a real estimate, so `npm test`
+ * (SKIP_NETWORK=1) skips the file. Run via `npm run test:network`.
  */
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
-const EstimateBuilder = require('../lib/estimate-builder');
-const { fetchEstimate, saveEstimate } = require('../lib/aws-client');
+const EstimateBuilder = require('../lib/aws/estimate-builder');
+const { fetchEstimate, saveEstimate } = require('../lib/aws/aws-client');
+
+const SKIP_NETWORK = process.env.SKIP_NETWORK === '1';
 
 const UUID_RE = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
 
@@ -78,7 +81,12 @@ function assertNoDiffs(sent, fetched) {
   assert.equal(diffs.length, 0, `expected zero diffs (modulo allowlist), got:\n  ${diffs.join('\n  ')}`);
 }
 
-describe('roundtrip: full payload deep-equal', () => {
+describe('roundtrip: full payload deep-equal (network)', () => {
+  if (SKIP_NETWORK) {
+    it.skip('SKIP_NETWORK=1; not running', () => {});
+    return;
+  }
+
   it('AppSync multi-child collapses into one parent envelope and round-trips', async () => {
     // awsAppSync is a subServiceSelector; appSyncApiCall + appSyncCaching
     // are two of its templates. The builder must collapse them into one

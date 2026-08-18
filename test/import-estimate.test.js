@@ -1,6 +1,6 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
-const { estimateToMarkdown } = require('../lib/aws-client');
+const { estimateToMarkdown } = require('../lib/aws/aws-client');
 
 describe('estimateToMarkdown', () => {
   it('renders estimate name and total cost', () => {

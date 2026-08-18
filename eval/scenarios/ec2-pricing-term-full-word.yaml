@@ -1,0 +1,57 @@
+id: ec2-pricing-term-full-word
+description: |
+  Regression lock 2026-08-12 — the catalog's OWN documented format
+  silently mis-prices the term.
+
+  catalog/services/ec2Enhancement.json required[].pricingStrategy
+  documents the full-object form with full-word terms:
+    {"model":"instanceSavings","term":"3 Year","upfrontPayment":"None"}
+  and the traps[] even say: term values are exact-case strings
+  '1 Year', '3 Year'.
+
+  But lib/aws/ec2.js#buildPricingStrategy only recognizes the '3yr'
+  shorthand: `term === '3yr' ? '3 Year' : '1 Year'`. An agent that
+  follows the catalog hint verbatim gets a 3-year commitment saved
+  as a 1-year commitment — valid-looking blob, wrong price, no
+  error, no trace event, no lint finding.
+
+  The model itself DOES resolve here (SELECTED_OPTION has the
+  'instanceSavings' key), which isolates the term bug from the
+  model-fallback bug covered by ec2-pricing-object-display-label.
+
+  PRE-FIX: the term assertion FAILS (blob shows "1 Year").
+  POST-FIX: "3 Year" must survive the transform.
+calls:
+  - tool: create_estimate
+    args:
+      name: ec2-pricing-term-full-word
+  - tool: add_service
+    args:
+      estimate_id: ${estimate_id}
+      services: |
+        [{"service":"ec2Enhancement","group":"Compute","config":{
+          "region":"us-east-1",
+          "description":"instanceSavings 3 Year per catalog-documented format",
+          "instanceType":"m5.large",
+          "selectedOS":"linux",
+          "workload":1,
+          "tenancy":"shared",
+          "pricingStrategy":{"model":"instanceSavings","term":"3 Year","upfrontPayment":"None"}
+        }}]
+  - tool: export_estimate
+    args:
+      estimate_id: ${estimate_id}
+expectations:
+  - predicate: save_succeeded
+  # Model resolves fine — this pins the scenario to the term bug only.
+  - predicate: saved_blob_field_equals
+    paths:
+      - services.*.calculationComponents.pricingStrategy.value.selectedOption
+      - groups.*.services.*.calculationComponents.pricingStrategy.value.selectedOption
+    equals: instance-savings
+  # The documented "3 Year" must survive. Pre-fix: blob holds "1 Year".
+  - predicate: saved_blob_field_equals
+    paths:
+      - services.*.calculationComponents.pricingStrategy.value.term
+      - groups.*.services.*.calculationComponents.pricingStrategy.value.term
+    equals: 3 Year

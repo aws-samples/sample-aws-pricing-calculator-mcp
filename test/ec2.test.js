@@ -1,6 +1,6 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
-const { transformConfig } = require('../lib/ec2');
+const { transformConfig } = require('../lib/aws/ec2');
 
 describe('EC2 transformConfig', () => {
   it('produces required fields with minimal config', () => {
@@ -14,7 +14,7 @@ describe('EC2 transformConfig', () => {
     assert.equal(result.ec2AdvancedPricingMetrics.value, 1);
     assert.equal(result.detailedMonitoringCheckbox.value, false);
     // dataTransferForEC2 is no longer injected by transformConfig — that
-    // responsibility moved to lib/handler-helpers.js#applyDefaultFields
+    // responsibility moved to lib/mcp/handler-helpers.js#applyDefaultFields
     // (sub-task A 2026-06-03), which reads the catalog's defaultFields
     // block. transformConfig now passes through whatever the merged
     // config supplied.
@@ -58,7 +58,7 @@ describe('EC2 transformConfig', () => {
 
   // Production regression 2026-06-07: agents pass workload as an object
   // that does NOT match the canonical { value: { workloadType, data } }
-  // envelope. Pre-fix: lib/ec2.js fell through to `String(workloadInput)`
+  // envelope. Pre-fix: lib/aws/ec2.js fell through to `String(workloadInput)`
   // which produced "[object Object]" in the saved blob, rendering the
   // estimate read-only. Post-fix: malformed object input gets a
   // best-effort coercion (numeric-shaped value extracted if findable)
@@ -218,15 +218,126 @@ describe('EC2 pricing strategy', () => {
   });
 });
 
+// Agent report 2026-08-12: object-form pricingStrategy skipped all
+// normalization — display-label models ("EC2 Instance Savings Plans"),
+// catalog-documented model "standard", and full-word terms ("3 Year")
+// silently priced as On-Demand / 1 Year. The contract now: both paths
+// normalize through the same resolvers, and anything unresolvable
+// throws instead of falling back.
+describe('EC2 pricing normalization + fail-fast', () => {
+  const { validatePricingStrategy } = require('../lib/aws/ec2');
+
+  it('object form accepts display-label model (the agent-reported case)', () => {
+    const result = transformConfig({
+      tenancy: 'shared',
+      pricingStrategy: { model: 'EC2 Instance Savings Plans', term: '3 Year' },
+    });
+    const ps = result.pricingStrategy.value;
+    assert.equal(ps.selectedOption, 'instance-savings');
+    assert.equal(ps.term, '3 Year');
+  });
+
+  it('object form accepts full-word term "3 Year" (catalog-documented format)', () => {
+    const result = transformConfig({
+      pricingStrategy: { model: 'instanceSavings', term: '3 Year', upfrontPayment: 'None' },
+    });
+    assert.equal(result.pricingStrategy.value.term, '3 Year');
+    assert.equal(result.pricingStrategy.value.selectedOption, 'instance-savings');
+  });
+
+  it('object form accepts model "standard" as reserved (catalog-documented format)', () => {
+    const result = transformConfig({
+      tenancy: 'dedicated',
+      pricingStrategy: { model: 'standard', term: '1 Year', upfrontPayment: 'None' },
+    });
+    assert.equal(result.pricingStrategy.value.selectedOption, 'standard');
+  });
+
+  it('model "standard" under shared tenancy remaps like reserved', () => {
+    const result = transformConfig({
+      tenancy: 'shared',
+      pricingStrategy: { model: 'standard', term: '1 Year' },
+    });
+    assert.equal(result.pricingStrategy.value.selectedOption, 'instance-savings');
+  });
+
+  it('accepts saved-blob style selectedOption values (import re-transform)', () => {
+    const result = transformConfig({
+      pricingStrategy: { model: 'compute-savings', term: '3yr' },
+    });
+    assert.equal(result.pricingStrategy.value.selectedOption, 'compute-savings');
+    assert.equal(result.pricingStrategy.value.term, '3 Year');
+  });
+
+  it('normalizes upfrontPayment variants ("No Upfront", "all")', () => {
+    const a = transformConfig({ pricingStrategy: { model: 'computeSavings', upfrontPayment: 'No Upfront' } });
+    assert.equal(a.pricingStrategy.value.upfrontPayment, 'None');
+    const b = transformConfig({ pricingStrategy: { model: 'computeSavings', upfrontPayment: 'all' } });
+    assert.equal(b.pricingStrategy.value.upfrontPayment, 'All');
+  });
+
+  it('throws on unresolvable object model instead of falling back to on-demand', () => {
+    assert.throws(
+      () => transformConfig({ pricingStrategy: { model: 'banana', term: '1 Year' } }),
+      /Invalid pricingStrategy model.*banana.*Valid model values/s);
+  });
+
+  it('throws on unresolvable term instead of degrading to 1 Year', () => {
+    assert.throws(
+      () => transformConfig({ pricingStrategy: { model: 'instanceSavings', term: '5 Year' } }),
+      /Invalid pricingStrategy term/);
+  });
+
+  it('throws on unresolvable upfrontPayment', () => {
+    assert.throws(
+      () => transformConfig({ pricingStrategy: { model: 'instanceSavings', upfrontPayment: 'half' } }),
+      /Invalid pricingStrategy upfrontPayment/);
+  });
+
+  it('throws on unresolvable string instead of falling back to on-demand', () => {
+    assert.throws(
+      () => transformConfig({ pricingStrategy: 'best effort pricing please' }),
+      /Invalid pricingStrategy model/);
+  });
+
+  it('string display label still fuzzy-matches (control for the fix)', () => {
+    const result = transformConfig({ pricingStrategy: 'EC2 Instance Savings Plans' });
+    assert.equal(result.pricingStrategy.value.selectedOption, 'instance-savings');
+  });
+
+  it('spot works as string shorthand and object model', () => {
+    assert.equal(transformConfig({ pricingStrategy: 'spot' }).pricingStrategy.value.selectedOption, 'spot');
+    assert.equal(transformConfig({ pricingStrategy: { model: 'spot' } }).pricingStrategy.value.selectedOption, 'spot');
+  });
+
+  it('utilization envelope without model still defaults to on-demand (no false rejection)', () => {
+    const result = transformConfig({ pricingStrategy: { value: { utilizationValue: '80' } } });
+    assert.equal(result.pricingStrategy.value.selectedOption, 'on-demand');
+    assert.equal(result.pricingStrategy.value.utilizationValue, '80');
+  });
+
+  it('validatePricingStrategy mirrors the transform contract', () => {
+    assert.equal(validatePricingStrategy({ model: 'EC2 Instance Savings Plans', term: '3 Year' }).ok, true);
+    assert.equal(validatePricingStrategy('ondemand').ok, true);
+    assert.equal(validatePricingStrategy(undefined).ok, true);
+    const bad = validatePricingStrategy({ model: 'banana' });
+    assert.equal(bad.ok, false);
+    assert.match(bad.error, /Valid model values/);
+    const badTerm = validatePricingStrategy({ model: 'instanceSavings', term: 'forever' });
+    assert.equal(badTerm.ok, false);
+    assert.match(badTerm.error, /Valid term values/);
+  });
+});
+
 describe('EC2 tenancy-remap trace event', () => {
   // The remap inside buildPricingStrategy stays (otherwise existing
   // shared+reserved saves would break). Sub-task C 2026-06-04 added
   // a trace event so observability can detect the asked-X-got-Y
   // divergence, since the saved blob alone shows only the post-remap
   // state. Capture the trace stream by stubbing trace-logger.
-  const TRACE_LOGGER_PATH = require.resolve('../lib/trace-logger');
-  const TRACE_EVENTS_PATH = require.resolve('../lib/trace-events');
-  const EC2_PATH = require.resolve('../lib/ec2');
+  const TRACE_LOGGER_PATH = require.resolve('../lib/trace/trace-logger');
+  const TRACE_EVENTS_PATH = require.resolve('../lib/trace/trace-events');
+  const EC2_PATH = require.resolve('../lib/aws/ec2');
 
   function withCapturedEmits(fn) {
     delete require.cache[TRACE_LOGGER_PATH];
@@ -238,7 +349,7 @@ describe('EC2 tenancy-remap trace event', () => {
         emit: (event, payload) => { captured.push({ event, payload }); },
       },
     };
-    const { transformConfig: tc } = require('../lib/ec2');
+    const { transformConfig: tc } = require('../lib/aws/ec2');
     fn(tc);
     delete require.cache[TRACE_LOGGER_PATH];
     delete require.cache[TRACE_EVENTS_PATH];

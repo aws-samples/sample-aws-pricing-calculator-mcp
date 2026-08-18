@@ -1,7 +1,7 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
-const { loadCatalog, getEntry } = require('../lib/catalog');
+const { loadCatalog, getEntry } = require('../lib/lint/catalog');
 
 const catalog = loadCatalog(path.join(__dirname, '..', 'catalog', 'services'), { strict: false });
 

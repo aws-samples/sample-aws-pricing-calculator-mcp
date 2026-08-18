@@ -19,8 +19,8 @@
 const { describe, it, beforeEach } = require('node:test');
 const assert = require('node:assert/strict');
 
-const AWS_CLIENT_PATH = require.resolve('../lib/aws-client');
-const HANDLER_HELPERS_PATH = require.resolve('../lib/handler-helpers');
+const AWS_CLIENT_PATH = require.resolve('../lib/aws/aws-client');
+const HANDLER_HELPERS_PATH = require.resolve('../lib/mcp/handler-helpers');
 
 function reset() {
   delete require.cache[AWS_CLIENT_PATH];
@@ -88,7 +88,7 @@ describe('discovery-time productCodes redirect', () => {
   describe('annotateSearchResults', () => {
     it('annotates a hit whose key is in productCodes with redirect_to + note', () => {
       stubAwsClient();
-      const { createHandlerHelpers } = require('../lib/handler-helpers');
+      const { createHandlerHelpers } = require('../lib/mcp/handler-helpers');
       const h = createHandlerHelpers({ catalog: CATALOG });
       const out = h.annotateSearchResults([
         { key: 'titanTextEmbeddingsV2', name: 'Titan Text Embeddings V2' },
@@ -104,7 +104,7 @@ describe('discovery-time productCodes redirect', () => {
 
     it('handles multi-term search shape ({ term: [...hits] })', () => {
       stubAwsClient();
-      const { createHandlerHelpers } = require('../lib/handler-helpers');
+      const { createHandlerHelpers } = require('../lib/mcp/handler-helpers');
       const h = createHandlerHelpers({ catalog: CATALOG });
       const out = h.annotateSearchResults({
         titan: [{ key: 'titanTextEmbeddingsV2', name: 'Titan' }],
@@ -116,7 +116,7 @@ describe('discovery-time productCodes redirect', () => {
 
     it('passes through unchanged when catalog has no productCodes', () => {
       stubAwsClient();
-      const { createHandlerHelpers } = require('../lib/handler-helpers');
+      const { createHandlerHelpers } = require('../lib/mcp/handler-helpers');
       const emptyCatalog = new Map();
       const h = createHandlerHelpers({ catalog: emptyCatalog });
       const hits = [{ key: 'titanTextEmbeddingsV2', name: 'Titan' }];
@@ -129,7 +129,7 @@ describe('discovery-time productCodes redirect', () => {
   describe('maybeBuildProductRedirect', () => {
     it('returns redirect envelope for a productCode with provider preview', async () => {
       stubAwsClient();
-      const { createHandlerHelpers } = require('../lib/handler-helpers');
+      const { createHandlerHelpers } = require('../lib/mcp/handler-helpers');
       const h = createHandlerHelpers({ catalog: CATALOG });
       const r = await h.maybeBuildProductRedirect({
         svc: { key: 'titanTextEmbeddingsV2', name: 'Titan Text Embeddings V2' },
@@ -148,7 +148,7 @@ describe('discovery-time productCodes redirect', () => {
 
     it('returns null for a service that is not a productCode', async () => {
       stubAwsClient();
-      const { createHandlerHelpers } = require('../lib/handler-helpers');
+      const { createHandlerHelpers } = require('../lib/mcp/handler-helpers');
       const h = createHandlerHelpers({ catalog: CATALOG });
       const r = await h.maybeBuildProductRedirect({
         svc: { key: 'aWSLambda', name: 'AWS Lambda' },
@@ -159,7 +159,7 @@ describe('discovery-time productCodes redirect', () => {
 
     it('returns null for a provider code itself (no recursion)', async () => {
       stubAwsClient();
-      const { createHandlerHelpers } = require('../lib/handler-helpers');
+      const { createHandlerHelpers } = require('../lib/mcp/handler-helpers');
       const h = createHandlerHelpers({ catalog: CATALOG });
       // anthropic is in subServices[].serviceCode, NOT productCodes[].
       // Must not redirect.

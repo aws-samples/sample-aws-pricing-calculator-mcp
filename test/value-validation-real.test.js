@@ -3,7 +3,7 @@
 
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
-const { validateConfigKeys } = require('../lib/validation');
+const { validateConfigKeys } = require('../lib/lint/validation');
 
 if (process.env.AWS_OFFLINE) {
   describe('value validation against real manifest (AWS_OFFLINE set, skipping)', () => {
@@ -18,7 +18,7 @@ if (process.env.AWS_OFFLINE) {
       //     added a default we don't know about)? Update this fixture and
       //     note the change in commit message.
       //   - Look like our rules over-corrected something legitimate? Fix
-      //     the rule in lib/validation.js, do not loosen this test.
+      //     the rule in lib/lint/validation.js, do not loosen this test.
       // Real Lambda fields (verified against the live manifest 2026-05-14):
       //   numberOfRequests       — frequency, units include millionPerMonth
       //   durationOfEachRequest  — numericInput (string-typed)

@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: MIT-0
 //
 // Entry point. The 9 tool registrations live here; their long
-// descriptions are in lib/tool-descriptions.js and the helpers each
-// handler calls into are in lib/handler-helpers.js. Read this file
+// descriptions are in lib/mcp/tool-descriptions.js and the helpers each
+// handler calls into are in lib/mcp/handler-helpers.js. Read this file
 // to understand the wiring; read those files for the prose and logic.
 
 const { McpServer } = require('@modelcontextprotocol/sdk/server/mcp.js');
@@ -12,16 +12,16 @@ const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio
 const { z } = require('zod');
 const path = require('node:path');
 
-const { PARTITIONS, loadManifest, findService, fetchServiceDefinition, extractInputFields, searchServices, fetchEstimate, estimateToMarkdown } = require('./lib/aws-client');
-const EstimateBuilder = require('./lib/estimate-builder');
-const { createEstimateStore } = require('./lib/estimate-store');
-const { loadCatalog } = require('./lib/catalog');
-const { nextStepFor } = require('./lib/lint-hints');
-const { traceTool } = require('./lib/trace-logger');
-const traceEvents = require('./lib/trace-events');
-const { runWithSession } = require('./lib/request-context');
-const { createHandlerHelpers, mcpJsonOk, mcpTextErr, checkPartition, parseServicesArg } = require('./lib/handler-helpers');
-const desc = require('./lib/tool-descriptions');
+const { PARTITIONS, loadManifest, findService, fetchServiceDefinition, extractInputFields, searchServices, fetchEstimate, estimateToMarkdown } = require('./lib/aws/aws-client');
+const EstimateBuilder = require('./lib/aws/estimate-builder');
+const { createEstimateStore } = require('./lib/store/estimate-store');
+const { loadCatalog } = require('./lib/lint/catalog');
+const { nextStepFor } = require('./lib/lint/lint-hints');
+const { traceTool } = require('./lib/trace/trace-logger');
+const traceEvents = require('./lib/trace/trace-events');
+const { runWithSession } = require('./lib/trace/request-context');
+const { createHandlerHelpers, mcpJsonOk, mcpTextErr, checkPartition, parseServicesArg } = require('./lib/mcp/handler-helpers');
+const desc = require('./lib/mcp/tool-descriptions');
 
 // CALCMCP_CATALOG_DIR is an eval-only override — the eval harness uses
 // it to point the server at a mutated copy of the catalog so probe
@@ -180,7 +180,7 @@ server.tool(
     await estimates.put(estimate);
     // Mark the start of an estimate flow so observability can derive a
     // session-shaped denominator instead of per-estimateId. See
-    // lib/trace-events.js#session for why build_estimate intentionally
+    // lib/trace/trace-events.js#session for why build_estimate intentionally
     // doesn't fire this event.
     traceEvents.session.start({
       estimateId: estimate.id,
@@ -410,7 +410,7 @@ async function main() {
       // expected to set the Mcp-Session-Id header on every request).
       // Tool handlers and any helpers they call see this via
       // currentSessionId() in lib/request-context (consumed by trace
-      // events and lib/aws-client.js's save logs).
+      // events and lib/aws/aws-client.js's save logs).
       const mcpSessionId = req.headers['mcp-session-id'] || null;
       await runWithSession(mcpSessionId, () =>
         transport.handleRequest(req, res, req.body),

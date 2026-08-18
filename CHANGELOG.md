@@ -2,6 +2,19 @@
 
 All notable changes to the AWS Pricing Calculator MCP server are documented here.
 
+## [1.3.0] - 2026-08-16
+
+- **`lib/` regrouped** into `aws/`, `lint/`, `mcp/`, `store/`, and `trace/` subdirectories — breaking for anything requiring `lib/*.js` directly (`lib/ec2.js` → `lib/aws/ec2.js`)
+- Fixed **EC2 `pricingStrategy` silently falling back to On-Demand / 1 Year** (`lib/aws/ec2.js`)
+- Added **`ec2-pricing-invalid-value` lint predicate** — refuses a saved ec2Enhancement blob whose `selectedOption`/`term`/`upfrontPayment` is out of enum
+- Added **timeout + bounded retry on every calculator HTTP call** (`lib/aws/fetch-resilience.js`) — mitigates [#7](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/issues/7); root cause still unknown
+- `POST /saveAs` retries on a smaller budget of 2 attempts and emits a new `save.retry` trace event, since it is not idempotent
+- Added **CI** (`.github/workflows/ci.yml`) — `npm test` on Node 22 and 24, plus a dist-freshness check that the committed bundle matches a fresh build
+- **`npm test` is now hermetic** — 10 tests that ignored `SKIP_NETWORK=1` and fetched anyway now honor it; new `npm run test:network` runs the full set with the gate off
+- Dependency bumps, superseding dependabot [#30](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/pull/30), [#31](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/pull/31), [#32](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/pull/32): `@modelcontextprotocol/sdk` 1.29.0 → 1.30.0, `ip-address` 10.2.0 → 10.5.0, `hono` 4.12.32 → 4.13.2
+- Investigated [#13](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/issues/13) (sub-service rows render `$0`) — not a save-payload bug and no code change needed
+- Known issue: `npm run test:network` is not green — `test/catalog-roundtrip.test.js` fails for ALB, NAT Gateway, and Transit Gateway on `serviceCode`/`estimateFor` (pre-existing)
+
 ## [1.2.9] - 2026-08-04
 
 - Improved instructions for import_estimate tool to handle ESC urls

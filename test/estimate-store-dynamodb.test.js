@@ -1,7 +1,7 @@
 const { describe, it, beforeEach } = require('node:test');
 const assert = require('node:assert/strict');
-const { DynamoEstimateStore } = require('../lib/estimate-store-dynamodb');
-const EstimateBuilder = require('../lib/estimate-builder');
+const { DynamoEstimateStore } = require('../lib/store/estimate-store-dynamodb');
+const EstimateBuilder = require('../lib/aws/estimate-builder');
 
 class FakeDocClient {
   constructor() {
@@ -116,7 +116,7 @@ describe('DynamoEstimateStore', () => {
 
 describe('createEstimateStore + dynamodb wiring', () => {
   it('createEstimateStore("dynamodb") returns a DynamoEstimateStore', () => {
-    const { createEstimateStore } = require('../lib/estimate-store');
+    const { createEstimateStore } = require('../lib/store/estimate-store');
     const store = createEstimateStore({
       ESTIMATES_STORE: 'dynamodb',
       ESTIMATES_TABLE: 'estimates-test',

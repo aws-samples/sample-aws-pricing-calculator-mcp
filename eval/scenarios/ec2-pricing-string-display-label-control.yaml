@@ -1,0 +1,47 @@
+id: ec2-pricing-string-display-label-control
+description: |
+  Control for ec2-pricing-object-display-label — pins the
+  string/object asymmetry in lib/aws/ec2.js.
+
+  The SAME display label that silently falls back to On-Demand in
+  object form works fine as a plain string, because only the string
+  path (parseString) has fuzzy matching: "EC2 Instance Savings
+  Plans" matches /instance.savings/i → instanceSavings →
+  selectedOption "instance-savings".
+
+  This scenario PASSES pre-fix. Its job:
+    1. Prove the fallback bug is specific to the object path (the
+       one the catalog steers agents toward for committed pricing).
+    2. Guard the fix — normalizing the object path must not break
+       the already-working string path.
+
+  Note the string form has no term slot, so it defaults to 1 Year —
+  fine here; term coverage lives in ec2-pricing-term-full-word.
+calls:
+  - tool: create_estimate
+    args:
+      name: ec2-pricing-string-display-label-control
+  - tool: add_service
+    args:
+      estimate_id: ${estimate_id}
+      services: |
+        [{"service":"ec2Enhancement","group":"Compute","config":{
+          "region":"us-east-1",
+          "description":"EC2 Instance Savings Plans as plain string (fuzzy path)",
+          "instanceType":"m5.large",
+          "selectedOS":"linux",
+          "workload":1,
+          "tenancy":"shared",
+          "pricingStrategy":"EC2 Instance Savings Plans"
+        }}]
+  - tool: export_estimate
+    args:
+      estimate_id: ${estimate_id}
+expectations:
+  - predicate: save_succeeded
+  # String path fuzzy-matches the display label correctly.
+  - predicate: saved_blob_field_equals
+    paths:
+      - services.*.calculationComponents.pricingStrategy.value.selectedOption
+      - groups.*.services.*.calculationComponents.pricingStrategy.value.selectedOption
+    equals: instance-savings

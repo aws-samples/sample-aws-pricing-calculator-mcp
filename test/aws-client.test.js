@@ -6,7 +6,7 @@ const assert = require('node:assert/strict');
 // covered in test/trace-flag.test.js.
 process.env.TRACE = 'on';
 
-const { runWithSession } = require('../lib/request-context');
+const { runWithSession } = require('../lib/trace/request-context');
 
 function mockManifest() {
   return new Map([
@@ -21,21 +21,21 @@ function mockManifest() {
 
 describe('searchServices', () => {
   it('finds services by name', () => {
-    const { searchServices } = require('../lib/aws-client');
+    const { searchServices } = require('../lib/aws/aws-client');
     const results = searchServices(mockManifest(), 'lambda');
     assert.equal(results.length, 1);
     assert.equal(results[0].key, 'aWSLambda');
   });
 
   it('finds services by keyword', () => {
-    const { searchServices } = require('../lib/aws-client');
+    const { searchServices } = require('../lib/aws/aws-client');
     const results = searchServices(mockManifest(), 'serverless');
     assert.equal(results.length, 1);
     assert.equal(results[0].key, 'aWSLambda');
   });
 
   it('excludes inactive services', () => {
-    const { searchServices } = require('../lib/aws-client');
+    const { searchServices } = require('../lib/aws/aws-client');
     const results = searchServices(mockManifest(), 'ec2');
     const keys = results.map(r => r.key);
     assert.ok(!keys.includes('eC2Next'), 'should exclude inactive eC2Next');
@@ -43,14 +43,14 @@ describe('searchServices', () => {
   });
 
   it('excludes subServiceSelector parents', () => {
-    const { searchServices } = require('../lib/aws-client');
+    const { searchServices } = require('../lib/aws/aws-client');
     const results = searchServices(mockManifest(), 'sns');
     const keys = results.map(r => r.key);
     assert.ok(!keys.includes('amazonSimpleNotificationService'));
   });
 
   it('handles multiple comma-separated terms', () => {
-    const { searchServices } = require('../lib/aws-client');
+    const { searchServices } = require('../lib/aws/aws-client');
     const results = searchServices(mockManifest(), 'lambda, s3');
     assert.ok(results.lambda, 'should have lambda key');
     assert.ok(results.s3, 'should have s3 key');
@@ -59,7 +59,7 @@ describe('searchServices', () => {
   });
 
   it('returns empty array for no matches', () => {
-    const { searchServices } = require('../lib/aws-client');
+    const { searchServices } = require('../lib/aws/aws-client');
     const results = searchServices(mockManifest(), 'nonexistent');
     assert.equal(results.length, 0);
   });
@@ -67,7 +67,7 @@ describe('searchServices', () => {
 
 describe('parseDoubleEncodedResponse', () => {
   it('parses valid double-encoded AWS response', () => {
-    const { parseDoubleEncodedResponse } = require('../lib/aws-client');
+    const { parseDoubleEncodedResponse } = require('../lib/aws/aws-client');
     const raw = JSON.stringify({
       statusCode: 200,
       body: JSON.stringify({ savedKey: 'abc123' }),
@@ -77,25 +77,25 @@ describe('parseDoubleEncodedResponse', () => {
   });
 
   it('throws on invalid outer JSON', () => {
-    const { parseDoubleEncodedResponse } = require('../lib/aws-client');
+    const { parseDoubleEncodedResponse } = require('../lib/aws/aws-client');
     assert.throws(() => parseDoubleEncodedResponse('not json'), /invalid JSON/i);
   });
 
   it('throws on invalid inner body JSON', () => {
-    const { parseDoubleEncodedResponse } = require('../lib/aws-client');
+    const { parseDoubleEncodedResponse } = require('../lib/aws/aws-client');
     const raw = JSON.stringify({ body: 'not json' });
     assert.throws(() => parseDoubleEncodedResponse(raw), /invalid body/i);
   });
 
   it('throws when savedKey is missing', () => {
-    const { parseDoubleEncodedResponse } = require('../lib/aws-client');
+    const { parseDoubleEncodedResponse } = require('../lib/aws/aws-client');
     const raw = JSON.stringify({ body: JSON.stringify({ other: 'data' }) });
     assert.throws(() => parseDoubleEncodedResponse(raw), /savedKey/i);
   });
 });
 
 describe('extractInputFields', () => {
-  const { extractInputFields } = require('../lib/aws-client');
+  const { extractInputFields } = require('../lib/aws/aws-client');
 
   it('extracts numericInput fields', () => {
     const def = { templates: [{ id: 'tpl', groups: [{ items: [
@@ -208,7 +208,7 @@ describe('saveEstimate trace events', () => {
   it('emits save.send and save.ok for a successful save, stamped with session id', async () => {
     // The AWS save endpoint returns a Lambda proxy-shaped response:
     // outer JSON has statusCode + body, body is a JSON string. See
-    // parseDoubleEncodedResponse in lib/aws-client.js and its existing
+    // parseDoubleEncodedResponse in lib/aws/aws-client.js and its existing
     // test on line 62-70 of test/aws-client.test.js for the exact shape.
     global.fetch = async () => ({
       ok: true, status: 200,
@@ -217,7 +217,7 @@ describe('saveEstimate trace events', () => {
         body: JSON.stringify({ savedKey: 'abc123' }),
       }),
     });
-    const { saveEstimate } = require('../lib/aws-client');
+    const { saveEstimate } = require('../lib/aws/aws-client');
     await runWithSession('sid-42', () =>
       saveEstimate({ services: { s1: {} }, groups: {} }),
     );
@@ -243,7 +243,7 @@ describe('saveEstimate trace events', () => {
       ok: false, status: 400,
       text: async () => 'bad request: too many tokens',
     });
-    const { saveEstimate } = require('../lib/aws-client');
+    const { saveEstimate } = require('../lib/aws/aws-client');
     await assert.rejects(() =>
       runWithSession('sid-43', () => saveEstimate({ services: {}, groups: {} })),
     );
@@ -265,7 +265,7 @@ describe('saveEstimate trace events', () => {
         body: JSON.stringify({ savedKey: 'abc123' }),
       }),
     });
-    const { saveEstimate } = require('../lib/aws-client');
+    const { saveEstimate } = require('../lib/aws/aws-client');
     await runWithSession('sid-50', () =>
       saveEstimate({ services: { s1: {} }, groups: {} }, { estimateId: 'local-est-id-99' }),
     );
@@ -286,7 +286,7 @@ describe('saveEstimate trace events', () => {
         body: JSON.stringify({ savedKey: 'abc124' }),
       }),
     });
-    const { saveEstimate } = require('../lib/aws-client');
+    const { saveEstimate } = require('../lib/aws/aws-client');
     await saveEstimate({ services: {}, groups: {} });  // no second arg
     const events = writes
       .map(s => { try { return JSON.parse(s); } catch { return null; } })
@@ -300,7 +300,7 @@ describe('saveEstimate trace events', () => {
       ok: false, status: 400,
       text: async () => 'bad request',
     });
-    const { saveEstimate } = require('../lib/aws-client');
+    const { saveEstimate } = require('../lib/aws/aws-client');
     await assert.rejects(() =>
       runWithSession('sid-51', () => saveEstimate({ services: {}, groups: {} }, { estimateId: 'local-est-id-100' })),
     );
