@@ -294,6 +294,17 @@ describe('EC2 pricing normalization + fail-fast', () => {
       /Invalid pricingStrategy upfrontPayment/);
   });
 
+  // Issue #36: object-form "50% upfront" exercises the suffix-strip-to-empty
+  // edge in resolveUpfront ("upfront" -> ""), the exact string that in 1.2.9
+  // slipped past normalization and saved a read-only $0 line item.
+  it('rejects percentage-with-suffix upfront ("50% upfront") — issue #36', () => {
+    const cfg = { model: 'computeSavings', term: '3yr', upfrontPayment: '50% upfront' };
+    assert.equal(validatePricingStrategy(cfg).ok, false);
+    assert.throws(
+      () => transformConfig({ pricingStrategy: cfg }),
+      /Invalid pricingStrategy upfrontPayment/);
+  });
+
   it('throws on unresolvable string instead of falling back to on-demand', () => {
     assert.throws(
       () => transformConfig({ pricingStrategy: 'best effort pricing please' }),

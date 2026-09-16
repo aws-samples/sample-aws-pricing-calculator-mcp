@@ -2,6 +2,12 @@
 
 All notable changes to the AWS Pricing Calculator MCP server are documented here.
 
+## [1.3.1] - 2026-09-16
+
+- Fix: Trap - Regional NAT Gateway is not available in AWS European Sovereign Cloud
+- Fixed Issue [#36](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/issues/36)
+- Fixed Issue [#37](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/issues/37)
+
 ## [1.3.0] - 2026-08-16
 
 - **`lib/` regrouped** into `aws/`, `lint/`, `mcp/`, `store/`, and `trace/` subdirectories — breaking for anything requiring `lib/*.js` directly (`lib/ec2.js` → `lib/aws/ec2.js`)

@@ -262,6 +262,61 @@ describe('toAWSPayload', () => {
     assert.equal(apiCall.description, 'API queries');
   });
 
+  // Issue #37: two AWS Backup vaults (same child code) must become two
+  // separate awsBackup cards, not one card with two ebsBackup rows (which
+  // renders read-only-ish and halves the cost on edit). The `instance`
+  // suffix is the per-card discriminator; distinct instances → distinct
+  // envelopes, shared instance → one envelope.
+  it('splits same-parent subservice children by instance, merges when shared', async () => {
+    const BACKUP_MANIFEST = {
+      awsServices: [
+        { key: 'awsBackup', name: 'AWS Backup', serviceCode: 'awsBackup',
+          subType: 'subServiceSelector', templates: ['ebsBackup', 'amazonEfsBackup'] },
+        { key: 'ebsBackup', name: 'EBS Backup', serviceCode: 'ebsBackup',
+          subType: 'subService' },
+        { key: 'amazonEfsBackup', name: 'EFS Backup', serviceCode: 'amazonEfsBackup',
+          subType: 'subService' },
+      ],
+    };
+    const backupDefs = [
+      ['manifest/en_US.json', BACKUP_MANIFEST],
+      ['data/awsBackup', { version: '0.0.101', serviceCode: 'awsBackup',
+        templateId: 'awsBackupSelector', templates: [{ id: 'awsBackupSelector' }] }],
+      ['data/ebsBackup', { version: '0.0.32', serviceCode: 'ebsBackup',
+        templates: [{ id: 'ebsBackup' }] }],
+      ['data/amazonEfsBackup', { version: '0.0.47', serviceCode: 'amazonEfsBackup',
+        templates: [{ id: 'efsBackup' }] }],
+    ];
+    const EB = require('../lib/aws/estimate-builder');
+
+    // Distinct instances → two separate awsBackup cards.
+    mockFetch(backupDefs);
+    const split = new EB('two vaults');
+    split.addService('ebsBackup:A', { region: 'us-east-1', description: 'A', dataSize: { value: '100', unit: 'gb|NA' } });
+    split.addService('ebsBackup:B', { region: 'us-east-1', description: 'B', dataSize: { value: '200', unit: 'gb|NA' } });
+    const splitPayload = await split.toAWSPayload();
+    const splitEntries = Object.values(splitPayload.services);
+    assert.equal(splitEntries.length, 2, 'distinct instances must produce two cards');
+    for (const env of splitEntries) {
+      assert.equal(env.serviceCode, 'awsBackup');
+      assert.equal(env.subServices.length, 1, 'each card holds exactly one ebsBackup');
+      assert.equal(env.subServices[0].serviceCode, 'ebsBackup');
+    }
+
+    // Shared instance (distinct child codes) → one multi-child card,
+    // preserving the AppSync-style legitimate merge (EFS + EBS in one card).
+    mockFetch(backupDefs);
+    const merge = new EB('one card, two resources');
+    merge.addService('ebsBackup:vault', { region: 'us-east-1', description: 'ebs', dataSize: { value: '100', unit: 'gb|NA' } });
+    merge.addService('amazonEfsBackup:vault', { region: 'us-east-1', description: 'efs' });
+    const mergePayload = await merge.toAWSPayload();
+    const mergeEntries = Object.values(mergePayload.services);
+    assert.equal(mergeEntries.length, 1, 'shared instance must collapse into one card');
+    assert.equal(mergeEntries[0].subServices.length, 2, 'card holds both children');
+    const mergedCodes = mergeEntries[0].subServices.map(s => s.serviceCode).sort();
+    assert.deepEqual(mergedCodes, ['amazonEfsBackup', 'ebsBackup']);
+  });
+
   it('keeps single subservice case working (no regression)', async () => {
     const SNS_MANIFEST = {
       awsServices: [

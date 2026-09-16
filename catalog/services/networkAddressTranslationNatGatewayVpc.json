@@ -6,6 +6,7 @@
   "status": "verified",
   "traps": [
     "NAT Gateway has two mutually exclusive field sets, make sure to confirm with the user to either use 'Regional NAT Gateway' or 'NAT Gateway'. Regional (regionalNatGatewayCount, regionalNatGatewayAzCount, regionalNatGatewayDataProcessed) is the current UI default. Non-regional/legacy (numberOfGateways, dataProcessedPerNATGateway) also works. Using both will double-count costs.",
+    "Regional NAT Gateway is not available in AWS European Sovereign Cloud",
     "All five fields are marked required by the manifest. When using one set, explicitly set the other set to \"0\" to avoid inflated defaults and linter refusals.",
     "Manifest defaults are 5 gateways × 3 AZs — wildly over-sized for a 'hello world'. minimalConfig overrides to 1×1; agents reading manifest defaults directly will over-estimate ~5×."
   ],
