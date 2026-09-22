@@ -2,11 +2,9 @@
 
 All notable changes to the AWS Pricing Calculator MCP server are documented here.
 
-## [Unreleased]
+## [1.3.2] - 2026-09-22
 
-- `lib/dom-cost.js` now returns **`rows`** (ordered, lossless) and **`rowsTotal`** alongside the existing Maps. `monthlyByService`/`configByService` are keyed by row label and silently drop duplicates via `Map.set()` - a grouped estimate renders the group label and an ungrouped one renders the AWS service display name, which repeats across entries of the same service. Observed live: an estimate with two `ec2Enhancement` entries returned 3 rows but only 2 Map keys. Existing consumers are unchanged.
-- `rowsTotal` gives callers a way to detect an incomplete per-row read, which is the reader-side half of [#13](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/issues/13): a service row can render `$0` (or not render at all) while the summary block is already correct, so comparing `rowsTotal` against `monthlyCost` says when to distrust per-row values. Observed live: a 12-group estimate rendered 10 rows, leaving $94.07 of a correct $1,857.98 total unattributed.
-- Row parsing is extracted into a pure exported `parseDetailRows(cellTextRows)`, with `test/dom-cost.test.js` covering the row-shape assumptions (duplicate labels, stale `$0` rows, header rows, short rows, USD-anchored column offsets). Hermetic - no Playwright, no network, runs under `SKIP_NETWORK=1`.
+- Fixed Issue [#38](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/pull/38)
 
 ## [1.3.1] - 2026-09-16
 
