@@ -20,7 +20,7 @@
     "build": "esbuild mcp-server.js --bundle --platform=node --outfile=dist/mcp-server.js --format=cjs --minify --external:@aws-sdk/client-dynamodb --external:@aws-sdk/lib-dynamodb && node scripts/emit-bundle-contract.js && rm -f dist/aws-calculator.zip && zip dist/aws-calculator.zip mcp-server.js lib/aws/aws-client.js lib/aws/fetch-resilience.js lib/aws/estimate-builder.js lib/aws/ec2.js package.json"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "1.30.0",
+    "@modelcontextprotocol/sdk": "1.32.1",
     "express": "5.2.1"
   },
   "peerDependencies": {
@@ -36,11 +36,11 @@
     }
   },
   "devDependencies": {
-    "@aws-sdk/client-dynamodb": "3.1046.0",
-    "@aws-sdk/lib-dynamodb": "3.1046.0",
+    "@aws-sdk/client-dynamodb": "3.1147.0",
+    "@aws-sdk/lib-dynamodb": "3.1147.0",
     "ajv": "8.20.0",
     "ajv-formats": "3.0.1",
-    "esbuild": "0.28.1",
-    "playwright": "1.60.0"
+    "esbuild": "0.28.2",
+    "playwright": "1.63.0"
   }
 }

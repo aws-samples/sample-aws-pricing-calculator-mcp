@@ -2,6 +2,12 @@
 
 All notable changes to the AWS Pricing Calculator MCP server are documented here.
 
+## [Unreleased]
+
+- Dependency bumps: `@modelcontextprotocol/sdk` 1.30.0 → 1.32.1 (fixes [GHSA-6qxp-vccf-f47h](https://github.com/advisories/GHSA-6qxp-vccf-f47h), high-severity OAuth credential-leak advisory), `esbuild` 0.28.1 → 0.28.2, `playwright` 1.60.0 → 1.63.0, `@aws-sdk/client-dynamodb` and `@aws-sdk/lib-dynamodb` 3.1046.0 → 3.1147.0
+- `npm audit fix` applied to resolve transitive `proxy-addr` (critical, [GHSA-jqcg-44mw-7w3h](https://github.com/advisories/GHSA-jqcg-44mw-7w3h)) and `ip-address` (moderate) advisories pulled in via `express` / `@modelcontextprotocol/sdk`'s `express-rate-limit` dependency. `npm audit` now reports 0 vulnerabilities.
+- Rebuilt `dist/` against the updated dependencies; no source or behavior changes.
+
 ## [1.3.2] - 2026-09-22
 
 - Fixed Issue [#38](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/pull/38)
