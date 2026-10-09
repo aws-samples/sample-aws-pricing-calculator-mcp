@@ -9,9 +9,10 @@
 - **Build estimates from natural language** - agent constructs the estimate via MCP tools; the server saves it to AWS Pricing Calculator and returns a shareable URL.
 - **No AWS credentials required** - uses public, unauthenticated calculator.aws CDN endpoints.
 - **Live service definitions** - fetches the AWS Pricing Calculator manifest at runtime (~436 services).
-- **Verified Configs Catalog** - 18 per-service entries declaring the smallest config that produces a priced estimate, with documented gotchas.
+- **Verified Configs Catalog** - 21 per-service entries declaring the smallest config that produces a priced estimate, with documented gotchas.
 - **Lint refusal before save** - refuses estimates the calculator would render read-only or required-input, with actionable recovery hints.
 - **Import existing estimates** - download by URL or ID as JSON (for region swaps, modifications) or Markdown (for LLM analysis).
+- **Read computed costs** - `get_estimate_cost` hydrates a saved estimate in a headless browser to return the calculator's actual monthly cost; uses an on-demand Playwright/Chromium dependency that is only needed for this tool.
 - **Two transport modes** - stdio (default, for local clients like Claude Desktop, Kiro, Cursor) and optional HTTP (`MCP_TRANSPORT=http`) for hosted deployments.
 
 ## Example
@@ -70,19 +71,20 @@ Then point your client at the built bundle:
 | Tool | Description |
 |---|---|
 | `search_services` | Search AWS services by name or key. Supports comma-separated queries. |
-| `get_service_fields` | Get input field IDs, types, labels, valid options, and selector values for one or more services. For curated services, the response includes a `catalog` block (`minimalConfig`, required-field hints, traps). For deprecated parent service codes (currently `amazonS3`), returns a `redirect_to_parent` status with `child_service_codes` listing the actual service codes to use instead. |
+| `get_service_fields` | Get input field IDs, types, labels, valid options, and selector values for one or more services. For curated services, the response includes a `catalog` block (`minimalConfig`, required-field hints, traps). For deprecated parent service codes (currently `amazonS3`), returns a `redirect_to_parent` status with `child_service_codes` listing the actual service codes to use instead. Services with an include/exclude AWS Free Tier template pair (e.g. Lambda) return a `freeTierChoice` block so the caller can ask the user and pass the chosen template as `estimateFor`. |
 | `create_estimate` | Create a new empty estimate. Returns an estimate ID. |
-| `add_service` | Add one or more services to an estimate. Validates field IDs and values against the live service definition (dropdowns, fileSize unit format, numeric/frequency types, region whitelist). Auto-corrects unambiguous mistakes (case mismatches, typos, number-to-string coercion) and returns a `corrections` array on the per-service result. Partial entries return a `partial: true` warning when required inputs are missing. |
+| `add_service` | Add one or more services to an estimate. Validates field IDs and values against the live service definition (dropdowns, fileSize unit format, numeric/frequency types, region whitelist). Auto-corrects unambiguous mistakes (case mismatches, typos, number-to-string coercion) and returns a `corrections` array on the per-service result. Partial entries return a `partial: true` warning when required inputs are missing. A per-entry `estimateFor` selects a specific pricing template (e.g. `lambdaWithoutFreeTier` to exclude the AWS Free Tier); Free-Tier-capable services added without a choice return a `free_tier_choice` advisory. |
 | `validate_estimate` | Dry-run preflight: builds the would-be saved payload and runs a static check, without calling the save API. Returns `{lint_verdict, next_step, lint_services, would_be_payload}`. Use to confirm an estimate would render correctly before saving. |
 | `build_estimate` | One-shot create + add services + lint preflight + save. Returns the shareable URL on success, or a structured envelope identifying which services need field discovery before retry. |
 | `export_estimate` | Save the in-flight estimate to calculator.aws and return a shareable URL. Refuses with an actionable `next_step` if the static linter predicts the saved blob would rehydrate read-only. |
 | `import_estimate` | Download an existing estimate by URL or ID. Returns JSON (raw) or Markdown. |
+| `get_estimate_cost` | Hydrate a saved estimate (by URL or ID) in a headless browser and return the calculator-computed monthly cost plus per-service rows. Requires Playwright and the Chromium browser — an on-demand dependency NOT installed by default; when either is missing the tool returns `cost_available:false` with the exact install commands instead of failing. |
 | `get_server_info` | Return version and capability information. |
 
 ## Project Structure
 
 ```
-mcp-server.js              # Entry point — registers the 9 MCP tools, stdio + HTTP transports
+mcp-server.js              # Entry point — registers the 10 MCP tools, stdio + HTTP transports
 lib/
   aws/                     # AWS API access + payload construction
     aws-client.js          #   Manifest loading, service definitions, save/read APIs, selector aggregations
@@ -107,7 +109,7 @@ lib/
   store/                   # In-flight estimate persistence
     estimate-store.js      #   Pluggable store (memory default)
     estimate-store-dynamodb.js # DynamoDB-backed store for stateless multi-replica deployments
-  dom-cost.js              # Playwright DOM scrape of the calculator's rendered cost (eval oracle)
+  dom-cost.js              # Playwright DOM scrape of the calculator's rendered cost (backs get_estimate_cost + the eval oracle; Playwright/Chromium is an on-demand dependency)
 catalog/
   schema.json              # JSON Schema for catalog entries
   services/                # Verified configs catalog (minimalConfig, traps, subServices)
@@ -222,6 +224,19 @@ When `export_estimate` is called, the server:
 
 AWS recalculates the actual costs when someone opens the link.
 
+### Reading computed costs
+
+`get_estimate_cost` hydrates a saved estimate (by URL or ID) in headless Chromium and reads the calculator's rendered cost — the summary monthly cost plus per-service rows. The summary `monthly_cost` is authoritative; a per-row value can render stale/$0 until the calculator recomputes, so when the per-row total disagrees the response includes a `note` and you should not attribute per-row costs.
+
+This is the only part of the server that needs a browser. **Playwright and the Chromium binary are an on-demand dependency, not installed by default.** The tool checks for them first and, when either is missing, returns `cost_available:false` with the exact install commands rather than failing:
+
+```bash
+npm install playwright        # if the library itself is missing
+npx playwright install chromium   # downloads the ~150MB browser binary
+```
+
+Every other tool works without Playwright.
+
 ## Environment Variables
 
 All optional. The full set is also documented machine-readably in `dist/bundle-contract.json` after build.
@@ -319,7 +334,7 @@ The cost-oracle sweep saves a fresh estimate from each verified entry's `minimal
 
 ### Catalog quality
 
-The 1.2.0 catalog content was audited along three independent axes before release.
+The catalog content was audited along three independent axes before release.
 
 **Cost-rendering correctness (deterministic).** The `validate-catalog:cost` sweep saves each of the verified entries' `minimalConfig` and confirms a non-zero rendered cost via the DOM oracle. Result: **entries render priced cost** (e.g. Lambda $699.80/mo, RDS PostgreSQL $175.75/mo, EC2 $70.08/mo).
 
@@ -341,8 +356,7 @@ The trap audit and earns-place data are summarized here for transparency; the de
 - Callers must use the correct AWS field IDs — discover them via `get_service_fields`.
 - The server discovers applicable selector values but cannot resolve cross-field dependencies (e.g. EC2 Instance Types ↔ License).
 - With the default `memory` store, in-flight estimates don't persist across restarts. Use `ESTIMATES_STORE=dynamodb` for stateless or multi-replica deployments.
-- No local cost calculation — pricing is computed by AWS when viewing the shareable link. Press **Update estimate** in the calculator UI to reflect the latest pricing.
-- Only `https://calculator.aws/` is supported.
+- No local cost calculation — pricing is computed by AWS. View the shareable link (press **Update estimate** in the calculator UI to reflect the latest pricing), or call `get_estimate_cost` to read the computed cost programmatically (requires the on-demand Playwright/Chromium dependency).
 - Catalog coverage is partial (verified entries against ~436 manifest services). Uncatalogued services still benefit from the lint and trace events; they just don't get the magnitude-calibration role the catalog plays.
 
 ## Security
