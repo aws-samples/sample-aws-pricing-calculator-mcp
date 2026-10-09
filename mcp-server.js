@@ -2,7 +2,7 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: MIT-0
 //
-// Entry point. The 9 tool registrations live here; their long
+// Entry point. The 10 tool registrations live here; their long
 // descriptions are in lib/mcp/tool-descriptions.js and the helpers each
 // handler calls into are in lib/mcp/handler-helpers.js. Read this file
 // to understand the wiring; read those files for the prose and logic.
@@ -21,6 +21,7 @@ const { traceTool } = require('./lib/trace/trace-logger');
 const traceEvents = require('./lib/trace/trace-events');
 const { runWithSession } = require('./lib/trace/request-context');
 const { createHandlerHelpers, mcpJsonOk, mcpTextErr, checkPartition, parseServicesArg } = require('./lib/mcp/handler-helpers');
+const { fetchCostFromDOM, checkPlaywrightAvailability } = require('./lib/dom-cost');
 const desc = require('./lib/mcp/tool-descriptions');
 
 // CALCMCP_CATALOG_DIR is an eval-only override — the eval harness uses
@@ -88,7 +89,7 @@ server.tool(
     name: pkg.name,
     version: pkg.version,
     description: pkg.description,
-    tools: ['search_services', 'get_service_fields', 'create_estimate', 'add_service', 'build_estimate', 'validate_estimate', 'export_estimate', 'import_estimate', 'get_server_info'],
+    tools: ['search_services', 'get_service_fields', 'create_estimate', 'add_service', 'build_estimate', 'validate_estimate', 'export_estimate', 'import_estimate', 'get_estimate_cost', 'get_server_info'],
     partitions: Object.keys(PARTITIONS),
   }))
 );
@@ -196,7 +197,7 @@ server.tool(
   desc.ADD_SERVICE,
   {
     estimate_id: z.string().describe('Estimate ID from create_estimate'),
-    services: z.string().describe('JSON array of service entries. Each entry: {"service":"serviceKey","instance":"optional","group":"optional","config":{...with region, description, and field values}}. Example: [{"service":"aWSLambda","group":"Prod","config":{"region":"eu-west-1","description":"Compute","numberOfRequests":{"value":"19","unit":"millionPerMonth"}}}]'),
+    services: z.string().describe('JSON array of service entries. Each entry: {"service":"serviceKey","instance":"optional","group":"optional","estimateFor":"optional template id — e.g. lambdaWithoutFreeTier to EXCLUDE the AWS Free Tier; see freeTierChoice from get_service_fields","config":{...with region, description, and field values}}. Example: [{"service":"aWSLambda","group":"Prod","config":{"region":"eu-west-1","description":"Compute","numberOfRequests":{"value":"19","unit":"millionPerMonth"}}}]'),
   },
   { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   traceTool('add_service', async ({ estimate_id, services: servicesStr }) => {
@@ -345,7 +346,7 @@ server.tool(
   'build_estimate',
   desc.BUILD_ESTIMATE,
   {
-    services: z.string().describe('JSON array of service entries. Same shape as add_service. Each entry: {"service":"serviceKey","instance":"optional","group":"optional","config":{...with region, description, and field values}}.'),
+    services: z.string().describe('JSON array of service entries. Same shape as add_service. Each entry: {"service":"serviceKey","instance":"optional","group":"optional","estimateFor":"optional template id — e.g. lambdaWithoutFreeTier to EXCLUDE the AWS Free Tier","config":{...with region, description, and field values}}.'),
     name: z.string().optional().describe('Estimate name (default: "My Estimate")'),
     partition: z.string().optional().describe('AWS partition (default: "aws"). Valid values: "aws", "aws-iso", "aws-iso-b", "aws-eusc", "aws-eusc"'),
   },
@@ -379,6 +380,75 @@ server.tool(
       return mcpTextErr(`Import failed: ${err.message}`);
     }
   })
+);
+
+// Extracted for testability (exposed via __test) — hydrates a saved
+// estimate in a headless browser and returns the calculator-computed
+// cost. The Playwright + Chromium dependency is on-demand: we classify
+// availability FIRST and return a non-error cost_available:false envelope
+// with install_commands when either piece is missing, so the agent can
+// ask the user to install rather than the tool crashing in launch().
+async function getEstimateCostHandler({ estimate_id }) {
+  const avail = checkPlaywrightAvailability();
+  if (!avail.available) {
+    return mcpJsonOk({
+      cost_available: false,
+      status: 'playwright_not_available',
+      reason: avail.reason,
+      message: avail.message,
+      install_commands: avail.install,
+      next_step:
+        'Playwright and the Chromium browser are an on-demand dependency and are not ' +
+        'installed by default. Ask the user to confirm before installing (Chromium is a ' +
+        '~150MB download), run the install_commands, then call get_estimate_cost again.',
+    });
+  }
+
+  // fetchCostFromDOM wants a URL. Pass a full URL through unchanged (so an
+  // ESC pricing.calculator.aws.eu link works); turn a bare id into the
+  // standard calculator URL, matching import_estimate's default.
+  const url = /^https?:\/\//.test(estimate_id)
+    ? estimate_id
+    : `https://calculator.aws/#/estimate?id=${estimate_id}`;
+
+  try {
+    const cost = await fetchCostFromDOM(url);
+    const out = {
+      cost_available: true,
+      source_url: url,
+      currency: 'USD',
+      monthly_cost: cost.monthlyCost,
+      rows: cost.rows,
+      rows_total: cost.rowsTotal,
+    };
+    // The summary monthly_cost is computed from the calculator's in-memory
+    // state; per-row values are scraped from the table and can render
+    // stale/$0 until a recompute (issue #13). When they disagree, flag it
+    // and tell the caller not to trust per-row attribution.
+    if (
+      cost.rowsTotal != null &&
+      cost.monthlyCost != null &&
+      Math.abs(cost.rowsTotal - cost.monthlyCost) > 0.01
+    ) {
+      out.note =
+        'Per-row totals disagree with the summary monthly_cost. monthly_cost is ' +
+        'authoritative; do not attribute per-row costs (a row can render stale/$0 ' +
+        'until the calculator recomputes).';
+    }
+    return mcpJsonOk(out);
+  } catch (err) {
+    return mcpTextErr(`Could not read estimate cost: ${err.message}`);
+  }
+}
+
+server.tool(
+  'get_estimate_cost',
+  desc.GET_ESTIMATE_COST,
+  {
+    estimate_id: z.string().describe('A full estimate URL or a bare ID. A bare ID is read from the standard calculator.aws; pass the full pricing.calculator.aws.eu URL for an ESC estimate.'),
+  },
+  { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true },
+  traceTool('get_estimate_cost', getEstimateCostHandler)
 );
 
 async function main() {
@@ -429,7 +499,7 @@ async function main() {
 
 // Test-only export. Production callers ignore this. Lets tests inspect the
 // configured store and any other internals without forking the module.
-module.exports = { __test: { store: estimates, addEntries, exportWithLint, lintEstimate, buildEstimateHandler } };
+module.exports = { __test: { store: estimates, addEntries, exportWithLint, lintEstimate, buildEstimateHandler, getEstimateCostHandler } };
 
 // Auto-start when invoked directly (`node mcp-server.js`) or when the
 // HTTP-mode env var is set. The latter handles bundled deployments where

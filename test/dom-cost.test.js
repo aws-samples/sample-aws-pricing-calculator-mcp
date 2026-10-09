@@ -136,3 +136,49 @@ describe('parseUsd', () => {
     assert.equal(parseUsd('USD'), null);
   });
 });
+
+const { classifyPlaywright, checkPlaywrightAvailability } = require('../lib/dom-cost');
+
+describe('classifyPlaywright (on-demand dependency preflight)', () => {
+  it('reports playwright-missing when the module is absent', () => {
+    const r = classifyPlaywright(null, () => true);
+    assert.equal(r.available, false);
+    assert.equal(r.reason, 'playwright-missing');
+    // The remediation names installing the module first.
+    assert.ok(r.install.some(c => /npm install playwright/.test(c)));
+    assert.ok(r.install.some(c => /playwright install chromium/.test(c)));
+  });
+
+  it('reports chromium-missing when the module is present but the binary is not downloaded', () => {
+    const chromiumStub = { executablePath: () => '/path/to/chromium' };
+    const r = classifyPlaywright(chromiumStub, () => false);
+    assert.equal(r.available, false);
+    assert.equal(r.reason, 'chromium-missing');
+    // Module is already there — only the browser download is needed.
+    assert.deepEqual(r.install, ['npx playwright install chromium']);
+  });
+
+  it('treats executablePath() throwing as a missing browser binary', () => {
+    const chromiumStub = { executablePath: () => { throw new Error('browser not downloaded'); } };
+    const r = classifyPlaywright(chromiumStub, () => true);
+    assert.equal(r.available, false);
+    assert.equal(r.reason, 'chromium-missing');
+  });
+
+  it('reports available when the module resolves and the binary exists', () => {
+    const chromiumStub = { executablePath: () => '/path/to/chromium' };
+    const r = classifyPlaywright(chromiumStub, () => true);
+    assert.deepEqual(r, { available: true });
+  });
+
+  it('checkPlaywrightAvailability returns a well-formed descriptor against the real environment', () => {
+    // Env-agnostic: this repo installs playwright+chromium (dev), CI's
+    // hermetic lane may not. Either way the shape must be valid.
+    const r = checkPlaywrightAvailability();
+    assert.equal(typeof r.available, 'boolean');
+    if (!r.available) {
+      assert.ok(['playwright-missing', 'chromium-missing'].includes(r.reason));
+      assert.ok(Array.isArray(r.install) && r.install.length > 0);
+    }
+  });
+});

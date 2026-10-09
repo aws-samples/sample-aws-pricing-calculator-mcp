@@ -1,0 +1,72 @@
+{
+  "$schema": "../schema.json",
+  "serviceCode": "amazonRDSForSQLServer",
+  "displayName": "Amazon RDS for SQL Server",
+  "templateId": "rdsForOracle",
+  "status": "verified",
+  "traps": [
+    "The template id for RDS for SQL Server is literally 'rdsForOracle' — this is a shared/legacy template id the calculator reuses across RDS engines, NOT a mis-mapping. A saved SQL Server estimate correctly carries estimateFor: 'rdsForOracle'; the pricing engine selects the SQL Server rate card from serviceCode + the columnFormIPM mappingDefinitionName 'rds-sqlserver-calc', not from the template id.",
+    "GP3 storage silently requires companion fields. When storageType is 'General Purpose-GP3' the calculator ALWAYS emits gp3Iops (baseline 3000) and gp3Throughput (baseline 125 MiBps). The manifest does NOT mark them validations.required, so get_service_fields doesn't flag them and the lint can't refuse without them — but omitting them makes the pricing engine charge for (0 - 3000) IOPS and (0 - 125) MiBps, driving the whole estimate NEGATIVE (issue #44: a db.t3.small Single-AZ Express estimate rendered -35.98 USD instead of 48.02 USD). These are injected automatically via defaultFields; keep them present. Injecting them when a non-GP3 storage type is selected is harmless — the engine ignores them.",
+    "Provisioned IOPS storage has its own companions: storageType 'Provisioned IOPS' (io1) needs provisioningIOPS, and 'Provisioned IOPS-IO2' (io2) needs provisionedIOPSIO2 (both baseline 1000). If you switch storageType to io1/io2, supply the matching IOPS field or the storage line will mis-price for the same reason GP3 does.",
+    "Instance configuration uses a columnFormIPM matrix — send the WRAPPED shape, NOT dotted-path keys. Shape: { columnFormIPM: { value: [{ <selectorId>: { value: '<n>' }, ... }] } }. Selector ids: 'Number of Nodes', 'Instance Type', 'Deployment Option', 'License Model', 'Database Edition', 'TermType', 'LeaseContractLength', 'PurchaseOption', 'Unbundled Licensing'. The literal string 'undefined' is the utilization slot key, and its inner value is itself an object: { value: { unit: '<percent>', selectedId: '%Utilized/Month' } }.",
+    "storageType options: 'General Purpose' (gp2), 'General Purpose-GP3' (gp3), 'Provisioned IOPS' (io1), 'Provisioned IOPS-IO2' (io2), 'Magnetic'. Note the field id is 'storageType' for SQL Server (RDS for PostgreSQL uses 'storageVolume')."
+  ],
+  "defaultFields": {
+    "gp3Iops": {
+      "value": "3000"
+    },
+    "gp3Throughput": {
+      "value": "125",
+      "unit": "mbps"
+    }
+  },
+  "minimalConfig": {
+    "region": "ap-northeast-1",
+    "description": "Single-AZ db.t3.small, Express, License included, gp3 storage",
+    "columnFormIPM": {
+      "value": [
+        {
+          "Number of Nodes": {
+            "value": "1"
+          },
+          "Instance Type": {
+            "value": "db.t3.small"
+          },
+          "undefined": {
+            "value": {
+              "unit": "100",
+              "selectedId": "%Utilized/Month"
+            }
+          },
+          "Deployment Option": {
+            "value": "Single-AZ"
+          },
+          "License Model": {
+            "value": "License included"
+          },
+          "Database Edition": {
+            "value": "Express"
+          },
+          "TermType": {
+            "value": "OnDemand"
+          }
+        }
+      ]
+    },
+    "optimize": "0",
+    "createRDSProxy": "0",
+    "storageType": "General Purpose-GP3",
+    "storageAmount": {
+      "value": "20",
+      "unit": "gb|NA"
+    },
+    "gp3Iops": "3000",
+    "gp3Throughput": {
+      "value": "125",
+      "unit": "mbps"
+    },
+    "DatabaseInsightsSelected": "0"
+  },
+  "lastVerifiedAt": "2026-10-09",
+  "verifiedEstimateId": "375fbb2ea95a5bcd2bd73b49cb8706a8f4c7bea5"
+}

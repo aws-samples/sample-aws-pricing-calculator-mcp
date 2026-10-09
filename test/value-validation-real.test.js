@@ -65,6 +65,33 @@ if (process.env.AWS_OFFLINE) {
         `expected no error; got: ${r.error}`);
     });
 
+    it('amazonRDSPostgreSQLDB — Database Savings Plans TermType is accepted (issue #41)', async () => {
+      // The TermType row offers Reserved / OnDemand / Database Savings
+      // Plans (via mappingValue), but the mapping metadata's
+      // valueAttributes.TermType lists only Reserved/OnDemand. The selector
+      // check must union the row's mappingValue keys so a value the
+      // calculator actually prices isn't rejected.
+      const r = await validateConfigKeys('amazonRDSPostgreSQLDB', {
+        region: 'eu-west-2',
+        description: 'real probe',
+        columnFormIPM: {
+          value: [{
+            'Number of Nodes': { value: '1' },
+            'Instance Type': { value: 'db.r7g.large' },
+            'undefined': { value: { unit: '100', selectedId: '%Utilized/Month' } },
+            'Deployment Option': { value: 'Single-AZ' },
+            'TermType': { value: 'Database Savings Plans' },
+            'LeaseContractLength': { value: '1yr' },
+            'PurchaseOption': { value: 'No Upfront' },
+          }],
+        },
+        storageVolume: 'General Purpose-GP3',
+        storageAmount: { value: '100', unit: 'gb|NA' },
+      });
+      assert.equal(r.error, null,
+        `Database Savings Plans must be accepted as a TermType; got: ${r.error}`);
+    });
+
     it('amazonMQ — RabbitMQ template config validates without crashing', async () => {
       // Same field IDs as test/templates.test.js
       const r = await validateConfigKeys('amazonMQ', {

@@ -2355,6 +2355,89 @@ describe('canRehydrate — column-form-unremapped-value', () => {
   });
 });
 
+describe('canRehydrate — column-form-tuple-valid: untracked pricing model (issue #41)', () => {
+  // primary-selector-aggregations.json enumerates only the per-instance
+  // OnDemand/Reserved tuples. "Database Savings Plans" is a real pricing
+  // model the calculator offers (and prices) on newer instances, but it
+  // is absent from that aggregation, so comparing a Savings Plans row
+  // against it would false-positive-refuse a valid line. The predicate
+  // drops a TermType whose value is outside the aggregation's TermType
+  // domain and validates the remaining tracked selectors instead.
+  const rdsDef = {
+    serviceCode: 'rdsPg',
+    templates: [{
+      id: 'tpl',
+      cards: [{
+        inputSection: {
+          components: [{
+            id: 'cf',
+            type: 'input',
+            subType: 'columnFormIPM',
+            label: 'DB',
+            // A remap.keyValue must be present for the predicate to run;
+            // its entries (lease length) don't touch TermType, so TermType
+            // reverse-maps to itself.
+            remap: { keyValue: { '/1\\s?yr/': '1 year' } },
+          }],
+        },
+      }],
+    }],
+  };
+  const PER_SVC = new Map([['rdsPg', rdsDef]]);
+  // Aggregation tuples track only OnDemand/Reserved, exactly as the live
+  // amazonRDSPostgreSQLDB data does (verified against eu-west-2).
+  const validTuples = [
+    { 'Deployment Option': 'Single-AZ', 'Instance Type': 'db.r7g.8xlarge', 'TermType': 'OnDemand' },
+    { 'Deployment Option': 'Single-AZ', 'Instance Type': 'db.r7g.8xlarge', 'TermType': 'Reserved' },
+    { 'Deployment Option': 'Multi-AZ', 'Instance Type': 'db.r7g.8xlarge', 'TermType': 'OnDemand' },
+  ];
+  const blobWith = (row) => ({
+    services: { s1: {
+      serviceCode: 'rdsPg', region: 'eu-west-2', regionName: 'Europe (London)',
+      estimateFor: 'tpl',
+      calculationComponents: { cf: { value: [row] } },
+    } },
+  });
+  const run = (row) => canRehydrate({
+    savedBlob: blobWith(row), manifest: new Map(),
+    perServiceDefinitions: PER_SVC, aggregations: new Map([['rdsPg', validTuples]]),
+  });
+  const tupleFails = (r) => (r.services[0]?.failures || []).filter(f => f.predicate === 'column-form-tuple-invalid');
+
+  it('does NOT fire for Savings Plans on an instance the aggregation lists (term dropped, instance/deployment match)', () => {
+    const r = run({
+      'Deployment Option': { value: 'Single-AZ' },
+      'Instance Type': { value: 'db.r7g.8xlarge' },
+      'TermType': { value: 'Database Savings Plans' },
+    });
+    assert.equal(tupleFails(r).length, 0,
+      `Savings Plans on a valid instance must not be refused; got ${JSON.stringify(tupleFails(r))}`);
+  });
+
+  it('STILL fires for Savings Plans on an instance absent from the aggregation (instance check survives)', () => {
+    const r = run({
+      'Deployment Option': { value: 'Single-AZ' },
+      'Instance Type': { value: 'db.fake.notreal' },
+      'TermType': { value: 'Database Savings Plans' },
+    });
+    assert.equal(tupleFails(r).length, 1,
+      'dropping the untracked term must not mask a genuinely invalid instance');
+  });
+
+  it('STILL fires for a TRACKED term (Reserved) on an unsupported deployment (term NOT dropped)', () => {
+    // Multi-AZ + db.r7g.8xlarge + Reserved is not in the aggregation
+    // (only Multi-AZ+OnDemand is). Reserved is in the TermType domain, so
+    // it is NOT dropped and the full tuple is correctly refused.
+    const r = run({
+      'Deployment Option': { value: 'Multi-AZ' },
+      'Instance Type': { value: 'db.r7g.8xlarge' },
+      'TermType': { value: 'Reserved' },
+    });
+    assert.equal(tupleFails(r).length, 1,
+      'a tracked term must still be tuple-validated in full');
+  });
+});
+
 describe('canRehydrate — column-form-tuple-valid', () => {
   // WorkSpaces Core has an Operating-System × License constraint that
   // nothing else enforces. The only canonical (OS-selector, License)
