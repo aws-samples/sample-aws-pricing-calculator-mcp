@@ -12,7 +12,7 @@
 - **Verified Configs Catalog** - 21 per-service entries declaring the smallest config that produces a priced estimate, with documented gotchas.
 - **Lint refusal before save** - refuses estimates the calculator would render read-only or required-input, with actionable recovery hints.
 - **Import existing estimates** - download by URL or ID as JSON (for region swaps, modifications) or Markdown (for LLM analysis).
-- **Read computed costs** - `get_estimate_cost` hydrates a saved estimate in a headless browser to return the calculator's actual monthly cost; uses an on-demand Playwright/Chromium dependency that is only needed for this tool.
+- **Read computed costs** - `get_estimate_cost` re-shares an estimate through the calculator (Update estimate → Share) so AWS persists the computed costs, then reads them back: upfront, monthly, and 12-month totals, the pricing date, and every per-line cost. Uses an on-demand Playwright/Chromium dependency only needed for this tool.
 - **Two transport modes** - stdio (default, for local clients like Claude Desktop, Kiro, Cursor) and optional HTTP (`MCP_TRANSPORT=http`) for hosted deployments.
 
 ## Example
@@ -78,7 +78,7 @@ Then point your client at the built bundle:
 | `build_estimate` | One-shot create + add services + lint preflight + save. Returns the shareable URL on success, or a structured envelope identifying which services need field discovery before retry. |
 | `export_estimate` | Save the in-flight estimate to calculator.aws and return a shareable URL. Refuses with an actionable `next_step` if the static linter predicts the saved blob would rehydrate read-only. |
 | `import_estimate` | Download an existing estimate by URL or ID. Returns JSON (raw) or Markdown. |
-| `get_estimate_cost` | Hydrate a saved estimate (by URL or ID) in a headless browser and return the calculator-computed monthly cost plus per-service rows. Requires Playwright and the Chromium browser — an on-demand dependency NOT installed by default; when either is missing the tool returns `cost_available:false` with the exact install commands instead of failing. |
+| `get_estimate_cost` | Return the AWS-computed cost of a saved estimate (by URL or ID): upfront, monthly, and 12-month totals, the pricing date, and every per-line cost (complete, un-paginated). It re-shares the estimate through the calculator (Update estimate → Share) so AWS persists the costs, then reads them back — this saves a fresh copy under a new id (`priced_estimate_url`; the original is untouched). Requires Playwright and the Chromium browser — an on-demand dependency NOT installed by default; when either is missing the tool returns `cost_available:false` with the exact install commands instead of failing. **Runs only on an explicit user request for the cost — agents should not call it automatically after `export_estimate`/`build_estimate`.** |
 | `get_server_info` | Return version and capability information. |
 
 ## Project Structure
@@ -109,7 +109,7 @@ lib/
   store/                   # In-flight estimate persistence
     estimate-store.js      #   Pluggable store (memory default)
     estimate-store-dynamodb.js # DynamoDB-backed store for stateless multi-replica deployments
-  dom-cost.js              # Playwright DOM scrape of the calculator's rendered cost (backs get_estimate_cost + the eval oracle; Playwright/Chromium is an on-demand dependency)
+  dom-cost.js              # Playwright flows: re-share for computed costs (get_estimate_cost) + single-page DOM read (eval oracle). Playwright/Chromium is an on-demand dependency
 catalog/
   schema.json              # JSON Schema for catalog entries
   services/                # Verified configs catalog (minimalConfig, traps, subServices)
@@ -226,13 +226,18 @@ AWS recalculates the actual costs when someone opens the link.
 
 ### Reading computed costs
 
-`get_estimate_cost` hydrates a saved estimate (by URL or ID) in headless Chromium and reads the calculator's rendered cost — the summary monthly cost plus per-service rows. The summary `monthly_cost` is authoritative; a per-row value can render stale/$0 until the calculator recomputes, so when the per-row total disagrees the response includes a `note` and you should not attribute per-row costs.
+`get_estimate_cost` returns AWS's computed cost for a saved estimate (by URL or ID). Because the calculator prices in the browser, the tool re-shares the estimate through the UI — it presses **Update estimate** (recompute to current pricing) then **Share**, which makes AWS persist the costs — and then reads the resulting saved estimate via the public read API. The response carries `upfront_cost`, `monthly_cost`, `total_12_months_cost` (derived as upfront + 12×monthly, which is how the calculator defines the 12-month total), `pricing_as_of`, and `rows` — every group/line with its own monthly, upfront, and config. There is no pagination, so `rows_complete` is always true.
+
+Because it carries an optional, heavyweight dependency (Playwright + Chromium, not installed by default), `get_estimate_cost` is meant to run **only when the user explicitly asks for the computed cost**. Agents should not invoke it automatically after `export_estimate` or `build_estimate` — those already return the shareable URL, which is the normal end of the flow.
+
+Because Update+Share re-saves, the tool creates a **fresh copy under a new id** (returned as `priced_estimate_url`); the original estimate is unchanged. This avoids two dead ends we ruled out: scraping the rendered table (it paginates at 10 rows) and the Export→file download (which does not fire in headless Chromium).
 
 This is the only part of the server that needs a browser. **Playwright and the Chromium binary are an on-demand dependency, not installed by default.** The tool checks for them first and, when either is missing, returns `cost_available:false` with the exact install commands rather than failing:
 
 ```bash
 npm install playwright        # if the library itself is missing
 npx playwright install chromium   # downloads the ~150MB browser binary
+npx playwright install-deps chromium # installs system dependencies
 ```
 
 Every other tool works without Playwright.

@@ -2355,6 +2355,99 @@ describe('canRehydrate — column-form-unremapped-value', () => {
   });
 });
 
+describe('canRehydrate — determined-but-omitted selector (issue #48)', () => {
+  // RDS-for-SQL-Server-shaped def: a columnFormIPM with a remap (required
+  // for the tuple predicate to engage) and a row schema that includes the
+  // dependent "Unbundled Licensing" selector.
+  const def = {
+    serviceCode: 'rdsSql',
+    templates: [{
+      id: 'tpl',
+      cards: [{
+        inputSection: {
+          components: [{
+            id: 'cf', type: 'input', subType: 'columnFormIPM', label: 'DB',
+            remap: { keyValue: { '/1\\s?yr/': '1 year' } },
+            row: [
+              { selectorId: 'Instance Type' },
+              { selectorId: 'Deployment Option' },
+              { selectorId: 'Unbundled Licensing' },
+            ],
+          }],
+        },
+      }],
+    }],
+  };
+  const PER_SVC = new Map([['rdsSql', def]]);
+  // Unbundled Licensing is TRUE for m7i, FALSE for t3 — varies globally,
+  // pinned per instance.
+  const validTuples = [
+    { 'Instance Type': 'db.m7i.large', 'Deployment Option': 'Single-AZ', 'Unbundled Licensing': 'TRUE' },
+    { 'Instance Type': 'db.t3.small', 'Deployment Option': 'Single-AZ', 'Unbundled Licensing': 'FALSE' },
+  ];
+  const blobWith = (row) => ({
+    services: { s1: {
+      serviceCode: 'rdsSql', region: 'eu-west-2', regionName: 'Europe (London)',
+      estimateFor: 'tpl', calculationComponents: { cf: { value: [row] } },
+    } },
+  });
+  const run = (row) => canRehydrate({
+    savedBlob: blobWith(row), manifest: new Map(),
+    perServiceDefinitions: PER_SVC, aggregations: new Map([['rdsSql', validTuples]]),
+    // Unbundled Licensing default-when-omitted is FALSE (first valueAttributes entry).
+    selectorDefaults: new Map([['rdsSql', { 'Unbundled Licensing': 'FALSE' }]]),
+  });
+  const omittedFails = (r) => (r.services[0]?.failures || [])
+    .filter(f => f.predicate === 'column-form-determined-selector-omitted');
+
+  it('refuses a 7th-gen row that omits Unbundled Licensing, naming the value to set', () => {
+    const r = run({ 'Instance Type': { value: 'db.m7i.large' }, 'Deployment Option': { value: 'Single-AZ' } });
+    const fails = omittedFails(r);
+    assert.equal(fails.length, 1);
+    assert.equal(fails[0].context.selector, 'Unbundled Licensing');
+    assert.equal(fails[0].context.requiredValue, 'TRUE');
+    assert.equal(fails[0].severity, 'required-only');
+    assert.match(fails[0].message, /Unbundled Licensing/);
+    assert.match(fails[0].message, /TRUE/);
+    assert.equal(r.status, 'required-input', `expected required-input; got ${r.status}`);
+  });
+
+  it('does NOT fire when the determined value equals the default (t3 → FALSE)', () => {
+    // db.t3.small pins Unbundled Licensing to FALSE, which is also the
+    // default-when-omitted, so omitting it is harmless — must not refuse
+    // (this is the shipped SQL Server minimalConfig's instance class).
+    const r = run({ 'Instance Type': { value: 'db.t3.small' }, 'Deployment Option': { value: 'Single-AZ' } });
+    assert.equal(omittedFails(r).length, 0);
+  });
+
+  it('stays silent when the default is unknown (never false-refuses)', () => {
+    // No selectorDefaults supplied → the predicate cannot prove the omission
+    // misprices, so it must not fire even on the m7i (TRUE) case.
+    const r = canRehydrate({
+      savedBlob: blobWith({ 'Instance Type': { value: 'db.m7i.large' }, 'Deployment Option': { value: 'Single-AZ' } }),
+      manifest: new Map(), perServiceDefinitions: PER_SVC,
+      aggregations: new Map([['rdsSql', validTuples]]),
+      // selectorDefaults omitted
+    });
+    assert.equal(omittedFails(r).length, 0);
+  });
+
+  it('does NOT fire when the caller supplied the cell', () => {
+    const r = run({
+      'Instance Type': { value: 'db.m7i.large' }, 'Deployment Option': { value: 'Single-AZ' },
+      'Unbundled Licensing': { value: 'TRUE' },
+    });
+    assert.equal(omittedFails(r).length, 0);
+  });
+
+  it('does NOT fire when the row is under-specified (value not pinned)', () => {
+    // Only Deployment Option provided → both TRUE and FALSE tuples survive,
+    // so Unbundled Licensing is not uniquely determined → no demand.
+    const r = run({ 'Deployment Option': { value: 'Single-AZ' } });
+    assert.equal(omittedFails(r).length, 0);
+  });
+});
+
 describe('canRehydrate — column-form-tuple-valid: untracked pricing model (issue #41)', () => {
   // primary-selector-aggregations.json enumerates only the per-instance
   // OnDemand/Reserved tuples. "Database Savings Plans" is a real pricing

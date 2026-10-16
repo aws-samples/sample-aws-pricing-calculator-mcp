@@ -2,19 +2,17 @@
 // SPDX-License-Identifier: MIT-0
 
 /**
- * Tests for the get_estimate_cost MCP tool handler.
+ * Tests for the get_estimate_cost MCP tool handler (issue #47).
  *
- * The handler hydrates a saved estimate in a headless browser via
- * lib/dom-cost.js. Playwright + Chromium are an ON-DEMAND dependency, so
- * the handler must:
- *   - detect their absence up front and return a soft, actionable
- *     cost_available:false envelope (NOT a hard tool error, NOT a crash
- *     inside chromium.launch()), and
- *   - when present, return the summary monthly_cost and per-row data,
- *     flagging a rows/summary disagreement.
+ * The handler re-shares an estimate (dom-cost#fetchPricedEstimateId →
+ * Update+Share → new id), reads that id with aws-client#fetchEstimate, and
+ * extracts costs with aws-client#extractCostsFromSavedBlob. Playwright +
+ * Chromium are an ON-DEMAND dependency, so the handler must detect their
+ * absence up front and return a soft cost_available:false envelope.
  *
- * lib/dom-cost.js is stubbed via require.cache injection so these run
- * offline (no Playwright, no browser, no network) under SKIP_NETWORK=1.
+ * dom-cost is stubbed (checkPlaywrightAvailability + fetchPricedEstimateId)
+ * and aws-client's fetchEstimate is overridden (keeping the real
+ * extractCostsFromSavedBlob) via require.cache injection — offline.
  */
 
 const { describe, it, beforeEach } = require('node:test');
@@ -22,151 +20,132 @@ const assert = require('node:assert/strict');
 
 const MCP_SERVER_PATH = require.resolve('../mcp-server.js');
 const DOM_COST_PATH = require.resolve('../lib/dom-cost');
+const AWS_CLIENT_PATH = require.resolve('../lib/aws/aws-client');
+const REAL_AWS = require('../lib/aws/aws-client');
 
-// Rebuild mcp-server against a stubbed lib/dom-cost. The stub must be in
-// the require cache BEFORE mcp-server requires it, so we drop the server's
-// own cache entry too and let the fresh require pick up the stub.
-function freshServerWithDomCostStub(stub) {
+function freshServer({ availability, pricedId = 'newid123', blob = {}, onShare } = {}) {
   delete require.cache[MCP_SERVER_PATH];
   require.cache[DOM_COST_PATH] = {
-    id: DOM_COST_PATH,
-    filename: DOM_COST_PATH,
-    loaded: true,
+    id: DOM_COST_PATH, filename: DOM_COST_PATH, loaded: true,
     exports: {
-      checkPlaywrightAvailability: stub.checkPlaywrightAvailability,
-      fetchCostFromDOM: stub.fetchCostFromDOM || (async () => {
-        throw new Error('fetchCostFromDOM must not be called when deps are unavailable');
-      }),
-      classifyPlaywright: () => ({ available: true }),
-      parseDetailRows: () => [],
-      parseUsd: () => null,
+      checkPlaywrightAvailability: () => availability,
+      fetchPricedEstimateId: async (url) => {
+        if (onShare) onShare(url);
+        return { estimateId: pricedId, shareUrl: `https://calculator.aws/#/estimate?id=${pricedId}` };
+      },
+      fetchCostFromDOM: async () => { throw new Error('unused'); },
+      parseDetailRows: () => [], parseUsd: () => null, classifyPlaywright: () => ({ available: true }),
     },
+  };
+  // Keep the REAL aws-client (extractCostsFromSavedBlob, etc.), override fetchEstimate only.
+  require.cache[AWS_CLIENT_PATH] = {
+    id: AWS_CLIENT_PATH, filename: AWS_CLIENT_PATH, loaded: true,
+    exports: { ...REAL_AWS, fetchEstimate: async () => blob },
   };
   return require('../mcp-server.js').__test;
 }
 
-function parseBody(res) {
-  return JSON.parse(res.content[0].text);
-}
+const parseBody = (res) => JSON.parse(res.content[0].text);
+const AVAILABLE = { available: true };
 
-describe('get_estimate_cost handler', () => {
-  beforeEach(() => {
-    process.env.ESTIMATES_STORE = 'memory';
-  });
+const costedBlob = () => ({
+  totalCost: { monthly: 48.02, upfront: 0 },
+  metaData: { createdOn: '2026-10-16T08:00:00.000Z' },
+  services: {},
+  groups: {
+    'G1-uuid': {
+      name: 'Sizing-01',
+      services: {
+        's-uuid': {
+          serviceName: 'Amazon RDS for SQL server',
+          serviceCost: { monthly: 48.02, upfront: 0 },
+          configSummary: 'db.t3.small',
+        },
+      },
+    },
+  },
+});
 
-  it('playwright module missing → soft cost_available:false with install commands', async () => {
-    const { getEstimateCostHandler } = freshServerWithDomCostStub({
-      checkPlaywrightAvailability: () => ({
-        available: false,
-        reason: 'playwright-missing',
-        message: 'The Playwright library is not installed.',
-        install: ['npm install playwright', 'npx playwright install chromium'],
-      }),
+describe('get_estimate_cost handler (issue #47)', () => {
+  beforeEach(() => { process.env.ESTIMATES_STORE = 'memory'; });
+
+  it('playwright missing → soft cost_available:false + install commands', async () => {
+    let shared = false;
+    const { getEstimateCostHandler } = freshServer({
+      availability: { available: false, reason: 'playwright-missing', message: 'x', install: ['npm install playwright', 'npx playwright install chromium'] },
+      onShare: () => { shared = true; },
     });
-
-    const res = await getEstimateCostHandler({ estimate_id: 'deadbeef' });
-    assert.ok(!res.isError, 'dependency-missing must be a soft result, not a hard tool error');
+    const res = await getEstimateCostHandler({ estimate_id: 'abc' });
+    assert.ok(!res.isError);
     const body = parseBody(res);
     assert.equal(body.cost_available, false);
     assert.equal(body.reason, 'playwright-missing');
     assert.deepEqual(body.install_commands, ['npm install playwright', 'npx playwright install chromium']);
     assert.match(body.next_step, /ask the user/i);
+    assert.equal(shared, false, 'must not drive the browser when deps are unavailable');
   });
 
-  it('chromium browser missing → soft cost_available:false, browser-only install', async () => {
-    const { getEstimateCostHandler } = freshServerWithDomCostStub({
-      checkPlaywrightAvailability: () => ({
-        available: false,
-        reason: 'chromium-missing',
-        message: 'Chromium browser binary is not installed.',
-        install: ['npx playwright install chromium'],
-      }),
+  it('chromium missing → soft cost_available:false, browser-only install', async () => {
+    const { getEstimateCostHandler } = freshServer({
+      availability: { available: false, reason: 'chromium-missing', message: 'x', install: ['npx playwright install chromium'] },
     });
-
-    const res = await getEstimateCostHandler({ estimate_id: 'deadbeef' });
-    const body = parseBody(res);
+    const body = parseBody(await getEstimateCostHandler({ estimate_id: 'abc' }));
     assert.equal(body.cost_available, false);
     assert.equal(body.reason, 'chromium-missing');
-    assert.deepEqual(body.install_commands, ['npx playwright install chromium']);
   });
 
-  it('does not invoke the browser fetch when deps are unavailable', async () => {
-    let called = false;
-    const { getEstimateCostHandler } = freshServerWithDomCostStub({
-      checkPlaywrightAvailability: () => ({ available: false, reason: 'playwright-missing', message: 'x', install: ['npm install playwright'] }),
-      fetchCostFromDOM: async () => { called = true; return {}; },
-    });
-    await getEstimateCostHandler({ estimate_id: 'deadbeef' });
-    assert.equal(called, false, 'fetchCostFromDOM must be short-circuited by the preflight');
-  });
-
-  it('available → returns summary monthly_cost and per-row data', async () => {
-    const { getEstimateCostHandler } = freshServerWithDomCostStub({
-      checkPlaywrightAvailability: () => ({ available: true }),
-      fetchCostFromDOM: async (url) => ({
-        monthlyCost: 48.02,
-        rows: [{ service: 'Amazon RDS for SQL server', monthly: 48.02, config: 'db.t3.small' }],
-        rowsTotal: 48.02,
-        monthlyByService: new Map(),
-        configByService: new Map(),
-        _url: url,
-      }),
-    });
-
-    const res = await getEstimateCostHandler({ estimate_id: 'abc123def' });
+  it('available → re-shares, reads the saved blob, returns all totals + complete rows', async () => {
+    const { getEstimateCostHandler } = freshServer({ availability: AVAILABLE, pricedId: 'priced777', blob: costedBlob() });
+    const res = await getEstimateCostHandler({ estimate_id: 'abc123' });
     assert.ok(!res.isError);
     const body = parseBody(res);
     assert.equal(body.cost_available, true);
     assert.equal(body.monthly_cost, 48.02);
-    assert.equal(body.rows_total, 48.02);
+    assert.equal(body.upfront_cost, 0);
+    assert.equal(body.total_12_months_cost, 576.24, 'derived = upfront + 12 x monthly');
+    assert.equal(body.total_12_months_is_derived, true);
+    assert.equal(body.pricing_as_of, '2026-10-16T08:00:00.000Z');
+    assert.equal(body.rows_complete, true);
     assert.equal(body.rows.length, 1);
-    // Bare id is normalized to the standard calculator URL.
-    assert.equal(body.source_url, 'https://calculator.aws/#/estimate?id=abc123def');
-    assert.equal(body.note, undefined, 'no disagreement note when rows_total matches monthly_cost');
+    assert.equal(body.rows[0].group, 'Sizing-01');
+    assert.equal(body.priced_estimate_url, 'https://calculator.aws/#/estimate?id=priced777');
+    assert.equal(body.currency, 'USD');
+    assert.equal(body.source_url, 'https://calculator.aws/#/estimate?id=abc123');
+    assert.equal(body.note, undefined);
   });
 
-  it('passes a full URL through unchanged (ESC domain preserved)', async () => {
+  it('ESC URL → aws-eusc partition and EUR currency, full URL forwarded', async () => {
     let seenUrl = null;
-    const { getEstimateCostHandler } = freshServerWithDomCostStub({
-      checkPlaywrightAvailability: () => ({ available: true }),
-      fetchCostFromDOM: async (url) => {
-        seenUrl = url;
-        return { monthlyCost: 10, rows: [], rowsTotal: null, monthlyByService: new Map(), configByService: new Map() };
+    const { getEstimateCostHandler } = freshServer({ availability: AVAILABLE, blob: costedBlob(), onShare: (u) => { seenUrl = u; } });
+    const escUrl = 'https://pricing.calculator.aws.eu/#/estimate?id=abc';
+    const body = parseBody(await getEstimateCostHandler({ estimate_id: escUrl }));
+    assert.equal(seenUrl, escUrl, 'full URL forwarded verbatim');
+    assert.equal(body.currency, 'EUR');
+  });
+
+  it('flags rows-vs-total disagreement', async () => {
+    const blob = costedBlob();
+    blob.totalCost.monthly = 99.99; // disagree with the single 48.02 row
+    const { getEstimateCostHandler } = freshServer({ availability: AVAILABLE, blob });
+    const body = parseBody(await getEstimateCostHandler({ estimate_id: 'abc' }));
+    assert.equal(body.monthly_cost, 99.99);
+    assert.ok(body.note && /authoritative/i.test(body.note));
+  });
+
+  it('surfaces a share/browser failure as a tool error', async () => {
+    delete require.cache[MCP_SERVER_PATH];
+    require.cache[DOM_COST_PATH] = {
+      id: DOM_COST_PATH, filename: DOM_COST_PATH, loaded: true,
+      exports: {
+        checkPlaywrightAvailability: () => AVAILABLE,
+        fetchPricedEstimateId: async () => { throw new Error('Share button never became available'); },
+        fetchCostFromDOM: async () => ({}), parseDetailRows: () => [], parseUsd: () => null, classifyPlaywright: () => ({ available: true }),
       },
-    });
-    const escUrl = 'https://pricing.calculator.aws.eu/#/estimate?id=abc123';
-    await getEstimateCostHandler({ estimate_id: escUrl });
-    assert.equal(seenUrl, escUrl, 'a full URL must be forwarded verbatim, not rewritten');
-  });
-
-  it('flags a rows-vs-summary disagreement so per-row costs are not trusted', async () => {
-    const { getEstimateCostHandler } = freshServerWithDomCostStub({
-      checkPlaywrightAvailability: () => ({ available: true }),
-      fetchCostFromDOM: async () => ({
-        monthlyCost: 399.55,
-        rows: [
-          { service: 'Amazon EC2', monthly: 284.55, config: null },
-          { service: 'Amazon S3', monthly: 0, config: null },
-        ],
-        rowsTotal: 284.55,
-        monthlyByService: new Map(),
-        configByService: new Map(),
-      }),
-    });
-    const res = await getEstimateCostHandler({ estimate_id: 'abc123' });
-    const body = parseBody(res);
-    assert.equal(body.monthly_cost, 399.55);
-    assert.ok(body.note && /authoritative/i.test(body.note),
-      'a disagreement note must be present when rows_total != monthly_cost');
-  });
-
-  it('surfaces a fetch failure as a tool error', async () => {
-    const { getEstimateCostHandler } = freshServerWithDomCostStub({
-      checkPlaywrightAvailability: () => ({ available: true }),
-      fetchCostFromDOM: async () => { throw new Error('rehydration failed: Export disabled'); },
-    });
-    const res = await getEstimateCostHandler({ estimate_id: 'abc123' });
-    assert.ok(res.isError, 'a genuine fetch failure (vs missing deps) is a hard error');
+    };
+    require.cache[AWS_CLIENT_PATH] = { id: AWS_CLIENT_PATH, filename: AWS_CLIENT_PATH, loaded: true, exports: { ...REAL_AWS, fetchEstimate: async () => ({}) } };
+    const { getEstimateCostHandler } = require('../mcp-server.js').__test;
+    const res = await getEstimateCostHandler({ estimate_id: 'abc' });
+    assert.ok(res.isError);
     assert.match(res.content[0].text, /Could not read estimate cost/);
   });
 });

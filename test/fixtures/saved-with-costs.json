@@ -1,0 +1,859 @@
+{
+  "name": "repro-47-12groups",
+  "services": {},
+  "groups": {
+    "Group 01-cd287d48-9f13-43cf-b4b2-dbfad67b9a9f": {
+      "name": "Group 01",
+      "services": {
+        "amazonRDSPostgreSQLDB-56326e9e-265e-441a-952a-446d2900700a": {
+          "serviceCode": "amazonRDSPostgreSQLDB",
+          "region": "eu-west-2",
+          "estimateFor": "rdsForPostgreSQL",
+          "description": "PG t4g micro 01",
+          "serviceName": "Amazon RDS for PostgreSQL",
+          "regionName": "Europe (London)",
+          "version": "0.0.111",
+          "calculationComponents": {
+            "columnFormIPM": {
+              "value": [
+                {
+                  "Number of Nodes": {
+                    "value": "1"
+                  },
+                  "Instance Type": {
+                    "value": "db.t4g.micro"
+                  },
+                  "Deployment Option": {
+                    "value": "Single-AZ"
+                  },
+                  "TermType": {
+                    "value": "OnDemand"
+                  },
+                  "undefined": {
+                    "value": {
+                      "unit": "100",
+                      "selectedId": "%Utilized/Month"
+                    }
+                  }
+                }
+              ]
+            },
+            "storageVolume": {
+              "value": "General Purpose-GP3"
+            },
+            "storageAmount": {
+              "value": "21",
+              "unit": "gb|NA"
+            },
+            "createRDSProxy": {
+              "value": "0"
+            },
+            "DatabaseInsightsSelected": {
+              "value": "0"
+            },
+            "addRDSExtendedSupport": {
+              "value": "0"
+            }
+          },
+          "configSummary": "Nodes (1), Instance Type (db.t4g.micro), Deployment Option (Single-AZ), Pricing Model (OnDemand), Utilization (On-Demand only) (100 %Utilized/Month), Storage volume (General Purpose SSD (gp3)), Storage amount (21 GB)",
+          "serviceCost": {
+            "monthly": 15.93,
+            "upfront": 0
+          }
+        }
+      },
+      "groups": {},
+      "groupSubtotal": {
+        "monthly": 15.93,
+        "upfront": 0
+      },
+      "totalCost": {
+        "monthly": 15.93,
+        "upfront": 0
+      }
+    },
+    "Group 02-47ba7dad-cc27-4266-849e-9113d74e4b76": {
+      "name": "Group 02",
+      "services": {
+        "amazonRDSPostgreSQLDB-655ea596-21f2-40c9-b7be-685ffc297716": {
+          "serviceCode": "amazonRDSPostgreSQLDB",
+          "region": "eu-west-2",
+          "estimateFor": "rdsForPostgreSQL",
+          "description": "PG t4g micro 02",
+          "serviceName": "Amazon RDS for PostgreSQL",
+          "regionName": "Europe (London)",
+          "version": "0.0.111",
+          "calculationComponents": {
+            "columnFormIPM": {
+              "value": [
+                {
+                  "Number of Nodes": {
+                    "value": "1"
+                  },
+                  "Instance Type": {
+                    "value": "db.t4g.micro"
+                  },
+                  "Deployment Option": {
+                    "value": "Single-AZ"
+                  },
+                  "TermType": {
+                    "value": "OnDemand"
+                  },
+                  "undefined": {
+                    "value": {
+                      "unit": "100",
+                      "selectedId": "%Utilized/Month"
+                    }
+                  }
+                }
+              ]
+            },
+            "storageVolume": {
+              "value": "General Purpose-GP3"
+            },
+            "storageAmount": {
+              "value": "22",
+              "unit": "gb|NA"
+            },
+            "createRDSProxy": {
+              "value": "0"
+            },
+            "DatabaseInsightsSelected": {
+              "value": "0"
+            },
+            "addRDSExtendedSupport": {
+              "value": "0"
+            }
+          },
+          "configSummary": "Nodes (1), Instance Type (db.t4g.micro), Deployment Option (Single-AZ), Pricing Model (OnDemand), Utilization (On-Demand only) (100 %Utilized/Month), Storage volume (General Purpose SSD (gp3)), Storage amount (22 GB)",
+          "serviceCost": {
+            "monthly": 16.07,
+            "upfront": 0
+          }
+        }
+      },
+      "groups": {},
+      "groupSubtotal": {
+        "monthly": 16.07,
+        "upfront": 0
+      },
+      "totalCost": {
+        "monthly": 16.07,
+        "upfront": 0
+      }
+    },
+    "Group 03-482d6bb2-3e4e-4647-b53c-4f6f6fc988ea": {
+      "name": "Group 03",
+      "services": {
+        "amazonRDSPostgreSQLDB-af0e8ae2-8c44-4f34-9cf5-1f24a6588237": {
+          "serviceCode": "amazonRDSPostgreSQLDB",
+          "region": "eu-west-2",
+          "estimateFor": "rdsForPostgreSQL",
+          "description": "PG t4g micro 03",
+          "serviceName": "Amazon RDS for PostgreSQL",
+          "regionName": "Europe (London)",
+          "version": "0.0.111",
+          "calculationComponents": {
+            "columnFormIPM": {
+              "value": [
+                {
+                  "Number of Nodes": {
+                    "value": "1"
+                  },
+                  "Instance Type": {
+                    "value": "db.t4g.micro"
+                  },
+                  "Deployment Option": {
+                    "value": "Single-AZ"
+                  },
+                  "TermType": {
+                    "value": "OnDemand"
+                  },
+                  "undefined": {
+                    "value": {
+                      "unit": "100",
+                      "selectedId": "%Utilized/Month"
+                    }
+                  }
+                }
+              ]
+            },
+            "storageVolume": {
+              "value": "General Purpose-GP3"
+            },
+            "storageAmount": {
+              "value": "23",
+              "unit": "gb|NA"
+            },
+            "createRDSProxy": {
+              "value": "0"
+            },
+            "DatabaseInsightsSelected": {
+              "value": "0"
+            },
+            "addRDSExtendedSupport": {
+              "value": "0"
+            }
+          },
+          "configSummary": "Nodes (1), Instance Type (db.t4g.micro), Deployment Option (Single-AZ), Pricing Model (OnDemand), Utilization (On-Demand only) (100 %Utilized/Month), Storage volume (General Purpose SSD (gp3)), Storage amount (23 GB)",
+          "serviceCost": {
+            "monthly": 16.2,
+            "upfront": 0
+          }
+        }
+      },
+      "groups": {},
+      "groupSubtotal": {
+        "monthly": 16.2,
+        "upfront": 0
+      },
+      "totalCost": {
+        "monthly": 16.2,
+        "upfront": 0
+      }
+    },
+    "Group 04-15f65249-9db8-45d2-8da2-a9cd11be6922": {
+      "name": "Group 04",
+      "services": {
+        "amazonRDSPostgreSQLDB-89c93ba4-bd75-4bb7-ad01-07a8e54e2189": {
+          "serviceCode": "amazonRDSPostgreSQLDB",
+          "region": "eu-west-2",
+          "estimateFor": "rdsForPostgreSQL",
+          "description": "PG t4g micro 04",
+          "serviceName": "Amazon RDS for PostgreSQL",
+          "regionName": "Europe (London)",
+          "version": "0.0.111",
+          "calculationComponents": {
+            "columnFormIPM": {
+              "value": [
+                {
+                  "Number of Nodes": {
+                    "value": "1"
+                  },
+                  "Instance Type": {
+                    "value": "db.t4g.micro"
+                  },
+                  "Deployment Option": {
+                    "value": "Single-AZ"
+                  },
+                  "TermType": {
+                    "value": "OnDemand"
+                  },
+                  "undefined": {
+                    "value": {
+                      "unit": "100",
+                      "selectedId": "%Utilized/Month"
+                    }
+                  }
+                }
+              ]
+            },
+            "storageVolume": {
+              "value": "General Purpose-GP3"
+            },
+            "storageAmount": {
+              "value": "24",
+              "unit": "gb|NA"
+            },
+            "createRDSProxy": {
+              "value": "0"
+            },
+            "DatabaseInsightsSelected": {
+              "value": "0"
+            },
+            "addRDSExtendedSupport": {
+              "value": "0"
+            }
+          },
+          "configSummary": "Nodes (1), Instance Type (db.t4g.micro), Deployment Option (Single-AZ), Pricing Model (OnDemand), Utilization (On-Demand only) (100 %Utilized/Month), Storage volume (General Purpose SSD (gp3)), Storage amount (24 GB)",
+          "serviceCost": {
+            "monthly": 16.33,
+            "upfront": 0
+          }
+        }
+      },
+      "groups": {},
+      "groupSubtotal": {
+        "monthly": 16.33,
+        "upfront": 0
+      },
+      "totalCost": {
+        "monthly": 16.33,
+        "upfront": 0
+      }
+    },
+    "Group 05-fe446f24-acc4-46e5-ab39-43063755f951": {
+      "name": "Group 05",
+      "services": {
+        "amazonRDSPostgreSQLDB-16d40420-215f-4525-afd0-eb32431921b0": {
+          "serviceCode": "amazonRDSPostgreSQLDB",
+          "region": "eu-west-2",
+          "estimateFor": "rdsForPostgreSQL",
+          "description": "PG t4g micro 05",
+          "serviceName": "Amazon RDS for PostgreSQL",
+          "regionName": "Europe (London)",
+          "version": "0.0.111",
+          "calculationComponents": {
+            "columnFormIPM": {
+              "value": [
+                {
+                  "Number of Nodes": {
+                    "value": "1"
+                  },
+                  "Instance Type": {
+                    "value": "db.t4g.micro"
+                  },
+                  "Deployment Option": {
+                    "value": "Single-AZ"
+                  },
+                  "TermType": {
+                    "value": "OnDemand"
+                  },
+                  "undefined": {
+                    "value": {
+                      "unit": "100",
+                      "selectedId": "%Utilized/Month"
+                    }
+                  }
+                }
+              ]
+            },
+            "storageVolume": {
+              "value": "General Purpose-GP3"
+            },
+            "storageAmount": {
+              "value": "25",
+              "unit": "gb|NA"
+            },
+            "createRDSProxy": {
+              "value": "0"
+            },
+            "DatabaseInsightsSelected": {
+              "value": "0"
+            },
+            "addRDSExtendedSupport": {
+              "value": "0"
+            }
+          },
+          "configSummary": "Nodes (1), Instance Type (db.t4g.micro), Deployment Option (Single-AZ), Pricing Model (OnDemand), Utilization (On-Demand only) (100 %Utilized/Month), Storage volume (General Purpose SSD (gp3)), Storage amount (25 GB)",
+          "serviceCost": {
+            "monthly": 16.47,
+            "upfront": 0
+          }
+        }
+      },
+      "groups": {},
+      "groupSubtotal": {
+        "monthly": 16.47,
+        "upfront": 0
+      },
+      "totalCost": {
+        "monthly": 16.47,
+        "upfront": 0
+      }
+    },
+    "Group 06-6e9fcd18-d2a5-463d-8227-832c87739997": {
+      "name": "Group 06",
+      "services": {
+        "amazonRDSPostgreSQLDB-4764a528-bd5f-4bed-8831-8a3a9fac74ca": {
+          "serviceCode": "amazonRDSPostgreSQLDB",
+          "region": "eu-west-2",
+          "estimateFor": "rdsForPostgreSQL",
+          "description": "PG t4g micro 06",
+          "serviceName": "Amazon RDS for PostgreSQL",
+          "regionName": "Europe (London)",
+          "version": "0.0.111",
+          "calculationComponents": {
+            "columnFormIPM": {
+              "value": [
+                {
+                  "Number of Nodes": {
+                    "value": "1"
+                  },
+                  "Instance Type": {
+                    "value": "db.t4g.micro"
+                  },
+                  "Deployment Option": {
+                    "value": "Single-AZ"
+                  },
+                  "TermType": {
+                    "value": "OnDemand"
+                  },
+                  "undefined": {
+                    "value": {
+                      "unit": "100",
+                      "selectedId": "%Utilized/Month"
+                    }
+                  }
+                }
+              ]
+            },
+            "storageVolume": {
+              "value": "General Purpose-GP3"
+            },
+            "storageAmount": {
+              "value": "26",
+              "unit": "gb|NA"
+            },
+            "createRDSProxy": {
+              "value": "0"
+            },
+            "DatabaseInsightsSelected": {
+              "value": "0"
+            },
+            "addRDSExtendedSupport": {
+              "value": "0"
+            }
+          },
+          "configSummary": "Nodes (1), Instance Type (db.t4g.micro), Deployment Option (Single-AZ), Pricing Model (OnDemand), Utilization (On-Demand only) (100 %Utilized/Month), Storage volume (General Purpose SSD (gp3)), Storage amount (26 GB)",
+          "serviceCost": {
+            "monthly": 16.6,
+            "upfront": 0
+          }
+        }
+      },
+      "groups": {},
+      "groupSubtotal": {
+        "monthly": 16.6,
+        "upfront": 0
+      },
+      "totalCost": {
+        "monthly": 16.6,
+        "upfront": 0
+      }
+    },
+    "Group 07-59766c53-d93d-4885-858c-363bb51cf506": {
+      "name": "Group 07",
+      "services": {
+        "amazonRDSPostgreSQLDB-6d19d936-9423-4cea-9f28-30f741d62487": {
+          "serviceCode": "amazonRDSPostgreSQLDB",
+          "region": "eu-west-2",
+          "estimateFor": "rdsForPostgreSQL",
+          "description": "PG t4g micro 07",
+          "serviceName": "Amazon RDS for PostgreSQL",
+          "regionName": "Europe (London)",
+          "version": "0.0.111",
+          "calculationComponents": {
+            "columnFormIPM": {
+              "value": [
+                {
+                  "Number of Nodes": {
+                    "value": "1"
+                  },
+                  "Instance Type": {
+                    "value": "db.t4g.micro"
+                  },
+                  "Deployment Option": {
+                    "value": "Single-AZ"
+                  },
+                  "TermType": {
+                    "value": "OnDemand"
+                  },
+                  "undefined": {
+                    "value": {
+                      "unit": "100",
+                      "selectedId": "%Utilized/Month"
+                    }
+                  }
+                }
+              ]
+            },
+            "storageVolume": {
+              "value": "General Purpose-GP3"
+            },
+            "storageAmount": {
+              "value": "27",
+              "unit": "gb|NA"
+            },
+            "createRDSProxy": {
+              "value": "0"
+            },
+            "DatabaseInsightsSelected": {
+              "value": "0"
+            },
+            "addRDSExtendedSupport": {
+              "value": "0"
+            }
+          },
+          "configSummary": "Nodes (1), Instance Type (db.t4g.micro), Deployment Option (Single-AZ), Pricing Model (OnDemand), Utilization (On-Demand only) (100 %Utilized/Month), Storage volume (General Purpose SSD (gp3)), Storage amount (27 GB)",
+          "serviceCost": {
+            "monthly": 16.73,
+            "upfront": 0
+          }
+        }
+      },
+      "groups": {},
+      "groupSubtotal": {
+        "monthly": 16.73,
+        "upfront": 0
+      },
+      "totalCost": {
+        "monthly": 16.73,
+        "upfront": 0
+      }
+    },
+    "Group 08-8bd23538-bf86-45a3-8174-bd7df3170f52": {
+      "name": "Group 08",
+      "services": {
+        "amazonRDSPostgreSQLDB-9bcc131f-9bbf-4ddb-ba72-e87b6149a285": {
+          "serviceCode": "amazonRDSPostgreSQLDB",
+          "region": "eu-west-2",
+          "estimateFor": "rdsForPostgreSQL",
+          "description": "PG t4g micro 08",
+          "serviceName": "Amazon RDS for PostgreSQL",
+          "regionName": "Europe (London)",
+          "version": "0.0.111",
+          "calculationComponents": {
+            "columnFormIPM": {
+              "value": [
+                {
+                  "Number of Nodes": {
+                    "value": "1"
+                  },
+                  "Instance Type": {
+                    "value": "db.t4g.micro"
+                  },
+                  "Deployment Option": {
+                    "value": "Single-AZ"
+                  },
+                  "TermType": {
+                    "value": "OnDemand"
+                  },
+                  "undefined": {
+                    "value": {
+                      "unit": "100",
+                      "selectedId": "%Utilized/Month"
+                    }
+                  }
+                }
+              ]
+            },
+            "storageVolume": {
+              "value": "General Purpose-GP3"
+            },
+            "storageAmount": {
+              "value": "28",
+              "unit": "gb|NA"
+            },
+            "createRDSProxy": {
+              "value": "0"
+            },
+            "DatabaseInsightsSelected": {
+              "value": "0"
+            },
+            "addRDSExtendedSupport": {
+              "value": "0"
+            }
+          },
+          "configSummary": "Nodes (1), Instance Type (db.t4g.micro), Deployment Option (Single-AZ), Pricing Model (OnDemand), Utilization (On-Demand only) (100 %Utilized/Month), Storage volume (General Purpose SSD (gp3)), Storage amount (28 GB)",
+          "serviceCost": {
+            "monthly": 16.86,
+            "upfront": 0
+          }
+        }
+      },
+      "groups": {},
+      "groupSubtotal": {
+        "monthly": 16.86,
+        "upfront": 0
+      },
+      "totalCost": {
+        "monthly": 16.86,
+        "upfront": 0
+      }
+    },
+    "Group 09-1d2f1dce-699f-4caf-8eb0-bd277678d314": {
+      "name": "Group 09",
+      "services": {
+        "amazonRDSPostgreSQLDB-e0be9e15-7057-4169-aee1-58ac6870c081": {
+          "serviceCode": "amazonRDSPostgreSQLDB",
+          "region": "eu-west-2",
+          "estimateFor": "rdsForPostgreSQL",
+          "description": "PG t4g micro 09",
+          "serviceName": "Amazon RDS for PostgreSQL",
+          "regionName": "Europe (London)",
+          "version": "0.0.111",
+          "calculationComponents": {
+            "columnFormIPM": {
+              "value": [
+                {
+                  "Number of Nodes": {
+                    "value": "1"
+                  },
+                  "Instance Type": {
+                    "value": "db.t4g.micro"
+                  },
+                  "Deployment Option": {
+                    "value": "Single-AZ"
+                  },
+                  "TermType": {
+                    "value": "OnDemand"
+                  },
+                  "undefined": {
+                    "value": {
+                      "unit": "100",
+                      "selectedId": "%Utilized/Month"
+                    }
+                  }
+                }
+              ]
+            },
+            "storageVolume": {
+              "value": "General Purpose-GP3"
+            },
+            "storageAmount": {
+              "value": "29",
+              "unit": "gb|NA"
+            },
+            "createRDSProxy": {
+              "value": "0"
+            },
+            "DatabaseInsightsSelected": {
+              "value": "0"
+            },
+            "addRDSExtendedSupport": {
+              "value": "0"
+            }
+          },
+          "configSummary": "Nodes (1), Instance Type (db.t4g.micro), Deployment Option (Single-AZ), Pricing Model (OnDemand), Utilization (On-Demand only) (100 %Utilized/Month), Storage volume (General Purpose SSD (gp3)), Storage amount (29 GB)",
+          "serviceCost": {
+            "monthly": 17,
+            "upfront": 0
+          }
+        }
+      },
+      "groups": {},
+      "groupSubtotal": {
+        "monthly": 17,
+        "upfront": 0
+      },
+      "totalCost": {
+        "monthly": 17,
+        "upfront": 0
+      }
+    },
+    "Group 10-fabd1735-abc9-4fae-820e-a158e1dd1158": {
+      "name": "Group 10",
+      "services": {
+        "amazonRDSPostgreSQLDB-1c86d44c-9357-4e0e-aa1f-f112e4e5b608": {
+          "serviceCode": "amazonRDSPostgreSQLDB",
+          "region": "eu-west-2",
+          "estimateFor": "rdsForPostgreSQL",
+          "description": "PG t4g micro 10",
+          "serviceName": "Amazon RDS for PostgreSQL",
+          "regionName": "Europe (London)",
+          "version": "0.0.111",
+          "calculationComponents": {
+            "columnFormIPM": {
+              "value": [
+                {
+                  "Number of Nodes": {
+                    "value": "1"
+                  },
+                  "Instance Type": {
+                    "value": "db.t4g.micro"
+                  },
+                  "Deployment Option": {
+                    "value": "Single-AZ"
+                  },
+                  "TermType": {
+                    "value": "OnDemand"
+                  },
+                  "undefined": {
+                    "value": {
+                      "unit": "100",
+                      "selectedId": "%Utilized/Month"
+                    }
+                  }
+                }
+              ]
+            },
+            "storageVolume": {
+              "value": "General Purpose-GP3"
+            },
+            "storageAmount": {
+              "value": "30",
+              "unit": "gb|NA"
+            },
+            "createRDSProxy": {
+              "value": "0"
+            },
+            "DatabaseInsightsSelected": {
+              "value": "0"
+            },
+            "addRDSExtendedSupport": {
+              "value": "0"
+            }
+          },
+          "configSummary": "Nodes (1), Instance Type (db.t4g.micro), Deployment Option (Single-AZ), Pricing Model (OnDemand), Utilization (On-Demand only) (100 %Utilized/Month), Storage volume (General Purpose SSD (gp3)), Storage amount (30 GB)",
+          "serviceCost": {
+            "monthly": 17.13,
+            "upfront": 0
+          }
+        }
+      },
+      "groups": {},
+      "groupSubtotal": {
+        "monthly": 17.13,
+        "upfront": 0
+      },
+      "totalCost": {
+        "monthly": 17.13,
+        "upfront": 0
+      }
+    },
+    "Group 11-15223e3d-cf4d-4ace-a9d0-36f5fe573cb6": {
+      "name": "Group 11",
+      "services": {
+        "amazonRDSPostgreSQLDB-969f89a3-2a56-44fa-85c2-a5ae1097a1bf": {
+          "serviceCode": "amazonRDSPostgreSQLDB",
+          "region": "eu-west-2",
+          "estimateFor": "rdsForPostgreSQL",
+          "description": "PG t4g micro 11",
+          "serviceName": "Amazon RDS for PostgreSQL",
+          "regionName": "Europe (London)",
+          "version": "0.0.111",
+          "calculationComponents": {
+            "columnFormIPM": {
+              "value": [
+                {
+                  "Number of Nodes": {
+                    "value": "1"
+                  },
+                  "Instance Type": {
+                    "value": "db.t4g.micro"
+                  },
+                  "Deployment Option": {
+                    "value": "Single-AZ"
+                  },
+                  "TermType": {
+                    "value": "OnDemand"
+                  },
+                  "undefined": {
+                    "value": {
+                      "unit": "100",
+                      "selectedId": "%Utilized/Month"
+                    }
+                  }
+                }
+              ]
+            },
+            "storageVolume": {
+              "value": "General Purpose-GP3"
+            },
+            "storageAmount": {
+              "value": "31",
+              "unit": "gb|NA"
+            },
+            "createRDSProxy": {
+              "value": "0"
+            },
+            "DatabaseInsightsSelected": {
+              "value": "0"
+            },
+            "addRDSExtendedSupport": {
+              "value": "0"
+            }
+          },
+          "configSummary": "Nodes (1), Instance Type (db.t4g.micro), Deployment Option (Single-AZ), Pricing Model (OnDemand), Utilization (On-Demand only) (100 %Utilized/Month), Storage volume (General Purpose SSD (gp3)), Storage amount (31 GB)",
+          "serviceCost": {
+            "monthly": 17.26,
+            "upfront": 0
+          }
+        }
+      },
+      "groups": {},
+      "groupSubtotal": {
+        "monthly": 17.26,
+        "upfront": 0
+      },
+      "totalCost": {
+        "monthly": 17.26,
+        "upfront": 0
+      }
+    },
+    "Group 12-795c3cf0-3bd7-41ac-9dfd-abb00d186107": {
+      "name": "Group 12",
+      "services": {
+        "amazonRDSPostgreSQLDB-b5986a81-ac3c-4ac2-a650-2a03f43971b5": {
+          "serviceCode": "amazonRDSPostgreSQLDB",
+          "region": "eu-west-2",
+          "estimateFor": "rdsForPostgreSQL",
+          "description": "PG t4g micro 12",
+          "serviceName": "Amazon RDS for PostgreSQL",
+          "regionName": "Europe (London)",
+          "version": "0.0.111",
+          "calculationComponents": {
+            "columnFormIPM": {
+              "value": [
+                {
+                  "Number of Nodes": {
+                    "value": "1"
+                  },
+                  "Instance Type": {
+                    "value": "db.t4g.micro"
+                  },
+                  "Deployment Option": {
+                    "value": "Single-AZ"
+                  },
+                  "TermType": {
+                    "value": "OnDemand"
+                  },
+                  "undefined": {
+                    "value": {
+                      "unit": "100",
+                      "selectedId": "%Utilized/Month"
+                    }
+                  }
+                }
+              ]
+            },
+            "storageVolume": {
+              "value": "General Purpose-GP3"
+            },
+            "storageAmount": {
+              "value": "32",
+              "unit": "gb|NA"
+            },
+            "createRDSProxy": {
+              "value": "0"
+            },
+            "DatabaseInsightsSelected": {
+              "value": "0"
+            },
+            "addRDSExtendedSupport": {
+              "value": "0"
+            }
+          },
+          "configSummary": "Nodes (1), Instance Type (db.t4g.micro), Deployment Option (Single-AZ), Pricing Model (OnDemand), Utilization (On-Demand only) (100 %Utilized/Month), Storage volume (General Purpose SSD (gp3)), Storage amount (32 GB)",
+          "serviceCost": {
+            "monthly": 17.4,
+            "upfront": 0
+          }
+        }
+      },
+      "groups": {},
+      "groupSubtotal": {
+        "monthly": 17.4,
+        "upfront": 0
+      },
+      "totalCost": {
+        "monthly": 17.4,
+        "upfront": 0
+      }
+    }
+  },
+  "groupSubtotal": {},
+  "totalCost": {
+    "monthly": 199.98,
+    "upfront": 0
+  },
+  "support": {},
+  "metaData": {
+    "locale": "en_US",
+    "currency": "USD",
+    "createdOn": "2026-10-16T07:59:19.397Z",
+    "source": "calculator-platform",
+    "estimateId": "d9d8c2929bba49c20d69da798560c31626438cfe"
+  }
+}

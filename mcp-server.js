@@ -12,7 +12,7 @@ const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio
 const { z } = require('zod');
 const path = require('node:path');
 
-const { PARTITIONS, loadManifest, findService, fetchServiceDefinition, extractInputFields, searchServices, fetchEstimate, estimateToMarkdown } = require('./lib/aws/aws-client');
+const { PARTITIONS, loadManifest, findService, fetchServiceDefinition, extractInputFields, searchServices, fetchEstimate, estimateToMarkdown, extractCostsFromSavedBlob } = require('./lib/aws/aws-client');
 const EstimateBuilder = require('./lib/aws/estimate-builder');
 const { createEstimateStore } = require('./lib/store/estimate-store');
 const { loadCatalog } = require('./lib/lint/catalog');
@@ -21,7 +21,7 @@ const { traceTool } = require('./lib/trace/trace-logger');
 const traceEvents = require('./lib/trace/trace-events');
 const { runWithSession } = require('./lib/trace/request-context');
 const { createHandlerHelpers, mcpJsonOk, mcpTextErr, checkPartition, parseServicesArg } = require('./lib/mcp/handler-helpers');
-const { fetchCostFromDOM, checkPlaywrightAvailability } = require('./lib/dom-cost');
+const { fetchPricedEstimateId, checkPlaywrightAvailability } = require('./lib/dom-cost');
 const desc = require('./lib/mcp/tool-descriptions');
 
 // CALCMCP_CATALOG_DIR is an eval-only override — the eval harness uses
@@ -404,36 +404,48 @@ async function getEstimateCostHandler({ estimate_id }) {
     });
   }
 
-  // fetchCostFromDOM wants a URL. Pass a full URL through unchanged (so an
-  // ESC pricing.calculator.aws.eu link works); turn a bare id into the
-  // standard calculator URL, matching import_estimate's default.
+  // A full URL passes through unchanged (so an ESC pricing.calculator.aws.eu
+  // link works); a bare id becomes the standard calculator URL, matching
+  // import_estimate's default. ESC links read from the aws-eusc partition.
   const url = /^https?:\/\//.test(estimate_id)
     ? estimate_id
     : `https://calculator.aws/#/estimate?id=${estimate_id}`;
+  const partition = url.includes('pricing.calculator.aws.eu') ? 'aws-eusc' : undefined;
 
   try {
-    const cost = await fetchCostFromDOM(url);
+    // Re-share through the UI so the calculator persists its computed
+    // costs (Update estimate → Share → new id), then read that id's
+    // saved blob — which carries full per-line + total costs, complete
+    // and un-paginated. This avoids the DOM scrape (10-row pagination)
+    // and the Export file download (which does not work headless).
+    const { estimateId: pricedId, shareUrl } = await fetchPricedEstimateId(url);
+    const data = await fetchEstimate(pricedId, { partition });
+    const cost = extractCostsFromSavedBlob(data);
     const out = {
       cost_available: true,
       source_url: url,
-      currency: 'USD',
+      priced_estimate_url: shareUrl || null,
+      currency: partition === 'aws-eusc' ? 'EUR' : 'USD',
+      pricing_as_of: cost.pricingAsOf,
+      upfront_cost: cost.upfrontCost,
       monthly_cost: cost.monthlyCost,
+      total_12_months_cost: cost.twelveMonthCost,
+      total_12_months_is_derived: true,
       rows: cost.rows,
       rows_total: cost.rowsTotal,
+      rows_complete: cost.rowsComplete,
     };
-    // The summary monthly_cost is computed from the calculator's in-memory
-    // state; per-row values are scraped from the table and can render
-    // stale/$0 until a recompute (issue #13). When they disagree, flag it
-    // and tell the caller not to trust per-row attribution.
+    // rows_total (sum of per-line monthly) should equal monthly_cost. A
+    // disagreement means some lines didn't carry costs; monthly_cost (the
+    // saved total) is authoritative.
     if (
       cost.rowsTotal != null &&
       cost.monthlyCost != null &&
       Math.abs(cost.rowsTotal - cost.monthlyCost) > 0.01
     ) {
       out.note =
-        'Per-row totals disagree with the summary monthly_cost. monthly_cost is ' +
-        'authoritative; do not attribute per-row costs (a row can render stale/$0 ' +
-        'until the calculator recomputes).';
+        'Per-row totals do not sum to monthly_cost — some lines may lack costs. ' +
+        'monthly_cost / total_12_months_cost (the saved totals) are authoritative.';
     }
     return mcpJsonOk(out);
   } catch (err) {
@@ -447,7 +459,7 @@ server.tool(
   {
     estimate_id: z.string().describe('A full estimate URL or a bare ID. A bare ID is read from the standard calculator.aws; pass the full pricing.calculator.aws.eu URL for an ESC estimate.'),
   },
-  { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true },
+  { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
   traceTool('get_estimate_cost', getEstimateCostHandler)
 );
 

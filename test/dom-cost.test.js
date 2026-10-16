@@ -137,7 +137,7 @@ describe('parseUsd', () => {
   });
 });
 
-const { classifyPlaywright, checkPlaywrightAvailability } = require('../lib/dom-cost');
+const { classifyPlaywright, checkPlaywrightAvailability} = require('../lib/dom-cost');
 
 describe('classifyPlaywright (on-demand dependency preflight)', () => {
   it('reports playwright-missing when the module is absent', () => {
@@ -182,3 +182,5 @@ describe('classifyPlaywright (on-demand dependency preflight)', () => {
     }
   });
 });
+
+

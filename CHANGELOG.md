@@ -2,6 +2,11 @@
 
 All notable changes to the AWS Pricing Calculator MCP server are documented here.
 
+## [1.3.4] - 2026-10-15
+
+- Improved `get_estimate_cost behaviour [#47](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/issues/47)
+- Fixed Issue [#48](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/issues/48)
+
 ## [1.3.3] - 2026-10-09
 
 - Fixed Issue [#40](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/issues/40)
