@@ -2,6 +2,10 @@
 
 All notable changes to the AWS Pricing Calculator MCP server are documented here.
 
+## [1.3.7] - 2026-11-09
+
+- Fixed hint for DB Savings Plans (1yr only)
+
 ## [1.3.6] - 2026-11-09
 
 - Added hint for DB Savings Plans (7th+ gen only)

@@ -2,15 +2,16 @@
 // SPDX-License-Identifier: MIT-0
 
 /**
- * Regression tests for the Database Savings Plans generation-eligibility
- * gap:
+ * Regression tests for the Database Savings Plans eligibility/term gap:
  *
  *   AWS Database Savings Plans are only sold on Gen 7+ instance families
  *   (m7g/r7g, m8g/r8g, m9g, ...). T-class (t3, t4g) and anything Gen 6 or
  *   older (m5, r5, m6, r6, ...) are NOT eligible at all, on any RDS/Aurora
- *   engine. The column-form tuple-validity lint (issue #41) can't catch an
- *   ineligible pick because the per-instance selector aggregation only
- *   tracks OnDemand/Reserved tuples, so a "Database Savings Plans"
+ *   engine. They are also only sold as a 1-year term — there is no 3-year
+ *   Database Savings Plan (LeaseContractLength "3yr" does not exist for
+ *   this TermType). The column-form tuple-validity lint (issue #41) can't
+ *   catch either violation because the per-instance selector aggregation
+ *   only tracks OnDemand/Reserved tuples, so a "Database Savings Plans"
  *   TermType is dropped from the comparison rather than checked against
  *   it — the row saves and rehydrates without error but silently
  *   misprices.
@@ -141,6 +142,8 @@ describe('buildFieldsResult — pricingModelHint (get_service_fields)', () => {
     assert.ok(out, 'expected a result');
     assert.match(out.pricingModelHint, /Database Savings Plans/);
     assert.match(out.pricingModelHint, /Gen 7\+/);
+    assert.match(out.pricingModelHint, /1-year term/);
+    assert.match(out.pricingModelHint, /no 3-year/i);
   });
 
   it('omits the hint for a non-RDS service', async () => {
@@ -183,6 +186,7 @@ describe('addEntries — pricing_model_hint (add_service)', () => {
     assert.equal(results[0].success, true);
     assert.match(results[0].pricing_model_hint || '', /Database Savings Plans/);
     assert.match(results[0].pricing_model_hint || '', /Gen 7\+/);
+    assert.match(results[0].pricing_model_hint || '', /1-year term/);
   });
 
   it('does not flag an RDS entry on OnDemand/Reserved pricing', async () => {
