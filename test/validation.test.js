@@ -657,6 +657,51 @@ describe('validateConfigKeys', () => {
     assert.deepEqual(r.missingRequired, ['mustHave']);
   });
 
+  it('issue #55: catalog required[] for one template must not flag missingRequired on another when estimateFor override is passed', async () => {
+    // Mirrors amazonElasticsearchService: the catalog entry targets the
+    // provisioned 'tmpl' template and requires 'numberOfInstances', but
+    // the entry is actually being saved under the serverless
+    // 'tmpl-serverless' template, which has no such field. Without
+    // threading the real target template through, this check always
+    // resolves the catalog's templateId and wrongly reports
+    // numberOfInstances as missing for every template.
+    const FAKE_MANIFEST_ES = {
+      awsServices: [
+        { key: 'amazonElasticsearchService', name: 'Amazon OpenSearch Service', serviceCode: 'amazonElasticsearchService' },
+      ],
+    };
+    const DEF = {
+      version: '1.0.0',
+      serviceCode: 'amazonElasticsearchService',
+      templates: [
+        { id: 'tmpl', cards: [{ inputSection: { components: [
+          { id: 'numberOfInstances', type: 'numericInput' },
+        ]}}] },
+        { id: 'tmpl-serverless', cards: [{ inputSection: { components: [
+          { id: 'indexingOCUs', type: 'numericInput' },
+        ]}}] },
+      ],
+    };
+    mockFetch([
+      ['manifest/en_US.json', FAKE_MANIFEST_ES],
+      ['data/amazonElasticsearchService', DEF],
+    ]);
+    const catalog = new Map([
+      ['amazonElasticsearchService', {
+        serviceCode: 'amazonElasticsearchService',
+        templateId: 'tmpl',
+        required: [{ field: 'numberOfInstances' }],
+      }],
+    ]);
+    const { validateConfigKeys } = require('../lib/lint/validation');
+    const r = await validateConfigKeys('amazonElasticsearchService', {
+      region: 'us-east-1',
+      indexingOCUs: '1',
+    }, 'aws', catalog, 'tmpl-serverless');
+    assert.equal(r.error, null);
+    assert.equal(r.missingRequired, undefined);
+  });
+
   // Production regression 2026-06-07: validateConfigKeys had an
   // unconditional early return for `ec2Enhancement` that bypassed all
   // checks (field-name validity, value shape, required-field-presence).

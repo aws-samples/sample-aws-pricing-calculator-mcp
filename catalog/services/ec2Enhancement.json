@@ -36,7 +36,8 @@
     "The dataTransferForEC2 field is a composite widget. Its value must be an array of transfer entries, each with entryType, value, unit, and a region field. Valid entryTypes: INBOUND, OUTBOUND, INTRA_REGION.",
     "Unit must be \"tb_month\" or \"gb_month\".",
     "OUTBOUND entries require a \"toRegion\" field — use \"External\" for internet or \"other\" for other AWS regions. INBOUND entries require a \"fromRegion\" field with the same options. INTRA_REGION requires neither.",
-    "All three entryTypes (INBOUND, OUTBOUND, INTRA_REGION) must be present in the array even if their value is \"0\"."
+    "All three entryTypes (INBOUND, OUTBOUND, INTRA_REGION) must be present in the array even if their value is \"0\".",
+    "tenancy is a dropdown with exactly three valid values: \"shared\" (default — used automatically whenever tenancy is omitted), \"dedicated\", \"host\". There is no validations.required on it, so nothing errors if you omit it — but if the user asks for 'Dedicated Instances' or 'Dedicated Host' pricing and you don't explicitly set tenancy, the estimate silently prices as Shared instead (usually cheaper, and not what was asked for; no lint predicate catches this because the saved blob is structurally valid). tenancy also gates which Reserved Instance models are visible (see the Reserved/Convertible trap above) and, when tenancy is \"host\", EstimateBuilder auto-promotes the plain EBS storage fields (storageType, storageAmount, gp3Iops, gp3Throughput, iops, iops2, storageAmountIo2) into their *DH equivalents (storageTypeDH, storageAmountDH, gp3IopsDH, gp3ThroughputDH, iopsDH, iops2DH) and drops the plain fields from the saved blob — set the plain field names as usual, you don't need the *DH names yourself. Don't set both a plain field and its *DH counterpart for host tenancy: an explicitly-set *DH field always wins over the auto-promoted value, so a stray *DH value (e.g. left over from reusing a config) silently overrides the plain field you intended."
   ],
   "minimalConfig": {
     "region": "us-east-1",
@@ -44,6 +45,7 @@
     "instanceType": "m5.large",
     "workload": 1,
     "selectedOS": "linux",
+    "tenancy": "shared",
     "pricingStrategy": "ondemand"
   },
   "defaultFields": {

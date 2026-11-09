@@ -503,6 +503,107 @@ describe('canRehydrate — catalog-required-field presence', () => {
     assert.equal(childFailures.length, 1);
     assert.equal(childFailures[0].context.componentId, 'regionalNatGatewayDataProcessed');
   });
+
+  it('does not promote catalog required[] onto a template other than the catalog templateId (issue #55)', () => {
+    // amazonElasticsearchService's catalog entry is curated against the
+    // 'elasticSearchService' (provisioned) template and requires
+    // numberOfInstances/storageType. A saved entry using the
+    // 'elasticSearchService-serverlesss' template doesn't have those
+    // fields at all — promoting the catalog required[] onto it would
+    // make required-field-presence and unknown-field-id contradict
+    // each other (one demands the fields, the other rejects them).
+    const esCatalog = new Map([
+      ['amazonElasticsearchService', {
+        serviceCode: 'amazonElasticsearchService',
+        templateId: 'elasticSearchService',
+        required: [
+          { field: 'numberOfInstances' },
+          { field: 'storageType' },
+        ],
+      }],
+    ]);
+    const esDef = {
+      serviceCode: 'amazonElasticsearchService',
+      templates: [
+        { id: 'elasticSearchService', inputSections: [] },
+        {
+          id: 'elasticSearchService-serverlesss',
+          inputSections: [{
+            components: [
+              { id: 'How_many_Indexing_OCUs' },
+              { id: 'How_many_Search_and_Query_OCUs' },
+              { id: 'How_big_is_the_index_data' },
+            ],
+          }],
+        },
+      ],
+    };
+    const blob = {
+      services: {
+        s1: {
+          serviceCode: 'amazonElasticsearchService',
+          estimateFor: 'elasticSearchService-serverlesss',
+          calculationComponents: {
+            How_many_Indexing_OCUs: { value: '1' },
+            How_many_Search_and_Query_OCUs: { value: '1' },
+            How_big_is_the_index_data: { value: '2', unit: 'gb|NA' },
+          },
+        },
+      },
+    };
+    const r = canRehydrate({
+      savedBlob: blob,
+      manifest: new Map(),
+      perServiceDefinitions: new Map([['amazonElasticsearchService', esDef]]),
+      catalog: esCatalog,
+    });
+    assert.equal(r.status, 'editable');
+    assert.equal(r.services[0].failures.length, 0);
+  });
+
+  it('still promotes catalog required[] when the saved entry uses the catalog templateId', () => {
+    // Regression guard: the template-match filter must not disable the
+    // catalog required[] check for the template it was actually curated
+    // against (the provisioned OpenSearch template, in this case).
+    const esCatalog = new Map([
+      ['amazonElasticsearchService', {
+        serviceCode: 'amazonElasticsearchService',
+        templateId: 'elasticSearchService',
+        required: [
+          { field: 'numberOfInstances' },
+          { field: 'storageType' },
+        ],
+      }],
+    ]);
+    const esDef = {
+      serviceCode: 'amazonElasticsearchService',
+      templates: [
+        { id: 'elasticSearchService', inputSections: [] },
+      ],
+    };
+    const blob = {
+      services: {
+        s1: {
+          serviceCode: 'amazonElasticsearchService',
+          estimateFor: 'elasticSearchService',
+          calculationComponents: {
+            numberOfInstances: { value: '1' },
+            // storageType omitted — must still be flagged.
+          },
+        },
+      },
+    };
+    const r = canRehydrate({
+      savedBlob: blob,
+      manifest: new Map(),
+      perServiceDefinitions: new Map([['amazonElasticsearchService', esDef]]),
+      catalog: esCatalog,
+    });
+    assert.equal(r.status, 'required-input');
+    const failures = r.services[0].failures;
+    assert.equal(failures.length, 1);
+    assert.equal(failures[0].context.componentId, 'storageType');
+  });
 });
 
 describe('canRehydrate — math-operand-required walk', () => {
