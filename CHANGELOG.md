@@ -2,6 +2,11 @@
 
 All notable changes to the AWS Pricing Calculator MCP server are documented here.
 
+## [1.3.8] - 2026-11-13
+
+- Fixed Issue [#57](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/issues/57)
+- Fixed Issue [#58](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp/issues/58)
+
 ## [1.3.7] - 2026-11-09
 
 - Fixed hint for DB Savings Plans (1yr only)
