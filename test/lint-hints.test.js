@@ -361,6 +361,11 @@ describe('nextStepFor', () => {
     });
     assert.match(out, /fakeService/);
     assert.match(out, /search_services/);
+    // Issue #58: the message used to assert the code "is not in the
+    // manifest", which is wrong for a valid code whose definition fetch
+    // was simply skipped (e.g. nested-group walker bug, transient
+    // network error). Must not overclaim that the code itself is bad.
+    assert.doesNotMatch(out, /is not in the manifest/);
   });
 
   it('appends a count when there are multiple failures', () => {

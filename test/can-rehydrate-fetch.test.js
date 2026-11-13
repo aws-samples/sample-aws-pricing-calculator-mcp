@@ -115,6 +115,53 @@ describe('canRehydrateFetch', () => {
     assert.deepEqual(fetched, ['aWSLambda']);
   });
 
+  it('walks services inside a NESTED group (groups[*].groups[*].services) — issue #58', async () => {
+    // Before the fix, iterateBlobServices only descended one level of
+    // groups, so a service that exists only under "Parent/Child" (a
+    // group nested inside another group) never got its definition
+    // fetched. canRehydrate then reported it as unknown/
+    // definition-unavailable even though the service code is valid.
+    const fakeManifest = new Map([
+      ['amazonS3Standard', { key: 'amazonS3Standard' }],
+    ]);
+    const fakeDef = {
+      serviceCode: 'amazonS3Standard',
+      templates: [{ id: 's3-template-1' }],
+    };
+    const fetched = [];
+    const fakeAwsClient = {
+      loadManifest: mock.fn(async () => fakeManifest),
+      fetchServiceDefinition: mock.fn(async (_m, code) => {
+        fetched.push(code);
+        return code === 'amazonS3Standard' ? fakeDef : null;
+      }),
+    };
+    require.cache[require.resolve('../lib/aws/aws-client')] = { exports: fakeAwsClient };
+
+    canRehydrateFetch = require('../lib/lint/can-rehydrate-fetch').canRehydrateFetch;
+
+    const r = await canRehydrateFetch({
+      savedBlob: {
+        services: {},
+        groups: {
+          Parent: {
+            services: {},
+            groups: {
+              Child: {
+                services: {
+                  s1: { serviceCode: 'amazonS3Standard', estimateFor: 's3-template-1', calculationComponents: {} },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    assert.deepEqual(fetched, ['amazonS3Standard']);
+    assert.equal(r.status, 'editable',
+      `nested-group service must lint as editable once its definition is fetched; got ${r.status}`);
+  });
+
   it('wires selector aggregations for a columnFormIPM SUB-SERVICE using region CODE (no regionName)', async () => {
     // Reality: columnFormIPM services like workSpacesCore are sub-services
     // nested under a parent envelope. The sub-service node carries `region`
